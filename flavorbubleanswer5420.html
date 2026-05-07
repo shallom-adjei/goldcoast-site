@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Gold Coast Capital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0a0a12; color: white; }
+    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+    .hidden { display: none; }
+    .flex { display: flex; }
+    .status-pending { color: #fbbf24; }
+    .status-active { color: #34d399; }
+    .status-matured { color: #60a5fa; }
+    .gradient-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.text-dark-950 { color: #0a0a12; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <div id="gate-screen" class="flex-grow flex items-center justify-center px-4">
+  <div class="glass rounded-2xl p-8 w-full max-w-md text-center">
+    <h2 class="text-lg font-semibold mb-4">Admin Access</h2>
+    <input type="password" id="gate-pass" placeholder="Enter access code" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-4">
+    <button onclick="checkGatePass()" class="w-full bg-yellow-600 text-black font-semibold py-3 rounded-xl">Submit</button>
+    <p id="gate-error" class="text-red-400 text-sm mt-2 hidden">Incorrect code</p>
+  </div>
+</div>
+
+<script>
+  const GATE_PASS = "Midnightolddrysong";   // change this!
+  function checkGatePass() {
+    const input = document.getElementById('gate-pass').value;
+    if (input === GATE_PASS) {
+      document.getElementById('gate-screen').remove();
+      document.getElementById('login-screen').classList.remove('hidden');
+    } else {
+      document.getElementById('gate-error').classList.remove('hidden');
+    }
+  }
+</script>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="hidden flex-grow flex items-center justify-center px-4">
+    <div class="glass rounded-2xl p-8 w-full max-w-md">
+      <h1 class="text-2xl font-bold mb-6 text-center">Admin Login</h1>
+      <form id="login-form" class="space-y-4">
+        <div><label class="block text-sm mb-1">Email</label><input type="email" id="login-email" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+        <div class="relative">
+  <label class="block text-sm mb-1">Password</label>
+  <input type="password" id="login-password" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+  <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-8 text-gray-400 hover:text-white">
+    <i data-lucide="eye" class="w-5 h-5"></i>
+  </button>
+</div>
+        <button type="submit" class="w-full bg-yellow-600 text-black font-semibold py-3 rounded-xl">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard-screen" class="hidden flex-grow p-6">
+    <nav class="glass rounded-xl p-4 mb-6 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <i data-lucide="shield" class="w-6 h-6 text-yellow-400"></i>
+        <span class="font-bold text-lg">Gold Coast Admin</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="openPasswordModal()" class="text-yellow-400 hover:text-yellow-300 flex items-center gap-1"><i data-lucide="key" class="w-5 h-5"></i> Change Password</button>
+        <button onclick="logout()" class="text-gray-400 hover:text-white flex items-center gap-2"><i data-lucide="log-out" class="w-5 h-5"></i> Logout</button>
+      </div>
+    </nav>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+    <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Total Users</p><p class="text-3xl font-bold mt-2" id="stat-users">0</p></div>
+    <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Total Investments</p><p class="text-3xl font-bold mt-2" id="stat-investments">0</p></div>
+    <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Total Amount</p><p class="text-3xl font-bold mt-2" id="stat-total">0</p></div>
+    <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Payout Requests</p><p class="text-3xl font-bold mt-2" id="stat-withdrawals">0</p></div>
+    <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Total Paid</p><p class="text-3xl font-bold mt-2" id="stat-paid-amount">0</p><p class="text-xs text-gray-400 mt-1" id="stat-paid-count">0 payouts</p></div>
+</div>
+
+    <!-- Tabs -->
+    <div class="flex gap-4 mb-6">
+      <button onclick="showTab('users')" id="tab-users" class="px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400 font-medium">Users</button>
+      <button onclick="showTab('investments')" id="tab-investments" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Investments</button>
+      <button onclick="showTab('withdrawals')" id="tab-withdrawals" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Withdrawals</button>
+      <button onclick="showTab('settings')" id="tab-settings" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Settings</button>
+    </div>
+
+    <!-- Users Table -->
+    <div id="content-users" class="glass rounded-xl p-6">
+      <button onclick="exportCSV('users')" class="ml-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-lg text-xs">Export</button>
+      <h2 class="text-lg font-semibold mb-4">Registered Users</h2>
+      <div class="mb-4">
+  <input type="text" id="user-search" placeholder="Search by email or phone..." class="w-full sm:w-64 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500" oninput="filterUsers()">
+</div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="text-gray-400 border-b border-white/10"><th class="text-left pb-3">Name</th><th class="text-left pb-3">Email</th><th class="text-left pb-3">Phone</th><th class="text-left pb-3">Referral</th><th class="text-left pb-3">Admin</th><th class="text-left pb-3">Joined</th><th class="text-left pb-3">Action</th></tr></thead>
+          <tbody id="users-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Investments Table -->
+    <div id="content-investments" class="hidden glass rounded-xl p-6">
+      <button onclick="exportCSV('investments')" class="ml-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-lg text-xs">Export</button>
+      <h2 class="text-lg font-semibold mb-4">All Investments</h2>
+      <div class="mb-4">
+  <input type="text" id="investment-search" placeholder="Search by user name or email..." 
+    class="w-full sm:w-64 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500"
+    oninput="filterInvestments()">
+</div>
+      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-gray-400 border-b border-white/10"><th class="text-left pb-3">User</th><th class="text-left pb-3">Amount</th><th class="text-left pb-3">Plan</th><th class="text-left pb-3">Method</th><th class="text-left pb-3">TxID</th><th class="text-left pb-3">Status</th><th class="text-left pb-3">Date</th><th class="text-left pb-3">Action</th></tr></thead><tbody id="investments-table"></tbody></table></div>
+    </div>
+
+    <!-- Withdrawals Table -->
+    <div id="content-withdrawals" class="hidden glass rounded-xl p-6">
+      <button onclick="exportCSV('withdrawals')" class="ml-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-lg text-xs">Export</button>
+      <h2 class="text-lg font-semibold mb-4">Payout Requests</h2>
+      <div class="mb-4">
+  <input type="text" id="withdrawal-search" placeholder="Search by user name or email..." 
+    class="w-full sm:w-64 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500"
+    oninput="filterWithdrawals()">
+</div>
+      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-gray-400 border-b border-white/10"><th class="text-left pb-3">User</th><th class="text-left pb-3">Amount</th><th class="text-left pb-3">Plan</th><th class="text-left pb-3">Invested</th><th class="text-left pb-3">Type</th><th class="text-left pb-3">Paid</th><th class="text-left pb-3">Status</th><th class="text-left pb-3">Requested</th><th class="text-left pb-3">Action</th></tr></thead>
+      <tbody id="withdrawals-table"></tbody>
+      </table></div>
+    </div>
+        <!-- Settings Panel -->
+    <div id="content-settings" class="hidden glass rounded-xl p-6">
+      <h2 class="text-lg font-semibold mb-4">Payment Settings</h2>
+      <div class="mb-6 p-4 glass rounded-xl">
+  <h3 class="text-md font-semibold mb-3">Announcement</h3>
+  <input type="text" id="announcement-text" placeholder="Enter announcement message" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
+  <div class="flex gap-2">
+    <button onclick="postAnnouncement()" class="bg-yellow-600 text-black px-4 py-2 rounded-lg text-sm font-semibold">Publish</button>
+    <button onclick="clearAnnouncements()" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm">Clear Expired</button>
+  </div>
+</div>
+      <form id="settings-form" class="space-y-4">
+        <div>
+          <label class="block text-sm mb-1">MTN MoMo Number</label>
+          <input type="text" id="set-momo" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+        </div>
+                <div>
+          <label class="block text-sm mb-1">MoMo Account Name</label>
+          <input type="text" id="set-momo-name" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">USDT (TRC20) Address</label>
+          <input type="text" id="set-usdt" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Bitcoin (BTC) Address</label>
+          <input type="text" id="set-btc" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Ethereum (ETH) Address</label>
+          <input type="text" id="set-eth" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Payment Note</label>
+          <textarea id="set-note" rows="2" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></textarea>
+        </div>
+        <button type="submit" class="w-full bg-yellow-600 text-black font-semibold py-3 rounded-xl">Save Settings</button>
+      </form>
+    </div>
+    <div class="glass rounded-xl p-5 mt-8">
+  <h2 class="text-lg font-semibold mb-4">Platform Overview (Last 30 Days)</h2>
+  <div style="position: relative; width: 100%; height: 300px;">
+    <canvas id="admin-chart"></canvas>
+  </div>
+</div>
+  </div>
+
+  <!-- CHANGE PASSWORD MODAL -->
+  <div id="password-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+    <div class="glass rounded-2xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold">Change Admin Password</h3>
+        <button onclick="closePasswordModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <form id="change-password-form" class="space-y-4">
+        <div class="relative">
+  <label class="block text-sm mb-1">Current Password</label>
+  <input type="password" id="current-password" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+  <button type="button" onclick="togglePasswordVisibility('current-password', this)" class="absolute right-3 top-8 text-gray-400 hover:text-white">
+    <i data-lucide="eye" class="w-5 h-5"></i>
+  </button>
+</div>
+        <div class="relative">
+  <label class="block text-sm mb-1">New Password (min 6 chars)</label>
+  <input type="password" id="new-password" required minlength="6" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+  <button type="button" onclick="togglePasswordVisibility('new-password', this)" class="absolute right-3 top-8 text-gray-400 hover:text-white">
+    <i data-lucide="eye" class="w-5 h-5"></i>
+  </button>
+</div>
+        <button type="submit" class="w-full bg-yellow-600 text-black font-semibold py-3 rounded-xl">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+<script>
+
+  async function postAnnouncement() {
+  const msg = document.getElementById('announcement-text').value.trim();
+  if (!msg) return toast('Enter a message', 'error');
+  try {
+    const res = await fetch(`${API}/announcements`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ message: msg })
+    });
+    if (res.ok) {
+      toast('Announcement published!');
+      document.getElementById('announcement-text').value = '';
+    } else {
+      const d = await res.json(); toast(d.error || 'Failed', 'error');
+    }
+  } catch(e) { toast('Connection error', 'error'); }
+}
+
+async function clearAnnouncements() {
+  if (!await customConfirm('Delete all expired announcements?')) return;
+  try {
+    await fetch(`${API}/announcements`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    toast('Expired announcements cleared.');
+  } catch(e) { toast('Error', 'error'); }
+}
+
+  function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon = btn.querySelector('[data-lucide]');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.setAttribute('data-lucide', 'eye-off');
+  } else {
+    input.type = 'password';
+    icon.setAttribute('data-lucide', 'eye');
+  }
+  lucide.createIcons();
+}
+
+  let adminChart = null;
+async function loadAdminChart() {
+  const res = await fetch(`${API}/dashboard-stats`, { headers: {'Authorization': `Bearer ${token}`} });
+  const data = await res.json();
+  const ctx = document.getElementById('admin-chart').getContext('2d');
+  if (adminChart) adminChart.destroy();
+  adminChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.days.map(d => d.slice(5)), // show MM-DD
+      datasets: [
+        { label: 'New Users', data: data.newUsers, borderColor: '#34d399', tension: 0.3 },
+        { label: 'Deposits', data: data.newDeposits, borderColor: '#D4A017', tension: 0.3 },
+        { label: 'Paid Payouts', data: data.newPayouts, borderColor: '#60a5fa', tension: 0.3 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+// Call after dashboard loads
+function loadDashboard() {
+  loadUsers(); loadInvestments(); loadWithdrawals(); showTab('users');
+  loadAdminChart(); // <-- add this
+}
+
+  function exportCSV(type) {
+  let data, headers, filename;
+  if (type === 'users') {
+    headers = ['Name', 'Email', 'Phone', 'Referral', 'Admin', 'Joined'];
+    data = allUsers.map(u => [u.name, u.email, u.phone, u.referral_code||'', u.is_admin?'Yes':'No', new Date(u.created_at).toLocaleDateString()]);
+    filename = 'users.csv';
+  } else if (type === 'investments') {
+    headers = ['User', 'Email', 'Amount', 'Plan', 'Method', 'TxID', 'Status', 'Date'];
+    data = allInvestments.map(i => [i.user_name, i.user_email, i.amount, i.plan, i.method, i.transaction_id||'', i.status, new Date(i.date).toLocaleDateString()]);
+    filename = 'investments.csv';
+  } else if (type === 'withdrawals') {
+    headers = ['User', 'Email', 'Amount', 'Plan', 'Invested', 'Type', 'Paid', 'Status', 'Requested'];
+    data = allWithdrawals.map(w => [w.user_name, w.user_email, w.amount, w.plan||'Referral', w.invested_amount||'', w.type||'investment', w.paid?'Yes':'No', w.status, new Date(w.created_at).toLocaleDateString()]);
+    filename = 'withdrawals.csv';
+  }
+  let csv = headers.join(',') + '\n';
+  data.forEach(row => csv += row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',') + '\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+}
+
+// Simple XSS sanitizer – use for all user-supplied data you display
+function safe(str) {
+  return String(str).replace(/[&<>"']/g, function(m) {
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
+  });
+}
+
+// Custom confirmation dialog (replaces native confirm)
+function customConfirm(message) {
+  return new Promise((resolve) => {
+    document.getElementById('custom-confirm-message').textContent = message;
+    document.getElementById('custom-confirm-modal').classList.remove('hidden');
+    document.getElementById('custom-confirm-modal').classList.add('flex');
+
+    function cleanup() {
+      document.getElementById('custom-confirm-modal').classList.add('hidden');
+      document.getElementById('custom-confirm-modal').classList.remove('flex');
+      document.getElementById('custom-confirm-ok').removeEventListener('click', onOk);
+      document.getElementById('custom-confirm-cancel').removeEventListener('click', onCancel);
+    }
+
+    function onOk() {
+      cleanup();
+      resolve(true);
+    }
+    function onCancel() {
+      cleanup();
+      resolve(false);
+    }
+
+    document.getElementById('custom-confirm-ok').addEventListener('click', onOk);
+    document.getElementById('custom-confirm-cancel').addEventListener('click', onCancel);
+  });
+}
+
+const API = 'https://goldcoast-api.onrender.com/api/admin';
+let allUsers = []; // holds all users for search filtering
+let allInvestments = [];
+let allWithdrawals = [];
+let token = localStorage.getItem('admin_token');
+
+function toast(msg, type='success') {
+  const c = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `glass ${type==='success'?'border-green-500 text-green-400':'border-red-500 text-red-400'} border rounded-xl px-4 py-3 flex items-center gap-2`;
+  el.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}" class="w-5 h-5"></i><span>${msg}</span>`;
+  c.appendChild(el);
+  lucide.createIcons();  // <-- changed here
+  setTimeout(() => el.remove(), 4000);
+}
+document.getElementById('login-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  try {
+    const res = await fetch(`${API}/login`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email, password }) });
+    const data = await res.json();
+    if (!res.ok) { alert('Login failed: ' + (data.error || 'Unknown error')); return; }
+    token = data.token;
+    localStorage.setItem('admin_token', token);
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('dashboard-screen').classList.remove('hidden');
+    document.getElementById('dashboard-screen').classList.add('flex-grow');
+    loadDashboard();
+  } catch (err) { alert('Connection error. Is the backend awake? Wait 30s and try again.'); }
+});
+
+function logout() {
+  localStorage.removeItem('admin_token');
+  token = null;
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('dashboard-screen').classList.add('hidden');
+}
+
+function showTab(tab) {
+  document.getElementById('content-users').classList.add('hidden');
+  document.getElementById('content-investments').classList.add('hidden');
+  document.getElementById('content-withdrawals').classList.add('hidden');
+  document.getElementById('content-settings').classList.add('hidden');
+  document.getElementById('tab-users').className = 'px-4 py-2 rounded-full bg-white/5 text-gray-300';
+  document.getElementById('tab-investments').className = 'px-4 py-2 rounded-full bg-white/5 text-gray-300';
+  document.getElementById('tab-withdrawals').className = 'px-4 py-2 rounded-full bg-white/5 text-gray-300';
+  document.getElementById('tab-settings').className = 'px-4 py-2 rounded-full bg-white/5 text-gray-300';
+  
+  if(tab==='users') {
+    document.getElementById('content-users').classList.remove('hidden');
+    document.getElementById('tab-users').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+  } else if(tab==='investments') {
+    document.getElementById('content-investments').classList.remove('hidden');
+    document.getElementById('tab-investments').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+  } else if(tab==='withdrawals') {
+    document.getElementById('content-withdrawals').classList.remove('hidden');
+    document.getElementById('tab-withdrawals').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+  } else if(tab==='settings') {
+    document.getElementById('content-settings').classList.remove('hidden');
+    document.getElementById('tab-settings').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+    loadSettings();
+  }
+}
+
+async function loadUsers() {
+  try {
+    const res = await fetch(`${API}/users`, { headers: {'Authorization': `Bearer ${token}`} });
+    const { users } = await res.json();
+    allUsers = users; // cache for search
+    document.getElementById('stat-users').textContent = users.length;
+    document.getElementById('users-table').innerHTML = users.map(u => `
+      <tr class="border-b border-white/5 cursor-pointer hover:bg-white/5" onclick="showUserDetail(${u.id})">
+        <td class="py-3">${safe(u.name)}</td>
+ <td class="py-3">${safe(u.email)}</td>
+ <td class="py-3">${safe(u.phone)}</td>
+ <td class="py-3">${safe(u.referral_code||'-')}</td>
+        <td class="py-3">${u.is_admin?'✅':'❌'}</td>
+        <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleDateString()}</td>
+        <td class="py-3">
+          ${!u.is_admin ? `<button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>` : '<span class="text-gray-500 text-xs">Admin</span>'}
+        </td>
+      </tr>`).join('');
+      document.getElementById('user-search').value = ''; // reset search field
+  } catch (err) { toast('Failed to load users', 'error'); }
+}
+
+async function showUserDetail(userId) {
+  const res = await fetch(`${API}/user/${userId}/details`, { headers: {'Authorization': `Bearer ${token}`} });
+  const data = await res.json();
+  if (!data.user) return toast('Failed to load user', 'error');
+  document.getElementById('detail-name').textContent = data.user.name;
+  const content = document.getElementById('detail-content');
+  content.innerHTML = `
+    <p class="text-sm text-gray-400 mb-2">Email: ${data.user.email} | Phone: ${data.user.phone}</p>
+    <p class="text-sm text-gray-400 mb-4">Referral Code: ${data.user.referral_code||'N/A'} | Referrals: ${data.referralCount} | Bonus: ₵${data.user.bonus||0}</p>
+    <h4 class="font-semibold text-gold-400 mb-2">Investments (${data.investments.length})</h4>
+    <div class="max-h-40 overflow-y-auto mb-4">
+      ${data.investments.map(i => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>${i.plan} - ₵${i.amount} (${i.status})</span><span>${new Date(i.date).toLocaleDateString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}
+    </div>
+    <h4 class="font-semibold text-gold-400 mb-2">Withdrawals (${data.withdrawals.length})</h4>
+    <div class="max-h-40 overflow-y-auto">
+      ${data.withdrawals.map(w => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>₵${w.amount} (${w.status})</span><span>${new Date(w.created_at).toLocaleDateString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}
+    </div>
+  `;
+  document.getElementById('user-detail-modal').classList.remove('hidden');
+  document.getElementById('user-detail-modal').classList.add('flex');
+}
+
+function filterUsers() {
+  const term = document.getElementById('user-search').value.toLowerCase().trim();
+  const filtered = allUsers.filter(u => 
+    u.email.toLowerCase().includes(term) || u.phone.includes(term)
+  );
+  document.getElementById('users-table').innerHTML = filtered.map(u => `
+    <tr class="border-b border-white/5">
+      <td class="py-3">${safe(u.name)}</td>
+      <td class="py-3">${safe(u.email)}</td>
+      <td class="py-3">${safe(u.phone)}</td>
+      <td class="py-3">${safe(u.referral_code||'-')}</td>
+      <td class="py-3">${u.is_admin?'✅':'❌'}</td>
+      <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleDateString()}</td>
+      <td class="py-3">
+        ${!u.is_admin ? `<button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>` : '<span class="text-gray-500 text-xs">Admin</span>'}
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function loadInvestments() {
+  try {
+    const res = await fetch(`${API}/investments`, { headers: {'Authorization': `Bearer ${token}`} });
+    const { investments } = await res.json();
+    allInvestments = investments;
+document.getElementById('investment-search').value = ''; // reset search field
+    document.getElementById('stat-investments').textContent = investments.filter(i => i.status !== 'rejected').length;
+    document.getElementById('stat-total').textContent = Number(
+  investments.reduce((s,i) => i.status !== 'rejected' ? s + i.amount : s, 0)
+).toLocaleString('en-GH');
+    document.getElementById('investments-table').innerHTML = investments.map(inv => `
+      <tr class="border-b border-white/5">
+        <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
+        <td class="py-3">₵${inv.amount.toLocaleString()}</td>
+        <td class="py-3 capitalize">${inv.plan}</td>
+        <td class="py-3">${inv.method}</td>
+        <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
+        <td class="py-3"><span class="status-${inv.status}">${inv.status}</span></td>
+        <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleDateString()}</td>
+        <td class="py-3">
+         <select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
+    <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
+    <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
+    <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
+    <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
+</select>
+        </td>
+      </tr>`).join('');
+  } catch (err) { toast('Failed to load investments', 'error'); }
+}
+
+async function loadWithdrawals() {
+  try {
+    const res = await fetch(`${API}/withdrawals`, { headers: {'Authorization': `Bearer ${token}`} });
+    const { withdrawals } = await res.json();
+    allWithdrawals = withdrawals;
+document.getElementById('withdrawal-search').value = ''; // reset search field
+    document.getElementById('stat-withdrawals').textContent = withdrawals.filter(w => w.status === 'pending' || w.status === 'approved').length;
+    const paidWithdrawals = withdrawals.filter(w => w.status === 'paid');
+const totalPaid = paidWithdrawals.reduce((s, w) => s + w.amount, 0);
+document.getElementById('stat-paid-amount').textContent = `₵${totalPaid.toLocaleString()}`;
+document.getElementById('stat-paid-count').textContent = `${paidWithdrawals.length} payout${paidWithdrawals.length !== 1 ? 's' : ''}`;
+    document.getElementById('withdrawals-table').innerHTML = withdrawals.map(w => `<tr class="border-b border-white/5">
+    <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span></td>
+    <td class="py-3">₵${w.amount.toLocaleString()}</td>
+    <td class="py-3 capitalize">${w.plan || 'Referral'}</td>
+    <td class="py-3">${w.invested_amount ? '₵'+w.invested_amount.toLocaleString() : '-'}</td>
+    <td class="py-3 text-xs capitalize">${w.type || 'investment'}</td>
+    <td class="py-3">${w.paid ? '<span class="text-green-400">Yes</span>' : '<span class="text-red-400">No</span>'}</td>
+    <td class="py-3"><span class="status-${w.status}">${w.status}</span></td>
+    <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleDateString()}</td>
+    <td class="py-3">
+        ${w.status === 'pending' ? `
+            <button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button>
+            <button onclick="rejectWithdrawal(${w.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Reject</button>
+        ` : ''}
+        ${w.status === 'approved' && !w.paid ? `
+            <button onclick="markWithdrawalPaid(${w.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mt-1">Mark Paid</button>
+        ` : ''}
+    </td>
+</tr>`).join('');
+  } catch (err) { toast('Failed to load withdrawals', 'error'); }
+}
+
+function filterInvestments() {
+  const term = document.getElementById('investment-search').value.toLowerCase().trim();
+  const filtered = allInvestments.filter(inv => 
+    inv.user_name.toLowerCase().includes(term) || inv.user_email.toLowerCase().includes(term)
+  );
+  document.getElementById('investments-table').innerHTML = filtered.map(inv => `
+    <tr class="border-b border-white/5">
+      <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
+      <td class="py-3">₵${inv.amount.toLocaleString()}</td>
+      <td class="py-3 capitalize">${inv.plan}</td>
+      <td class="py-3">${inv.method}</td>
+      <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
+      <td class="py-3"><span class="status-${inv.status}">${inv.status}</span></td>
+      <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleDateString()}</td>
+      <td class="py-3">
+         <select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
+    <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
+    <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
+    <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
+    <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
+</select>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterWithdrawals() {
+  const term = document.getElementById('withdrawal-search').value.toLowerCase().trim();
+  const filtered = allWithdrawals.filter(w => 
+    w.user_name.toLowerCase().includes(term) || w.user_email.toLowerCase().includes(term)
+  );
+  document.getElementById('withdrawals-table').innerHTML = filtered.map(w => `
+    <tr class="border-b border-white/5">
+      <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span></td>
+      <td class="py-3">₵${w.amount.toLocaleString()}</td>
+      <td class="py-3 capitalize">${w.plan || 'Referral'}</td>
+      <td class="py-3">${w.invested_amount ? '₵'+w.invested_amount.toLocaleString() : '-'}</td>
+      <td class="py-3 text-xs capitalize">${w.type || 'investment'}</td>
+      <td class="py-3">${w.paid ? '<span class="text-green-400">Yes</span>' : '<span class="text-red-400">No</span>'}</td>
+      <td class="py-3"><span class="status-${w.status}">${w.status}</span></td>
+      <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleDateString()}</td>
+      <td class="py-3">
+        ${w.status === 'pending' ? `
+            <button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button>
+            <button onclick="rejectWithdrawal(${w.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Reject</button>
+        ` : ''}
+        ${w.status === 'approved' && !w.paid ? `
+            <button onclick="markWithdrawalPaid(${w.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mt-1">Mark Paid</button>
+        ` : ''}
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function updateInvestmentStatus(id, status) {
+  const res = await fetch(`${API}/investments/${id}`, {
+    method: 'PUT',
+    headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${token}`},
+    body: JSON.stringify({ status })
+  });
+  if(res.ok) { toast('Status updated'); loadInvestments(); }
+  else { const data = await res.json(); toast(data.error || 'Error', 'error'); }
+}
+
+async function approveWithdrawal(id) {
+  if(!await customConfirm('Approve this payout?')) return;
+  const res = await fetch(`${API}/withdrawals/${id}`, {
+    method: 'PUT',
+    headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${token}`},
+    body: JSON.stringify({ status: 'approved' })
+  });
+  if(res.ok) { toast('Payout approved'); loadWithdrawals(); }
+  else { const data = await res.json(); toast(data.error || 'Failed', 'error'); }
+}
+
+async function rejectWithdrawal(id) {
+  if(!await customConfirm('Reject this payout?')) return;
+  const res = await fetch(`${API}/withdrawals/${id}`, {
+    method: 'PUT',
+    headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${token}`},
+    body: JSON.stringify({ status: 'rejected' })
+  });
+  if(res.ok) { toast('Payout rejected'); loadWithdrawals(); }
+  else { const data = await res.json(); toast(data.error || 'Failed', 'error'); }
+}
+
+// NEW: Delete user function
+async function deleteUser(userId) {
+  if (!await customConfirm('Are you sure you want to permanently delete this user and all their investments?')) return;
+  try {
+    const res = await fetch(`${API}/users/${userId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      toast('User deleted successfully', 'success');
+      loadUsers(); // refresh list
+    } else {
+      toast(data.error || 'Failed to delete', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+function openPasswordModal() {
+  document.getElementById('password-modal').classList.remove('hidden');
+  document.getElementById('password-modal').classList.add('flex');
+}
+function closePasswordModal() {
+  document.getElementById('password-modal').classList.add('hidden');
+  document.getElementById('password-modal').classList.remove('flex');
+}
+document.getElementById('change-password-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const current = document.getElementById('current-password').value;
+  const newPass = document.getElementById('new-password').value;
+  try {
+    const res = await fetch(`${API}/change-password`, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${token}`},
+      body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+    });
+    const data = await res.json();
+    if(res.ok) { toast('Password updated!', 'success'); closePasswordModal(); }
+    else { toast(data.error || 'Failed', 'error'); }
+  } catch (err) { toast('Connection error', 'error'); }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  if(token) {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('dashboard-screen').classList.remove('hidden');
+    document.getElementById('dashboard-screen').classList.add('flex-grow');
+    loadDashboard();
+  }
+});
+async function markWithdrawalPaid(id) {
+    if (!await customConfirm('Mark this withdrawal as paid?')) return;
+    try {
+        const res = await fetch(`${API}/withdrawals/${id}/paid`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+            toast('Withdrawal marked as paid');
+            loadWithdrawals();
+        } else {
+            const data = await res.json();
+            toast(data.error || 'Failed', 'error');
+        }
+    } catch (err) { toast('Connection error', 'error'); }
+}
+async function loadSettings() {
+  try {
+    const res = await fetch(`${API}/settings`, { headers: {'Authorization': `Bearer ${token}`} });
+    const data = await res.json();
+    if (data.settings) {
+      document.getElementById('set-momo').value = data.settings.momo_number || '';
+      document.getElementById('set-momo-name').value = data.settings.momo_name || '';
+      document.getElementById('set-usdt').value = data.settings.usdt_address || '';
+      document.getElementById('set-btc').value = data.settings.btc_address || '';
+      document.getElementById('set-eth').value = data.settings.eth_address || '';
+      document.getElementById('set-note').value = data.settings.payment_note || '';
+    }
+  } catch (err) { toast('Failed to load settings', 'error'); }
+}
+
+document.getElementById('settings-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const updates = [
+    { key: 'momo_number', value: document.getElementById('set-momo').value },
+    { key: 'usdt_address', value: document.getElementById('set-usdt').value },
+    { key: 'btc_address', value: document.getElementById('set-btc').value },
+    { key: 'eth_address', value: document.getElementById('set-eth').value },
+    { key: 'payment_note', value: document.getElementById('set-note').value },
+    { key: 'momo_name', value: document.getElementById('set-momo-name').value }
+  ];
+  try {
+    for (let item of updates) {
+      await fetch(`${API}/settings/${item.key}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${token}`},
+        body: JSON.stringify({ value: item.value })
+      });
+    }
+    toast('Settings saved!', 'success');
+  } catch (err) { toast('Failed to save settings', 'error'); }
+});
+</script>
+<!-- Custom Confirmation Modal -->
+<div id="custom-confirm-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl p-6 w-full max-w-sm text-center">
+    <i data-lucide="help-circle" class="w-10 h-10 text-yellow-400 mx-auto mb-3"></i>
+    <p id="custom-confirm-message" class="text-white text-sm mb-6">Are you sure?</p>
+    <div class="flex justify-center gap-4">
+      <button id="custom-confirm-cancel" class="px-6 py-2 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+      <button id="custom-confirm-ok" class="px-6 py-2 rounded-full gradient-gold text-dark-950 font-semibold text-sm hover:opacity-90 transition">Confirm</button>
+    </div>
+  </div>
+</div>
+<!-- User Quick View Modal -->
+<div id="user-detail-modal" class="fixed inset-0 z-[250] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold" id="detail-name">User</h3>
+      <button onclick="document.getElementById('user-detail-modal').classList.add('hidden')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+    </div>
+    <div id="detail-content"></div>
+  </div>
+</div>
+</body>
+</html>

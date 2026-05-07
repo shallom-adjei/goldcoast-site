@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Gold Coast Capital - Smart Investments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {50:'#FFF9E6',100:'#FFF0B3',200:'#FFE680',300:'#FFDB4D',400:'#FFD11A',500:'#D4A017',600:'#B8860B',700:'#8B6914',800:'#5E4B1E',900:'#312A14'},
+                        dark: {50:'#f7f7f8',100:'#eeeef0',200:'#d9d9de',300:'#b8b8c1',400:'#92929e',500:'#747482',600:'#5d5d6b',700:'#4c4c58',800:'#1a1a2e',900:'#0f0f1a',950:'#0a0a12'}
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+
+        .animate-pulse-gold { animation: pulseGold 2s ease-in-out infinite; }
+@keyframes pulseGold { 0%,100% { box-shadow: 0 0 0 0 rgba(212,160,23,0.4); } 50% { box-shadow: 0 0 20px 10px rgba(212,160,23,0.1); } }
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+        body { font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        .glass-gold { background: rgba(212,160,23,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(212,160,23,0.2); }
+        .gradient-gold { background: linear-gradient(135deg, #D4A017, #FFD11A, #B8860B); }
+        .gradient-dark { background: linear-gradient(180deg, #0a0a12 0%, #1a1a2e 100%); }
+        .text-gradient {
+    background: linear-gradient(135deg, #FFD11A, #D4A017, #B8860B);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-float-delay { animation: float 6s ease-in-out 2s infinite; }
+        @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .page { display: none; }
+        .page.active { display: block; }
+        input:focus { outline: none; box-shadow: 0 0 0 2px rgba(212,160,23,0.5); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a12; }
+        ::-webkit-scrollbar-thumb { background: #D4A017; border-radius: 3px; }
+        .stat-card:hover { transform: translateY(-4px); }
+        .nav-link { position: relative; }
+        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, #D4A017, #FFD11A); transition: width 0.3s; }
+        .nav-link:hover::after { width: 100%; }
+        .toast { animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { transform: translateX(100%); opacity: 0; } }
+
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        .payout-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10,10,18,0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212,160,23,0.4);
+            border-radius: 16px;
+            padding: 12px 20px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(212,160,23,0.2);
+            animation: payoutSlideUp 0.6s ease, payoutFadeOut 0.5s ease 4.5s forwards;
+            max-width: 90vw;
+        }
+        @keyframes payoutSlideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes payoutFadeOut { to { transform: translateY(100%); opacity: 0; } }
+        /* Telegram pulse animation */
+@keyframes telegramPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,136,204,0.7); }
+    50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0,136,204,0); }
+}
+.telegram-float {
+    animation: telegramPulse 2s infinite;
+}
+    </style>
+</head>
+<body class="bg-dark-950 text-white min-h-screen">
+    <!-- Telegram Support - shows on all pages -->
+<a href="https://t.me/+xxDIWBZBy4A0NmU0" target="_blank" 
+   class="fixed bottom-24 left-5 z-50 flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-all hover:scale-110 telegram-float"
+   style="background: #0088cc;" title="Join our Telegram">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="22" height="22">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.93 1.23-5.46 3.62-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.24.37-.49 1.02-.74 3.98-1.73 6.64-2.87 7.98-3.42 3.8-1.58 4.59-1.85 5.1-1.86.11 0 .37.03.54.17.14.12.18.28.2.45.02.16.04.53.03.55z"/>
+    </svg>
+</a>
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2"></div>
+
+    <!-- ========== LANDING PAGE ========== -->
+    <div id="page-landing" class="page active">
+        <nav class="fixed top-0 w-full z-50 transition-all duration-300" id="navbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16 sm:h-20">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full gradient-gold flex items-center justify-center"><i data-lucide="landmark" class="w-4 h-4 sm:w-5 sm:h-5 text-dark-950"></i></div>
+                        <span class="font-display text-lg sm:text-xl font-bold text-gradient">Gold Coast Capital</span>
+                    </div>
+                    <div class="hidden md:flex items-center gap-8">
+                        <a href="#features" class="nav-link text-gray-300 hover:text-gold-400 text-sm">Features</a>
+                        <a href="#how-it-works" class="nav-link text-gray-300 hover:text-gold-400 text-sm">How It Works</a>
+                        <a href="#plans" class="nav-link text-gray-300 hover:text-gold-400 text-sm">Plans</a>
+                        <a href="#faq" class="nav-link text-gray-300 hover:text-gold-400 text-sm">FAQ</a>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="navigateTo('login')" class="text-gray-300 hover:text-gold-400 text-sm font-medium px-3 py-2">Login</button>
+                        <button onclick="navigateTo('signup')" class="gradient-gold text-dark-950 font-semibold text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-full">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+<section class="relative min-h-screen flex items-center overflow-hidden pt-24 sm:pt-28 pb-10">
+    <div class="absolute inset-0">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-gold-500/10 rounded-full blur-[100px] animate-float"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-gold-600/5 rounded-full blur-[120px] animate-float-delay"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold-500/5 rounded-full blur-[150px]"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="text-center lg:text-left">
+    <div class="inline-flex items-center gap-2 glass-gold rounded-full px-4 py-2 mb-4">
+        <div class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></div>
+        <span class="text-gold-400 text-sm font-medium">Ghana's Trusted Investment Platform</span>
+    </div>
+    <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-4">
+        Grow Your <span class="text-gradient">Wealth</span> with Confidence
+    </h1>
+    <p class="text-gray-400 text-base sm:text-lg max-w-xl mb-8 leading-relaxed">
+        Invest from just <span class="text-gold-400 font-semibold">₵200</span> and receive <span class="text-gold-400 font-semibold">100% returns</span> plus your capital. Gold Coast Capital makes investing simple, transparent, and rewarding.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+        <button onclick="navigateTo('signup')" class="gradient-gold text-dark-950 font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity text-base flex items-center justify-center gap-2">
+            Start Investing <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+        <button onclick="navigateTo('login')" class="glass text-white font-medium px-8 py-4 rounded-full hover:bg-white/10 transition-colors text-base">
+            Login to Dashboard
+        </button>
+    </div>
+    <div class="flex items-center gap-8 mt-10 justify-center lg:justify-start">
+        <div>
+            <div class="text-2xl font-bold text-gradient">₵2M+</div>
+            <div class="text-gray-500 text-sm">Paid To Investors</div>
+        </div>
+        <div class="w-px h-10 bg-white/10"></div>
+        <div>
+            <div class="text-2xl font-bold text-gradient">5,000+</div>
+            <div class="text-gray-500 text-sm">Investors</div>
+        </div>
+        <div class="w-px h-10 bg-white/10"></div>
+        <div>
+            <div class="text-2xl font-bold text-gradient">100%</div>
+            <div class="text-gray-500 text-sm">Returns</div>
+        </div>
+    </div>
+
+    <!-- Mobile Portfolio Card (hidden on lg and up) -->
+    <div class="lg:hidden mt-8">
+        <div class="glass rounded-3xl p-6 max-w-xs mx-auto animate-float">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-400 text-xs">Portfolio Value</span>
+                <span class="text-green-400 text-xs flex items-center gap-1"><i data-lucide="trending-up" class="w-3 h-3"></i> +100%</span>
+            </div>
+            <div class="text-3xl font-bold mb-4">₵<span class="hero-counter">0</span></div>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between glass rounded-lg px-3 py-2 text-xs">
+                    <span>Initial Deposit</span>
+                    <span class="font-medium">₵1,000</span>
+                </div>
+                <div class="flex items-center justify-between glass rounded-lg px-3 py-2 text-xs">
+                    <span>Earnings</span>
+                    <span class="font-medium text-green-400">₵1,000</span>
+                </div>
+                <div class="flex items-center justify-between glass rounded-lg px-3 py-2 text-xs">
+                    <span>Total Payout</span>
+                    <span class="font-medium text-gold-400">₵2,000</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            <div class="hidden lg:block">
+                <div class="relative">
+                    <div class="glass rounded-3xl p-8 max-w-md mx-auto animate-float">
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-gray-400 text-sm">Portfolio Value</span>
+                            <span class="text-green-400 text-sm flex items-center gap-1"><i data-lucide="trending-up" class="w-4 h-4"></i> +100%</span>
+                        </div>
+                        <div class="text-4xl font-bold mb-6">₵<span class="hero-counter">0</span></div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between glass rounded-xl px-4 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-500/20 flex items-center justify-center"><i data-lucide="coins" class="w-4 h-4 text-gold-400"></i></div>
+                                    <span class="text-sm">Initial Deposit</span>
+                                </div>
+                                <span class="text-sm font-medium">₵1,000</span>
+                            </div>
+                            <div class="flex items-center justify-between glass rounded-xl px-4 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center"><i data-lucide="trending-up" class="w-4 h-4 text-green-400"></i></div>
+                                    <span class="text-sm">Earnings</span>
+                                </div>
+                                <span class="text-sm font-medium text-green-400">₵1,000</span>
+                            </div>
+                            <div class="flex items-center justify-between glass rounded-xl px-4 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><i data-lucide="wallet" class="w-4 h-4 text-blue-400"></i></div>
+                                    <span class="text-sm">Total Payout</span>
+                                </div>
+                                <span class="text-sm font-medium text-gold-400">₵2,000</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -top-4 -right-4 glass-gold rounded-2xl px-4 py-3 animate-pulse-gold">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-gold-400"></i>
+                            <span class="text-sm font-medium text-gold-400">Investment Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-gold-400 text-sm font-semibold uppercase tracking-widest">Why Choose Us</span>
+                    <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4">Built for <span class="text-gradient">Smart Investors</span></h2>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="shield-check" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">Secure & Transparent</h3>
+                        <p class="text-gray-400 text-sm">Your investments are tracked in real-time with full transparency on every transaction.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="percent" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">100% Returns</h3>
+                        <p class="text-gray-400 text-sm">Receive 100% earnings on top of your invested capital. Double your money with our premium plan.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="smartphone" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">MoMo & Crypto</h3>
+                        <p class="text-gray-400 text-sm">Deposit via MTN Mobile Money or popular cryptocurrencies. Flexible payment options.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="bar-chart-3" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">Live Dashboard</h3>
+                        <p class="text-gray-400 text-sm">Monitor your investment growth in real-time through your personalized dashboard.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="banknote" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">Low Minimum</h3>
+                        <p class="text-gray-400 text-sm">Start investing from just ₵200. Accessible to everyone in Ghana.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="clock" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">Fast Payouts</h3>
+                        <p class="text-gray-400 text-sm">Withdraw your earnings quickly and hassle-free when your investment matures.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section id="how-it-works" class="py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-gold-400 text-sm font-semibold uppercase tracking-widest">Simple Process</span>
+                    <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4">How It <span class="text-gradient">Works</span></h2>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center"><div class="w-16 h-16 rounded-full gradient-gold flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-dark-950">1</div><h3 class="text-xl font-semibold mb-3">Create Account</h3><p class="text-gray-400">Sign up with your details.</p></div>
+                    <div class="text-center"><div class="w-16 h-16 rounded-full gradient-gold flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-dark-950">2</div><h3 class="text-xl font-semibold mb-3">Make Deposit</h3><p class="text-gray-400">Invest from ₵200 via MTN MoMo or Crypto. Your investment starts immediately.</p></div>
+                    <div class="text-center"><div class="w-16 h-16 rounded-full gradient-gold flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-dark-950">3</div><h3 class="text-xl font-semibold mb-3">Earn 100%</h3><p class="text-gray-400">Watch your investment grow and receive 100% returns plus your capital.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Plans -->
+        <section id="plans" class="py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-gold-400 text-sm font-semibold uppercase tracking-widest">Investment Plans</span>
+                    <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4">Choose Your <span class="text-gradient">Plan</span></h2>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass rounded-2xl p-8">
+                        <div class="text-gold-400 text-sm font-semibold mb-2">STARTER</div>
+                        <div class="text-3xl font-bold mb-1">₵200 <span class="text-base text-gray-400 font-normal">min</span></div>
+                        <div class="text-gray-400 text-sm mb-6">7 Days</div>
+                        <ul class="space-y-3 mb-8 text-sm">
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 50% Returns</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Real-time Dashboard</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> MoMo & Crypto Deposit</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Fast Payout</li>
+</ul>
+                        <button onclick="navigateTo('signup')" class="w-full py-3 rounded-full border border-gold-500/50 text-gold-400 font-semibold hover:bg-gold-500/10">Get Started</button>
+                    </div>
+                    <div class="glass-gold rounded-2xl p-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 gradient-gold text-dark-950 text-xs font-bold px-4 py-1 rounded-bl-xl">POPULAR</div>
+                        <div class="text-gold-400 text-sm font-semibold mb-2">GROWTH</div>
+                        <div class="text-3xl font-bold mb-1">₵200 <span class="text-base text-gray-400 font-normal">min</span></div>
+                        <div class="text-gray-400 text-sm mb-6">14 Days</div>
+                        <ul class="space-y-3 mb-8 text-sm">
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 90% Returns</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Real-time Dashboard</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Priority Support</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Instant Payout</li>
+</ul>
+                        <button onclick="navigateTo('signup')" class="w-full py-3 rounded-full gradient-gold text-dark-950 font-semibold hover:opacity-90">Get Started</button>
+                    </div>
+                    <div class="glass rounded-2xl p-8">
+                        <div class="text-gold-400 text-sm font-semibold mb-2">PREMIUM</div>
+                        <div class="text-3xl font-bold mb-1">₵200 <span class="text-base text-gray-400 font-normal">min</span></div>
+                        <div class="text-gray-400 text-sm mb-6">21 Days</div>
+                        <ul class="space-y-3 mb-8 text-sm">
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 100% Returns</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> VIP Dashboard</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Dedicated Manager</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Instant Payout</li>
+</ul>
+                        <button onclick="navigateTo('signup')" class="w-full py-3 rounded-full border border-gold-500/50 text-gold-400 font-semibold hover:bg-gold-500/10">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="py-20 relative">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-gold-400 text-sm font-semibold uppercase tracking-widest">FAQ</span>
+                    <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4">Frequently <span class="text-gradient">Asked</span></h2>
+                </div>
+                <div class="space-y-4" id="faq-container">
+    <div class="glass rounded-xl overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left">
+            <span class="font-medium">What is the minimum investment amount?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
+        </button>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">The minimum investment is ₵200. You can invest any amount above this threshold.</div>
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left">
+            <span class="font-medium">How do I deposit money?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
+        </button>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">You can deposit via MTN Mobile Money or cryptocurrency (USDT, BTC, ETH). Simply choose your preferred method in the dashboard.</div>
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left">
+            <span class="font-medium">How do the returns work?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
+        </button>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">Returns vary by plan: Starter gives 50% earnings (e.g. invest ₵1,000 → get ₵1,500), Growth gives 90% earnings (e.g. invest ₵1,000 → get ₵1,900), and Premium gives 100% earnings (e.g. invest ₵1,000 → get ₵2,000). All payouts include your original capital.</div>
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left">
+            <span class="font-medium">How long until I receive my returns?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
+        </button>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">Returns depend on your chosen plan: Starter (7 days), Growth (14 days), or Premium (21 days). When your investment matures – a Withdraw button will appear.</div>
+    </div>
+</div>
+            </div>
+        </section>
+
+        <footer class="border-t border-white/5 py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <p class="text-gray-500 text-sm">© 2026 Gold Coast Capital. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- SIGNUP PAGE -->
+    <div id="page-signup" class="page">
+        <div class="min-h-screen flex items-center justify-center px-4 py-12">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center gap-2 mb-6">
+                        <div class="w-10 h-10 rounded-full gradient-gold flex items-center justify-center"><i data-lucide="landmark" class="w-5 h-5 text-dark-950"></i></div>
+                        <span class="font-display text-xl font-bold text-gradient">Gold Coast Capital</span>
+                    </div>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold">Create Account</h2>
+                </div>
+                <form onsubmit="handleSignup(event)" class="glass rounded-2xl p-6 sm:p-8 space-y-4">
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Full Name</label><input type="text" id="signup-name" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Email</label><input type="email" id="signup-email" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Phone Number</label><input type="tel" id="signup-phone" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <div class="relative">
+  <label class="block text-sm font-medium mb-1.5 text-gray-300">Password</label>
+  <input type="password" id="signup-password" required minlength="6" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+  <button type="button" onclick="togglePasswordVisibility('signup-password', this)" class="absolute right-3 top-9 text-gray-400 hover:text-white">
+    <i data-lucide="eye" class="w-5 h-5"></i>
+  </button>
+</div>
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Referral Code (Optional)</label><input type="text" id="signup-referral" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <button type="submit" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">Create Account</button>
+                    <p class="text-center text-gray-400 text-sm">Already have an account? <button type="button" onclick="navigateTo('login')" class="text-gold-400 hover:underline">Login</button></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="page-login" class="page">
+        <div class="min-h-screen flex items-center justify-center px-4 py-12">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center gap-2 mb-6">
+                        <div class="w-10 h-10 rounded-full gradient-gold flex items-center justify-center"><i data-lucide="landmark" class="w-5 h-5 text-dark-950"></i></div>
+                        <span class="font-display text-xl font-bold text-gradient">Gold Coast Capital</span>
+                    </div>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold">Welcome Back</h2>
+                </div>
+                <form onsubmit="handleLogin(event)" class="glass rounded-2xl p-6 sm:p-8 space-y-4">
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Email</label><input type="email" id="login-email" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <div class="relative">
+  <label class="block text-sm font-medium mb-1.5 text-gray-300">Password</label>
+  <input type="password" id="login-password" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+  <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-9 text-gray-400 hover:text-white">
+    <i data-lucide="eye" class="w-5 h-5"></i>
+  </button>
+</div>
+<div class="text-right">
+  <button type="button" onclick="navigateTo('forgot-password')" class="text-gold-400 text-sm hover:underline">Forgot Password?</button>
+</div>
+                    <button type="submit" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">Login</button>
+                    <p class="text-center text-gray-400 text-sm">Don't have an account? <button type="button" onclick="navigateTo('signup')" class="text-gold-400 hover:underline">Sign Up</button></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD PAGE -->
+<div id="page-forgot-password" class="page">
+  <div class="min-h-screen flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold">Forgot Password</h2>
+      </div>
+      <form onsubmit="handleForgotPassword(event)" class="glass rounded-2xl p-6 sm:p-8 space-y-4">
+        <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Email</label><input type="email" id="forgot-email" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+        <button type="submit" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">Send Reset Link</button>
+        <p class="text-center text-gray-400 text-sm">Remembered? <button type="button" onclick="navigateTo('login')" class="text-gold-400 hover:underline">Login</button></p>
+      </form>
+      <div id="forgot-message" class="mt-4 text-center text-sm text-gray-400 hidden"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESET PASSWORD PAGE -->
+<div id="page-reset-password" class="page">
+  <div class="min-h-screen flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold">Reset Password</h2>
+      </div>
+      <form onsubmit="handleResetPassword(event)" class="glass rounded-2xl p-6 sm:p-8 space-y-4">
+        <div class="relative">
+          <label class="block text-sm font-medium mb-1.5 text-gray-300">New Password</label>
+          <input type="password" id="reset-password" required minlength="6" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+          <button type="button" onclick="togglePasswordVisibility('reset-password', this)" class="absolute right-3 top-9 text-gray-400 hover:text-white"><i data-lucide="eye" class="w-5 h-5"></i></button>
+        </div>
+        <input type="hidden" id="reset-token" value="">
+        <button type="submit" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">Set New Password</button>
+        <div id="reset-message" class="text-center text-sm text-gray-400 hidden"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page">
+        <div class="min-h-screen gradient-dark">
+            <nav class="border-b border-white/5 bg-dark-950/80 backdrop-blur-xl sticky top-0 z-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between h-16">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center"><i data-lucide="landmark" class="w-4 h-4 text-dark-950"></i></div>
+                            <span class="font-display text-lg font-bold text-gradient hidden sm:block">Gold Coast Capital</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center text-dark-950 font-bold text-sm" id="dash-avatar">U</div>
+                                <span class="text-sm font-medium hidden sm:block" id="dash-username">User</span>
+                            </div>
+                            <button onclick="openAnnouncementsModal()" class="text-gray-400 hover:text-yellow-400 relative">
+  <i data-lucide="bell" class="w-5 h-5"></i>
+  <span id="announcement-dot" class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-yellow-400 hidden"></span>
+</button>
+                            <button onclick="handleLogout()" class="text-gray-400 hover:text-red-400"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                <div class="mb-8"><h1 class="font-display text-2xl sm:text-3xl font-bold">Welcome back, <span class="text-gradient" id="dash-name">User</span></h1></div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+    <div class="glass rounded-2xl p-4 sm:p-5 stat-card"><div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-lg bg-gold-500/20 flex items-center justify-center"><i data-lucide="wallet" class="w-4 h-4 text-gold-400"></i></div><span class="text-gray-400 text-xs sm:text-sm">Total Invested</span></div><div class="text-xl sm:text-2xl font-bold" id="stat-invested">₵0</div></div>
+    <div class="glass rounded-2xl p-4 sm:p-5 stat-card"><div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center"><i data-lucide="trending-up" class="w-4 h-4 text-green-400"></i></div><span class="text-gray-400 text-xs sm:text-sm">Earnings</span></div><div class="text-xl sm:text-2xl font-bold text-green-400" id="stat-earnings">₵0</div></div>
+    <div class="glass rounded-2xl p-4 sm:p-5 stat-card"><div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center"><i data-lucide="target" class="w-4 h-4 text-blue-400"></i></div><span class="text-gray-400 text-xs sm:text-sm">Expected Total</span></div><div class="text-xl sm:text-2xl font-bold text-blue-400" id="stat-expected">₵0</div></div>
+    <div class="glass rounded-2xl p-4 sm:p-5 stat-card"><div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center"><i data-lucide="download" class="w-4 h-4 text-orange-400"></i></div><span class="text-gray-400 text-xs sm:text-sm">Total Withdrawn</span></div><div class="text-xl sm:text-2xl font-bold text-orange-400" id="stat-withdrawn">₵0</div></div>
+    <div class="glass rounded-2xl p-4 sm:p-5 stat-card"><div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center"><i data-lucide="clock" class="w-4 h-4 text-purple-400"></i></div><span class="text-gray-400 text-xs sm:text-sm">Days Left</span></div><div class="text-xl sm:text-2xl font-bold text-purple-400" id="stat-days">0</div></div>
+</div>
+
+                <!-- Referral Card -->
+<div class="glass rounded-2xl p-4 sm:p-5 mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h4 class="text-sm font-semibold text-gold-400">Your Referral Code</h4>
+            <p class="text-xl font-bold mt-1" id="dash-referral-code">----</p>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-green-400">Referral Bonus</h4>
+            <p class="text-xl font-bold mt-1" id="dash-bonus">₵0</p>
+        </div>
+        <div>
+            <button id="withdraw-bonus-btn" onclick="requestReferralWithdrawal()" class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-xl text-sm">
+                Withdraw Bonus
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Referral Leaderboard -->
+<div class="glass rounded-2xl p-4 sm:p-5 mb-6">
+    <h3 class="text-sm font-semibold text-gold-400 mb-3 flex items-center justify-between">
+  <span>🏆 Referral Leaderboard</span>
+  <div class="relative inline-block">
+  <select id="leaderboard-period" onchange="loadLeaderboard()" 
+    class="appearance-none bg-white/5 border border-white/10 rounded-lg pl-3 pr-8 py-1.5 text-xs text-gold-400 focus:outline-none focus:border-yellow-500">
+    <option value="all">All Time</option>
+    <option value="monthly">This Month</option>
+  </select>
+  <i data-lucide="chevron-down" class="absolute right-2 top-1.5 w-3.5 h-3.5 text-gold-400 pointer-events-none"></i>
+</div>
+</h3>
+    <div id="leaderboard-list" class="space-y-2 text-sm">
+        <div class="text-gray-500 text-center py-2">Loading...</div>
+    </div>
+</div>
+
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass rounded-2xl p-5 sm:p-6">
+                        <h3 class="font-semibold text-lg mb-4">Investment Growth</h3>
+  <div style="position: relative; width: 100%; height: 300px;">
+    <canvas id="growth-chart"></canvas>
+</div>
+                    </div>
+                    <div class="glass rounded-2xl p-5 sm:p-6">
+                        <h3 class="font-semibold text-lg mb-4">Quick Deposit</h3>
+                        <button onclick="openDepositModal()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2"><i data-lucide="plus-circle" class="w-5 h-5"></i> Make Deposit</button>
+                        <div class="mt-6 pt-6 border-t border-white/5">
+                            <h4 class="text-sm font-medium mb-3 text-gray-300">Recent Activity</h4>
+                            <div class="space-y-3" id="recent-activity"><div class="text-gray-500 text-sm text-center py-4">No activity yet</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-2xl p-5 sm:p-6 mt-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-semibold text-lg">My Investments</h3>
+                        <button onclick="openDepositModal()" class="text-gold-400 text-sm font-medium hover:underline flex items-center gap-1"><i data-lucide="plus" class="w-4 h-4"></i> New Investment</button>
+                    </div>
+                    <div id="investments-cards" class="sm:hidden space-y-3"></div>
+                    <div class="overflow-x-auto hidden sm:block">
+                        <table class="w-full text-sm">
+                            <thead><tr class="border-b border-white/5"><th class="text-left pb-3 text-gray-400 font-medium">Amount</th>
+                                <th class="text-left pb-3 text-gray-400 font-medium hidden sm:table-cell">Plan</th>
+                                <th class="text-left pb-3 text-gray-400 font-medium">Earnings</th>
+                                <th class="text-left pb-3 text-gray-400 font-medium">Progress</th>
+                                <th class="text-left pb-3 text-gray-400 font-medium">Status</th>
+                                <th class="text-left pb-3 text-gray-400 font-medium">Action</th></tr></thead>
+                            <tbody id="investments-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Transaction History -->
+<div class="glass rounded-2xl p-5 sm:p-6 mt-6">
+  <h3 class="font-semibold text-lg mb-4">Transaction History</h3>
+  <div id="transaction-cards" class="sm:hidden space-y-3"></div>
+  <div class="overflow-x-auto hidden sm:block" id="transaction-table-container">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-white/5">
+          <th class="text-left pb-3 text-gray-400 font-medium">Type</th>
+          <th class="text-left pb-3 text-gray-400 font-medium">Description</th>
+          <th class="text-left pb-3 text-gray-400 font-medium">Amount</th>
+          <th class="text-left pb-3 text-gray-400 font-medium">Status</th>
+          <th class="text-left pb-3 text-gray-400 font-medium">Date</th>
+        </tr>
+      </thead>
+      <tbody id="transaction-table-body"></tbody>
+    </table>
+  </div>
+</div>
+            </div>
+        </div>
+        <div id="announcements-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold">Announcements</h3>
+      <button onclick="closeAnnouncementsModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div id="announcements-list" class="space-y-2 text-sm">
+      <div class="text-gray-500 text-center py-2">Loading...</div>
+    </div>
+    <div class="mt-4 text-right">
+      <button onclick="clearAllAnnouncements()" class="bg-red-600 hover:bg-red-500 text-white text-xs px-4 py-2 rounded-lg">Clear All</button>
+    </div>
+  </div>
+</div>
+    </div>
+
+    <!-- DEPOSIT MODAL -->
+    <div id="deposit-modal" class="fixed inset-0 z-[90] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+        <div class="glass rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div class="p-6 sm:p-8">
+                <div class="flex items-center justify-between mb-6"><h2 class="font-display text-xl sm:text-2xl font-bold">Make a Deposit</h2><button onclick="closeDepositModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+
+                <div id="deposit-step1">
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Select Plan</label>
+                    <div class="grid grid-cols-3 gap-3 mb-5">
+                        <button onclick="selectPlan('starter')" id="plan-starter" class="glass rounded-xl p-3 text-center"><div class="font-bold text-gold-400">Starter</div><div class="text-gray-500 text-xs">7 Days</div></button>
+                        <button onclick="selectPlan('growth')" id="plan-growth" class="glass-gold rounded-xl p-3 text-center"><div class="font-bold text-gold-400">Growth</div><div class="text-gray-500 text-xs">14 Days</div></button>
+                        <button onclick="selectPlan('premium')" id="plan-premium" class="glass rounded-xl p-3 text-center"><div class="font-bold text-gold-400">Premium</div><div class="text-gray-500 text-xs">21 Days</div></button>
+                    </div>
+                    <input type="hidden" id="deposit-plan" value="growth">
+
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Amount (GHS)</label>
+                    <input type="number" id="deposit-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
+                    <p class="text-xs text-gray-500 mb-5">Minimum deposit is ₵200</p>
+
+                    <div class="glass-gold rounded-xl p-4 mb-5">
+                        <div class="flex items-center gap-2 mb-3"><i data-lucide="calculator" class="w-4 h-4 text-gold-400"></i><span class="text-sm font-medium text-gold-400">Calculator</span></div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between"><span class="text-gray-400">You Invest:</span><span id="calc-invest" class="font-medium">₵0</span></div>
+                            <div class="flex justify-between"><span class="text-gray-400">You Earn (<span id="calc-rate-label">90</span>%):</span><span id="calc-earn" class="font-medium text-green-400">₵0</span></div>
+                            <div class="flex justify-between border-t border-white/10 pt-2"><span class="text-gray-400">Total Payout:</span><span id="calc-total" class="font-bold text-gold-400">₵0</span></div>
+                        </div>
+                    </div>
+
+                    <button onclick="goToStep2()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2">Continue <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                </div>
+
+                <div id="deposit-step2" class="hidden">
+                    <button onclick="goToStep1()" class="flex items-center gap-1 text-gray-400 hover:text-white text-sm mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back</button>
+                    <label class="block text-sm font-medium mb-3 text-gray-300">Payment Method</label>
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <button onclick="selectPayment('momo')" id="pay-momo" class="glass-gold rounded-xl p-4 text-center"><div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mx-auto mb-2"><span class="text-yellow-400 font-bold text-lg">M</span></div><span class="text-sm font-medium">MTN MoMo</span></button>
+                        <button onclick="selectPayment('crypto')" id="pay-crypto" class="glass rounded-xl p-4 text-center"><div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center mx-auto mb-2"><i data-lucide="bitcoin" class="w-6 h-6 text-orange-400"></i></div><span class="text-sm font-medium">Crypto</span></button>
+                    </div>
+                    <input type="hidden" id="deposit-payment" value="momo">
+
+                    <div id="momo-details" class="glass rounded-xl p-5 mb-5">  
+                    </div>
+
+                    <div id="crypto-details" class="hidden glass rounded-xl p-5 mb-5">
+                    </div>
+
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Transaction ID / Reference</label>
+                    <input type="text" id="deposit-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-5">
+
+                    <button onclick="submitDeposit()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2"><i data-lucide="check-circle" class="w-5 h-5"></i> Confirm Deposit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+
+        // Store dismissed IDs in an array (localStorage)
+function getDismissedIds() {
+  try { return JSON.parse(localStorage.getItem('dismissed_announcements') || '[]'); } catch(e) { return []; }
+}
+
+function addDismissedId(id) {
+  const ids = getDismissedIds();
+  ids.push(id);
+  localStorage.setItem('dismissed_announcements', JSON.stringify(ids));
+}
+
+async function openAnnouncementsModal() {
+  const modal = document.getElementById('announcements-modal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  const list = document.getElementById('announcements-list');
+  list.innerHTML = '<div class="text-gray-500 text-center py-2">Loading...</div>';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/announcements?limit=10`);
+    if (!res.ok) throw new Error('Failed');
+    const { announcements } = await res.json();
+    if (!announcements || announcements.length === 0) {
+      list.innerHTML = '<div class="text-gray-500 text-center py-4">No announcements.</div>';
+      return;
+    }
+    const dismissedIds = getDismissedIds();
+    const visible = announcements.filter(a => !dismissedIds.includes(a.id));
+    if (visible.length === 0) {
+      list.innerHTML = '<div class="text-gray-500 text-center py-4">No new announcements.</div>';
+      return;
+    }
+    list.innerHTML = visible.map(a => `
+      <div class="flex items-start justify-between border-b border-white/5 pb-2">
+        <div>
+          <p class="text-white">${a.message}</p>
+          <span class="text-xs text-gray-500">${new Date(a.created_at).toLocaleString()}</span>
+        </div>
+        <button onclick="dismissSingleAnnouncement(${a.id})" class="text-gray-400 hover:text-red-400 ml-2 shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+    `).join('');
+    lucide.createIcons();
+  } catch(e) {
+    list.innerHTML = '<div class="text-gray-500 text-center py-4">Failed to load announcements.</div>';
+  }
+}
+
+function closeAnnouncementsModal() {
+  document.getElementById('announcements-modal').classList.add('hidden');
+  document.getElementById('announcements-modal').classList.remove('flex');
+}
+
+function dismissSingleAnnouncement(id) {
+  addDismissedId(id);
+  // Reload the modal list
+  openAnnouncementsModal();
+}
+
+async function clearAllAnnouncements() {
+  if (!await customConfirm('Dismiss all announcements?')) return;
+  // Get all visible IDs and add them to dismissed list
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/announcements?limit=100`);
+    if (res.ok) {
+      const { announcements } = await res.json();
+      const ids = getDismissedIds();
+      announcements.forEach(a => { if (!ids.includes(a.id)) ids.push(a.id); });
+      localStorage.setItem('dismissed_announcements', JSON.stringify(ids));
+    }
+  } catch(e) {}
+  closeAnnouncementsModal();
+ const dot = document.getElementById('announcement-dot');
+if (dot) dot.classList.add('hidden');
+}
+
+       let currentAnnouncementId = null;
+async function loadAnnouncement() {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/announcements`);
+    if (!res.ok) return;
+    const { announcements } = await res.json();
+    const announcement = announcements && announcements.length > 0 ? announcements[0] : null;
+    
+    const dot = document.getElementById('announcement-dot');
+    if (!announcement) {
+      if (dot) dot.classList.add('hidden');
+      return;
+    }
+
+    const dismissedIds = getDismissedIds();
+    if (dismissedIds.includes(announcement.id)) {
+      if (dot) dot.classList.add('hidden');
+      return;
+    }
+
+    // Show the dot on the bell (but don’t show the banner)
+    if (dot) dot.classList.remove('hidden');
+    currentAnnouncementId = announcement.id; // keep for other functions
+  } catch(e) {}
+}
+
+       async function loadTransactionHistory() {
+  const tableBody = document.getElementById('transaction-table-body');
+  const cardsContainer = document.getElementById('transaction-cards');
+  try {
+    const res = await fetch(`${API_BASE}/api/transactions`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    if (!res.ok) throw new Error('Failed');
+    const { transactions } = await res.json();
+
+    // Table (sm+)
+    if (tableBody) {
+      tableBody.innerHTML = transactions.length === 0
+        ? '<tr><td colspan="5" class="py-8 text-center text-gray-500">No transactions yet.</td></tr>'
+        : transactions.map(tx => `
+          <tr class="border-b border-white/5">
+            <td class="py-3 capitalize">${tx.type}</td>
+            <td class="py-3">${tx.description}</td>
+            <td class="py-3 ${tx.type === 'withdrawal' || tx.type === 'referral_bonus' ? 'text-red-400' : 'text-green-400'}">₵${formatNumber(tx.amount)}</td>
+            <td class="py-3"><span class="status-${tx.status}">${tx.status}</span></td>
+            <td class="py-3 text-gray-400">${new Date(tx.date).toLocaleDateString()}</td>
+          </tr>
+        `).join('');
+    }
+
+    // Cards (mobile)
+    if (cardsContainer) {
+      cardsContainer.innerHTML = transactions.length === 0
+        ? '<div class="text-gray-500 text-center py-4">No transactions yet.</div>'
+        : transactions.map(tx => `
+          <div class="glass rounded-lg p-3 mb-2 flex justify-between items-start">
+            <div>
+              <div class="font-semibold capitalize">${tx.type}</div>
+              <div class="text-sm text-gray-300">${tx.description}</div>
+              <div class="text-xs text-gray-500">${new Date(tx.date).toLocaleDateString()}</div>
+            </div>
+            <div class="text-right">
+              <div class="${tx.type === 'withdrawal' || tx.type === 'referral_bonus' ? 'text-red-400' : 'text-green-400'} font-semibold">₵${formatNumber(tx.amount)}</div>
+              <span class="status-${tx.status} text-xs">${tx.status}</span>
+            </div>
+          </div>
+        `).join('');
+    }
+  } catch(e) {
+    if (tableBody) tableBody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-gray-500">Failed to load transactions.</td></tr>';
+    if (cardsContainer) cardsContainer.innerHTML = '<div class="text-gray-500 text-center py-4">Failed to load transactions.</div>';
+  }
+}
+
+        async function handleForgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById('forgot-email').value;
+  const msgDiv = document.getElementById('forgot-message');
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    msgDiv.textContent = data.message;
+    msgDiv.classList.remove('hidden');
+    if (res.ok) {
+      showToast('Reset link sent! Check your email.', 'success');
+    }
+  } catch (err) {
+    msgDiv.textContent = 'Connection error.';
+    msgDiv.classList.remove('hidden');
+  }
+}
+
+async function handleResetPassword(e) {
+  e.preventDefault();
+  const token = document.getElementById('reset-token').value;
+  const newPassword = document.getElementById('reset-password').value;
+  const msgDiv = document.getElementById('reset-message');
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ token, newPassword })
+    });
+    const data = await res.json();
+    msgDiv.textContent = data.message || data.error;
+    msgDiv.classList.remove('hidden');
+    if (res.ok) {
+      showToast('Password reset successfully! Please login.', 'success');
+      setTimeout(() => navigateTo('login'), 2000);
+    }
+  } catch (err) {
+    msgDiv.textContent = 'Connection error.';
+    msgDiv.classList.remove('hidden');
+  }
+}
+
+        function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon = btn.querySelector('[data-lucide]');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.setAttribute('data-lucide', 'eye-off');
+  } else {
+    input.type = 'password';
+    icon.setAttribute('data-lucide', 'eye');
+  }
+  lucide.createIcons();
+}
+
+// Simple XSS sanitizer – use for all user-supplied data you display
+function safe(str) {
+  return String(str).replace(/[&<>"']/g, function(m) {
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
+  });
+}
+
+// Custom confirmation dialog (replaces native confirm)
+function customConfirm(message) {
+  return new Promise((resolve) => {
+    document.getElementById('custom-confirm-message').textContent = message;
+    document.getElementById('custom-confirm-modal').classList.remove('hidden');
+    document.getElementById('custom-confirm-modal').classList.add('flex');
+
+    function cleanup() {
+      document.getElementById('custom-confirm-modal').classList.add('hidden');
+      document.getElementById('custom-confirm-modal').classList.remove('flex');
+      document.getElementById('custom-confirm-ok').removeEventListener('click', onOk);
+      document.getElementById('custom-confirm-cancel').removeEventListener('click', onCancel);
+    }
+
+    function onOk() {
+      cleanup();
+      resolve(true);
+    }
+    function onCancel() {
+      cleanup();
+      resolve(false);
+    }
+
+    document.getElementById('custom-confirm-ok').addEventListener('click', onOk);
+    document.getElementById('custom-confirm-cancel').addEventListener('click', onCancel);
+  });
+}
+
+        const API_BASE = 'https://goldcoast-api.onrender.com';
+        let currentUser = null;
+        let authToken = localStorage.getItem('gcc_token');
+        let selectedPlan = 'growth';
+        let selectedPayment = 'momo';
+        const returnRates = { starter: 0.5, growth: 0.9, premium: 1.0 };
+
+// Payment detail generators (no hardcoded info in HTML)
+function getMomoDetailsHtml(amountText) {
+    const note = paymentSettings.payment_note || 'Send exactly the amount shown.';
+    const momoNumber = paymentSettings.momo_number;
+    const momoName = paymentSettings.momo_name;
+    
+    if (!momoNumber) {
+        // No number configured – show a clean message
+        return `<div class="text-gray-500 text-sm text-center py-4">⚠️ MoMo payment details not configured yet.</div>`;
+    }
+
+    return `
+        <div class="flex items-center gap-2 mb-4"><i data-lucide="smartphone" class="w-5 h-5 text-gold-400"></i><span class="font-medium">Send to MTN Mobile Money</span></div>
+                <div class="bg-dark-950/50 rounded-lg p-4 mb-4 text-center">
+            <p class="text-gray-400 text-xs mb-1">MTN MoMo Number</p>
+            <div class="flex items-center justify-center gap-2">
+                <p class="text-2xl font-bold text-gradient tracking-wider">${momoNumber}</p>
+                <button onclick="copyAddress('${momoNumber}')" class="text-gold-400 hover:text-gold-300 transition-colors" title="Copy number">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                </button>
+            </div>
+            ${momoName ? `<p class="text-gray-400 text-xs mt-1">${momoName}</p>` : ''}
+        </div>
+        <div class="space-y-2 text-sm text-gray-400">
+            <div class="flex items-start gap-2"><i data-lucide="info" class="w-4 h-4 mt-0.5 text-gold-400 shrink-0"></i> ${note} <span class="text-white font-medium mx-1">${amountText}</span></div>
+        </div>
+    `;
+}
+
+function getCryptoDetailsHtml(amountText) {
+    const usdt = paymentSettings.usdt_address;
+    const btc = paymentSettings.btc_address;
+    const eth = paymentSettings.eth_address;
+    if (!usdt && !btc && !eth) {
+        return `<div class="text-gray-500 text-sm text-center py-4">⚠️ Crypto payment details not configured yet.</div>`;
+    }
+
+    return `
+        <div class="flex items-center gap-2 mb-4"><i data-lucide="bitcoin" class="w-5 h-5 text-orange-400"></i><span class="font-medium">Send Cryptocurrency</span></div>
+        <div class="space-y-4">
+            ${usdt ? `<div class="bg-dark-950/50 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-1"><span class="text-xs text-gray-400">USDT (TRC20)</span><button onclick="copyAddress('${usdt}')" class="text-gold-400 text-xs hover:underline"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button></div>
+                <p class="text-sm font-mono break-all text-gray-300">${usdt}</p>
+            </div>` : ''}
+            ${btc ? `<div class="bg-dark-950/50 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-1"><span class="text-xs text-gray-400">Bitcoin (BTC)</span><button onclick="copyAddress('${btc}')" class="text-gold-400 text-xs hover:underline"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button></div>
+                <p class="text-sm font-mono break-all text-gray-300">${btc}</p>
+            </div>` : ''}
+            ${eth ? `<div class="bg-dark-950/50 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-1"><span class="text-xs text-gray-400">Ethereum (ETH)</span><button onclick="copyAddress('${eth}')" class="text-gold-400 text-xs hover:underline"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button></div>
+                <p class="text-sm font-mono break-all text-gray-300">${eth}</p>
+            </div>` : ''}
+        </div>
+        <div class="mt-4 space-y-2 text-sm text-gray-400">
+            <div class="flex items-start gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 text-orange-400 shrink-0"></i> Send equivalent of <span class="text-white font-medium mx-1">${amountText}</span></div>
+        </div>
+    `;
+}
+
+        // Payment settings (will be loaded from backend)
+let paymentSettings = {
+  momo_number: '',
+  usdt_address: '',
+  btc_address: '',
+  eth_address: '',
+  payment_note: ''
+};
+
+
+async function loadPaymentSettings() {
+  if (!authToken) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/settings`, {
+      headers: {'Authorization': `Bearer ${authToken}`}
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.settings) paymentSettings = data.settings;
+    }
+  } catch(e) { /* keep defaults */ }
+}
+
+        let growthChart = null;   // holds the Chart.js instance
+        let countdownTimer = null; // for the live countdown
+
+        function navigateTo(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`page-${page}`).classList.add('active');
+            if (page === 'dashboard') updateDashboard();
+            window.scrollTo(0, 0);
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('signup-name').value,
+                email: document.getElementById('signup-email').value,
+                phone: document.getElementById('signup-phone').value,
+                password: document.getElementById('signup-password').value,
+                referral: document.getElementById('signup-referral').value
+            };
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) return showToast(data.error || 'Registration failed', 'error');
+                authToken = data.token;
+                currentUser = data.user;
+                localStorage.setItem('gcc_token', authToken);
+                localStorage.setItem('gcc_user', JSON.stringify(data.user));
+                loadPaymentSettings();
+                showToast('Account created!', 'success');
+                navigateTo('dashboard');
+            } catch (err) { showToast('Connection error', 'error'); }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const payload = {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            };
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) return showToast(data.error || 'Login failed', 'error');
+                authToken = data.token;
+                currentUser = data.user;
+                localStorage.setItem('gcc_token', authToken);
+                localStorage.setItem('gcc_user', JSON.stringify(data.user));
+                loadPaymentSettings();
+                showToast('Welcome back!', 'success');
+                navigateTo('dashboard');
+            } catch (err) { showToast('Connection error', 'error'); }
+        }
+
+        function handleLogout() {
+    if (countdownTimer) clearInterval(countdownTimer);   // <-- add this line
+    localStorage.removeItem('gcc_token');
+    localStorage.removeItem('gcc_user');
+    authToken = null;
+    currentUser = null;
+    navigateTo('landing');
+}
+
+        async function updateDashboard() {
+            if (!authToken) return handleLogout();
+            if (!currentUser) {
+                const res = await fetch(`${API_BASE}/api/auth/me`, {
+                    headers: {'Authorization': `Bearer ${authToken}`}
+                });
+                if (!res.ok) { handleLogout(); return; }
+                const data = await res.json();
+                currentUser = data.user;
+            }
+
+            document.getElementById('dash-name').textContent = safe(currentUser.name.split(' ')[0]);
+            document.getElementById('dash-username').textContent = safe(currentUser.name.split(' ')[0]);
+            document.getElementById('dash-avatar').textContent = currentUser.name[0].toUpperCase();
+            document.getElementById('dash-referral-code').textContent = currentUser.referral_code || currentUser.id;
+document.getElementById('dash-bonus').textContent = `₵${formatNumber(currentUser.bonus || 0)}`;
+            loadLeaderboard();
+            loadAnnouncement();
+            
+
+const btn = document.getElementById('withdraw-bonus-btn');
+if (btn) {
+    const b = parseFloat((currentUser.bonus || 0).toString());
+    btn.disabled = b < 50;
+    btn.style.opacity = b < 50 ? '0.5' : '1';
+}
+
+ // ✅ INSERT SKELETON LINES HERE (right before the first fetch)
+   document.getElementById('investments-table').innerHTML = `
+  <tr><td colspan="6" class="py-4"><div class="skeleton h-4 w-full mb-2"></div><div class="skeleton h-4 w-3/4"></div></td></tr>
+`;
+document.getElementById('investments-cards').innerHTML = `
+  <div class="skeleton h-12 w-full mb-2"></div>
+`;
+document.getElementById('transaction-table-body').innerHTML = `
+  <tr><td colspan="5" class="py-4"><div class="skeleton h-4 w-full mb-2"></div><div class="skeleton h-4 w-3/4"></div></td></tr>
+`;
+document.getElementById('transaction-cards').innerHTML = `
+  <div class="skeleton h-12 w-full mb-2"></div>
+`;
+
+
+            const [invRes, wdrRes] = await Promise.all([
+                fetch(`${API_BASE}/api/investments`, { headers: {'Authorization': `Bearer ${authToken}`} }),
+                fetch(`${API_BASE}/api/withdrawals`, { headers: {'Authorization': `Bearer ${authToken}`} })
+            ]);
+            const { investments } = await invRes.json();
+            const { withdrawals } = await wdrRes.json();
+
+            const withdrawalMap = {};
+            withdrawals.forEach(w => { withdrawalMap[w.investment_id] = w; });
+
+            const totalInvested = investments.reduce((s, i) => i.status !== 'rejected' ? s + i.amount : s, 0);
+            const totalEarnings = investments.reduce((s, i) => {
+    if (i.status === 'pending' || i.status === 'matured') return s;
+    return s + getCurrentEarnings(i);
+}, 0);
+           const totalExpected = investments.reduce((s, i) => {
+    if (i.status === 'pending') return s + i.amount;
+    if (i.status === 'rejected' || i.status === 'matured') return s;
+    return s + i.amount * (1 + (returnRates[i.plan] || 1));
+}, 0);
+           const activeInvs = investments.filter(i => i.status !== 'pending' && i.status !== 'rejected' && i.status !== 'matured');
+
+// --- Live countdown for Days Left ---
+// Clear any previous countdown
+if (countdownTimer) clearInterval(countdownTimer);
+
+let earliestMaturityDate = null;
+if (activeInvs.length > 0) {
+    const planDays = { starter: 7, growth: 14, premium: 21 };
+    let earliest = Infinity;
+    for (const inv of activeInvs) {
+        const matureTime = new Date(inv.date).getTime() + (planDays[inv.plan] || 14) * 86400000;
+        if (matureTime < earliest) earliest = matureTime;
+    }
+    earliestMaturityDate = new Date(earliest);
+
+    // Update countdown immediately, then every second
+    const updateCountdown = () => {
+        const now = new Date().getTime();
+        const distance = earliestMaturityDate.getTime() - now;
+        if (distance <= 0) {
+            document.getElementById('stat-days').textContent = 'Matured';
+            clearInterval(countdownTimer);
+            return;
+        }
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        document.getElementById('stat-days').textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    };
+    countdownTimer = setInterval(updateCountdown, 1000);
+    updateCountdown(); // first display
+} else {
+    document.getElementById('stat-days').textContent = '0';
+}
+
+            document.getElementById('stat-invested').textContent = `₵${formatNumber(totalInvested)}`;
+            document.getElementById('stat-earnings').textContent = `₵${formatNumber(totalEarnings)}`;
+            document.getElementById('stat-expected').textContent = `₵${formatNumber(totalExpected)}`;
+            // Total successful withdrawals (paid)
+const totalWithdrawn = withdrawals.filter(w => w.status === 'paid').reduce((s, w) => s + w.amount, 0);
+document.getElementById('stat-withdrawn').textContent = `₵${formatNumber(totalWithdrawn)}`;
+
+            const tbody = document.getElementById('investments-table');
+const cardContainer = document.getElementById('investments-cards');
+
+if (investments.length === 0) {
+  tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-gray-500">No investments yet.</td></tr>';
+  if (cardContainer) cardContainer.innerHTML = '<div class="text-gray-500 text-center py-4">No investments yet.</div>';
+} else {
+  tbody.innerHTML = investments.map(inv => {
+    const wd = withdrawalMap[inv.id];
+    const status = inv.status;
+    const isPending = status === 'pending';
+    const isMatured = status === 'matured';
+    const earnings = getCurrentEarnings(inv);
+    const progress = getProgress(inv);
+    const daysLeft = getDaysLeft(inv);
+
+    let statusBadge = '';
+    if (isPending) statusBadge = '<span class="bg-yellow-500/20 text-yellow-400 rounded-full px-2 py-1 text-xs">Pending ⏳</span>';
+    else if (status === 'rejected') statusBadge = '<span class="bg-red-500/20 text-red-400 rounded-full px-2 py-1 text-xs">Rejected ❌</span>';
+    else if (isMatured) statusBadge = '<span class="bg-green-500/20 text-green-400 rounded-full px-2 py-1 text-xs">Matured ✅</span>';
+    else statusBadge = `<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;
+
+    let actionHtml = '';
+    if (isMatured && !wd) {
+      actionHtml = `<button onclick="requestWithdrawal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500">Withdraw</button>`;
+    } else if (wd) {
+      if (wd.status === 'pending') actionHtml = '<span class="text-yellow-400 text-xs">Payout pending</span>';
+      else if (wd.status === 'approved') actionHtml = '<span class="text-green-400 text-xs">Approved ✅</span>';
+      else if (wd.status === 'paid') actionHtml = `<span class="text-green-400 text-xs">Paid ✅</span><button onclick="openDepositModal()" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Reinvest</button>`;
+      else actionHtml = '<span class="text-red-400 text-xs">Rejected ❌</span>';
+    }
+
+    return `<tr class="border-b border-white/5">
+      <td class="py-4 font-medium">₵${formatNumber(inv.amount)}</td>
+      <td class="py-4 hidden sm:table-cell"><span class="glass-gold rounded-full px-2 py-1 text-xs">${inv.plan}</span></td>
+      <td class="py-4 text-green-400">₵${formatNumber(earnings)}</td>
+      <td class="py-4"><div class="flex items-center gap-2"><div class="w-20 h-2 bg-white/5 rounded-full"><div class="h-full gradient-gold rounded-full" style="width:${Math.min(100, progress)}%"></div></div><span class="text-xs">${Math.round(progress)}%</span></div></td>
+      <td class="py-4">${statusBadge}</td>
+      <td class="py-4">${actionHtml}</td>
+    </tr>`;
+  }).join('');
+
+  if (cardContainer) {
+    cardContainer.innerHTML = investments.map(inv => {
+      const wd = withdrawalMap[inv.id];
+      const status = inv.status;
+      const isPending = status === 'pending';
+      const isMatured = status === 'matured';
+      const earnings = getCurrentEarnings(inv);
+      const progress = getProgress(inv);
+      const daysLeft = getDaysLeft(inv);
+
+      let statusBadge = '';
+      if (isPending) statusBadge = '<span class="bg-yellow-500/20 text-yellow-400 rounded-full px-2 py-1 text-xs">Pending ⏳</span>';
+      else if (status === 'rejected') statusBadge = '<span class="bg-red-500/20 text-red-400 rounded-full px-2 py-1 text-xs">Rejected ❌</span>';
+      else if (isMatured) statusBadge = '<span class="bg-green-500/20 text-green-400 rounded-full px-2 py-1 text-xs">Matured ✅</span>';
+      else statusBadge = `<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;
+
+      let actionHtml = '';
+      if (isMatured && !wd) {
+        actionHtml = `<button onclick="requestWithdrawal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500">Withdraw</button>`;
+      } else if (wd) {
+        if (wd.status === 'pending') actionHtml = '<span class="text-yellow-400 text-xs">Payout pending</span>';
+        else if (wd.status === 'approved') actionHtml = '<span class="text-green-400 text-xs">Approved ✅</span>';
+        else if (wd.status === 'paid') actionHtml = `<span class="text-green-400 text-xs">Paid ✅</span><button onclick="openDepositModal()" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Reinvest</button>`;
+        else actionHtml = '<span class="text-red-400 text-xs">Rejected ❌</span>';
+      }
+
+      return `<div class="glass rounded-lg p-3 mb-2">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="font-semibold">₵${formatNumber(inv.amount)} <span class="text-xs text-gray-400 capitalize">${inv.plan}</span></div>
+            <div class="text-sm text-green-400">Earnings: ₵${formatNumber(earnings)}</div>
+            <div class="flex items-center gap-2 mt-1">
+              <div class="w-16 h-1.5 bg-white/5 rounded-full"><div class="h-full gradient-gold rounded-full" style="width:${Math.min(100, progress)}%"></div></div>
+              <span class="text-xs text-gray-400">${Math.round(progress)}%</span>
+            </div>
+            <div class="mt-1">${statusBadge}</div>
+          </div>
+          <div class="flex flex-col items-end gap-1">
+            ${actionHtml}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+            const activityEl = document.getElementById('recent-activity');
+            if (investments.length === 0) {
+                activityEl.innerHTML = '<div class="text-gray-500 text-sm text-center py-4">No activity yet</div>';
+            } else {
+                activityEl.innerHTML = investments.slice(-3).reverse().map(inv => `
+                    <div class="flex items-center justify-between glass rounded-lg p-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-full ${inv.method==='momo'?'bg-yellow-500/20':'bg-orange-500/20'} flex items-center justify-center"><span class="text-xs">${inv.method==='momo'?'M':'₿'}</span></div>
+                            <div><div class="text-xs font-medium">₵${formatNumber(inv.amount)}</div><div class="text-[10px] text-gray-500">${inv.plan}</div></div>
+                        </div>
+                        <span class="text-[10px] text-gray-500">${timeAgo(inv.date)}</span>
+                    </div>`).join('');
+            }
+
+            drawChart(investments);
+            loadTransactionHistory();
+        }
+
+        async function requestWithdrawal(investmentId) {
+            if (!await customConfirm('Request payout for this investment?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/withdrawals`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                    body: JSON.stringify({ investment_id: investmentId })
+                });
+                const data = await res.json();
+                if (!res.ok) return showToast(data.error, 'error');
+                showToast('Payout request submitted!', 'success');
+                updateDashboard();
+            } catch (e) { showToast('Connection error', 'error'); }
+        }
+
+        async function requestReferralWithdrawal() {
+    const bonusText = document.getElementById('dash-bonus').textContent.replace('₵','').replace(/,/g,'');
+    const bonus = parseFloat(bonusText) || 0;
+    if (bonus < 50) {
+        showToast('Minimum referral withdrawal is ₵50', 'error');
+        return;
+    }
+    if (!await customConfirm(`Withdraw your referral bonus of ₵${bonus}?`)) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/referral-withdrawal`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (!res.ok) return showToast(data.error, 'error');
+        showToast('Referral withdrawal requested!', 'success');
+        updateDashboard();
+    } catch (e) { showToast('Connection error', 'error'); }
+}
+
+        function getCurrentEarnings(inv) {
+            if (inv.status === 'pending') return 0;
+            if (inv.status === 'rejected') return 0;
+            if (inv.status === 'matured') {
+                const rate = returnRates[inv.plan] || 1;
+                return inv.amount * rate;
+            }
+            const progress = getProgress(inv) / 100;
+            const rate = returnRates[inv.plan] || 1;
+            return inv.amount * rate * progress;
+        }
+
+        function getProgress(inv) {
+            if (inv.status === 'pending') return 0;
+            if (inv.status === 'rejected') return 0;
+            if (inv.status === 'matured') return 100;
+            const planDays = { starter: 7, growth: 14, premium: 21 };
+            const totalDays = planDays[inv.plan] || 14;
+            const start = new Date(inv.date);
+            const now = new Date();
+            const elapsed = (now - start) / (1000 * 60 * 60 * 24);
+            return Math.min(100, (elapsed / totalDays) * 100);
+        }
+
+        function getDaysLeft(inv) {
+            const planDays = { starter: 7, growth: 14, premium: 21 };
+            const totalDays = planDays[inv.plan] || 14;
+            const start = new Date(inv.date);
+            const now = new Date();
+            const elapsed = (now - start) / (1000 * 60 * 60 * 24);
+            return Math.ceil(Math.max(0, totalDays - elapsed));
+        }
+
+        function drawChart(investments) {
+    const canvas = document.getElementById('growth-chart');
+    const ctx = canvas.getContext('2d');
+
+    // Destroy previous chart before creating a new one
+    if (growthChart) growthChart.destroy();
+
+    const activeInvs = investments.filter(i => i.status !== 'pending' && i.status !== 'rejected');
+    if (activeInvs.length === 0) {
+        // Still create an empty chart so the canvas doesn't collapse
+        growthChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: [], datasets: [] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.5)' } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.5)' } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+        return;
+    }
+
+    const earliest = Math.min(...activeInvs.map(i => new Date(i.date).getTime()));
+    const planDays = { starter: 7, growth: 14, premium: 21 };
+    const latest = Math.max(...activeInvs.map(i => {
+        const d = new Date(i.date);
+        d.setDate(d.getDate() + (planDays[i.plan] || 14));
+        return d.getTime();
+    }));
+    const totalDays = Math.ceil((latest - earliest) / (1000 * 60 * 60 * 24));
+
+    let labels = [], dataPoints = [];
+    for (let day = 0; day <= totalDays; day++) {
+        const dayTime = earliest + day * 24 * 60 * 60 * 1000;
+        let value = 0;
+        activeInvs.forEach(inv => {
+            const start = new Date(inv.date).getTime();
+            const end = start + (planDays[inv.plan] || 14) * 24 * 60 * 60 * 1000;
+            if (dayTime >= start) {
+                const progress = Math.min(1, (dayTime - start) / (end - start));
+                const rate = returnRates[inv.plan] || 1;
+                value += inv.amount + (inv.amount * rate * progress);
+            }
+        });
+        labels.push(`Day ${day}`);
+        dataPoints.push(value);
+    }
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(212,160,23,0.4)');
+    gradient.addColorStop(1, 'rgba(212,160,23,0)');
+
+    growthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Portfolio Value',
+                data: dataPoints,
+                borderColor: '#D4A017',
+                backgroundColor: gradient,
+                borderWidth: 2.5,
+                tension: 0.4,
+                pointRadius: 3,
+                pointBackgroundColor: '#D4A017',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1500,
+                easing: 'easeOutQuart'
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: 'rgba(255,255,255,0.5)', maxTicksLimit: 8 }
+                },
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: {
+                        color: 'rgba(255,255,255,0.5)',
+                        callback: (value) => '₵' + value.toLocaleString()
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => '₵' + ctx.raw.toLocaleString()
+                    }
+                }
+            }
+        }
+    });
+}
+
+        // Deposit modal functions
+        function openDepositModal() {
+            document.getElementById('deposit-modal').classList.remove('hidden');
+            document.getElementById('deposit-modal').classList.add('flex');
+            document.getElementById('deposit-step1').classList.remove('hidden');
+            document.getElementById('deposit-step2').classList.add('hidden');
+            document.getElementById('deposit-amount').value = '';
+            updateCalculator();
+        }
+
+        function closeDepositModal() {
+            document.getElementById('deposit-modal').classList.add('hidden');
+            document.getElementById('deposit-modal').classList.remove('flex');
+        }
+
+        function selectPlan(plan) {
+            selectedPlan = plan;
+            document.getElementById('deposit-plan').value = plan;
+            ['starter', 'growth', 'premium'].forEach(p => {
+                const el = document.getElementById(`plan-${p}`);
+                el.className = p === plan ? 'glass-gold rounded-xl p-3 text-center' : 'glass rounded-xl p-3 text-center';
+            });
+            updateCalculator();
+        }
+
+        function selectPayment(method) {
+    selectedPayment = method;
+    document.getElementById('deposit-payment').value = method;
+    document.getElementById('pay-momo').className = method === 'momo' ? 'glass-gold rounded-xl p-4 text-center' : 'glass rounded-xl p-4 text-center';
+    document.getElementById('pay-crypto').className = method === 'crypto' ? 'glass-gold rounded-xl p-4 text-center' : 'glass rounded-xl p-4 text-center';
+    
+    const amount = document.getElementById('deposit-amount').value;
+    const amountText = amount ? `₵${formatNumber(parseFloat(amount))}` : '₵0';
+
+    // Show the chosen method and hide the other
+    if (method === 'momo') {
+        document.getElementById('momo-details').innerHTML = getMomoDetailsHtml(amountText);
+        document.getElementById('momo-details').classList.remove('hidden');
+        document.getElementById('crypto-details').classList.add('hidden');
+    } else {
+        document.getElementById('crypto-details').innerHTML = getCryptoDetailsHtml(amountText);
+        document.getElementById('crypto-details').classList.remove('hidden');
+        document.getElementById('momo-details').classList.add('hidden');
+    }
+}
+
+        function goToStep2() {
+            const amount = parseFloat(document.getElementById('deposit-amount').value);
+            if (!amount || amount < 200) {
+                showToast('Minimum deposit is ₵200', 'error');
+                return;
+            }
+            document.getElementById('deposit-step1').classList.add('hidden');
+            document.getElementById('deposit-step2').classList.remove('hidden');
+                selectPayment(selectedPayment);
+        }
+
+        function goToStep1() {
+            document.getElementById('deposit-step1').classList.remove('hidden');
+            document.getElementById('deposit-step2').classList.add('hidden');
+        }
+
+        async function submitDeposit() {
+            const txid = document.getElementById('deposit-txid').value.trim();
+            if (!txid) {
+                showToast('Please enter your transaction ID or reference', 'error');
+                return;
+            }
+            if (!authToken) {
+                showToast('You must be logged in', 'error');
+                return;
+            }
+            const payload = {
+                amount: parseFloat(document.getElementById('deposit-amount').value),
+                plan: document.getElementById('deposit-plan').value,
+                method: document.getElementById('deposit-payment').value,
+                transaction_id: txid
+            };
+            try {
+                const res = await fetch(`${API_BASE}/api/investments`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}`},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) return showToast(data.error || 'Deposit failed', 'error');
+                closeDepositModal();
+                showToast('Deposit submitted! Pending admin approval.', 'success');
+                updateDashboard();
+            } catch (e) { showToast('Connection error', 'error'); }
+        }
+
+        document.addEventListener('input', function(e) { if (e.target.id === 'deposit-amount') updateCalculator(); });
+        function updateCalculator() {
+            const amount = parseFloat(document.getElementById('deposit-amount').value) || 0;
+            const rate = returnRates[selectedPlan] || 1;
+            document.getElementById('calc-invest').textContent = `₵${formatNumber(amount)}`;
+            document.getElementById('calc-earn').textContent = `₵${formatNumber(amount * rate)}`;
+            document.getElementById('calc-total').textContent = `₵${formatNumber(amount * (1 + rate))}`;
+            const rateLabel = document.getElementById('calc-rate-label');
+            if (rateLabel) rateLabel.textContent = Math.round(rate * 100);
+        }
+
+        function formatNumber(n) { return Number(n).toLocaleString('en-GH', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
+        function timeAgo(dateStr) {
+            const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+            if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+            return `${Math.floor(diff/86400)}d ago`;
+        }
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-red-500/20 border-red-500/50 text-red-400';
+            const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+            toast.className = `toast glass ${colors} border rounded-xl px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-sm`;
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5 shrink-0"></i><span class="text-sm">${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => toast.remove(), 4000);
+        }
+        function copyAddress(addr) {
+    navigator.clipboard.writeText(addr).then(() => showToast('Copied!', 'success'));
+}
+        function toggleFaq(btn) {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('[data-lucide]');
+            content.classList.toggle('hidden');
+            icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+               async function loadLeaderboard() {
+  const list = document.getElementById('leaderboard-list');
+  if (!list) return;
+  const period = document.getElementById('leaderboard-period')?.value || 'all';
+  try {
+    const res = await fetch(`${API_BASE}/api/referral-leaderboard?period=${period}`);
+    const data = await res.json();
+    if (!data.leaderboard || data.leaderboard.length === 0) {
+      list.innerHTML = '<div class="text-gray-500 text-center py-2">No referrals yet.</div>';
+      return;
+    }
+    const top6 = data.leaderboard.slice(0, 6);
+    list.innerHTML = top6.map((entry, i) => `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-gold-400 w-5">${i+1}.</span>
+          ${i===0 ? '<span class="text-yellow-400 text-sm">👑</span>' : ''}
+          <span class="truncate max-w-[120px]">${safe(entry.name)}</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-gray-400">${entry.referrals} ref</span>
+          <span class="text-xs text-green-400 font-semibold">₵${formatNumber(entry.bonus)}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="text-gray-500 text-center py-2">Failed to load leaderboard.</div>';
+  }
+}
+
+       function animateCounter() {
+    const els = document.querySelectorAll('.hero-counter');
+    if (els.length === 0) return;
+    let current = 0;
+    const target = 2000;
+    const step = target / 60;
+    const interval = setInterval(() => {
+        current += step;
+        if (current >= target) {
+            current = target;
+            clearInterval(interval);
+        }
+        els.forEach(el => { el.textContent = formatNumber(current); });
+    }, 30);
+}
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (nav) {
+                nav.style.background = window.scrollY > 50 ? 'rgba(10,10,18,0.9)' : 'transparent';
+                nav.style.backdropFilter = window.scrollY > 50 ? 'blur(20px)' : 'none';
+            }
+        });
+
+        setInterval(() => {
+            if (document.getElementById('page-dashboard').classList.contains('active') && authToken) {
+                updateDashboard();
+            }
+        }, 60000);
+
+        // ========== RANDOM PAYOUT NOTIFICATION ==========
+        const firstNames = ['Kwame', 'Ama', 'Kofi', 'Akua', 'Yaw', 'Afia', 'Kojo', 'Adwoa', 'Kwesi', 'Efua', 'Nana', 'Esi', 'Kwabena', 'Akosua', 'Kwaku', 'Abena'];
+        const lastNames = ['Mensah', 'Owusu', 'Asante', 'Adjei', 'Boateng', 'Sarpong', 'Agyeman', 'Danso', 'Osei', 'Adu', 'Tetteh', 'Nyarko', 'Frimpong', 'Annan', 'Arthur'];
+        const messages = ['just received a payout of', 'withdrew', 'got paid', 'cashed out'];
+
+        function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function getRandomAmount() { return Math.floor(Math.random() * (5000 - 800 + 1)) + 800; }
+        function getRandomTimeAgo() {
+            const mins = Math.floor(Math.random() * 59) + 1;
+            return mins === 1 ? '1 minute ago' : `${mins} minutes ago`;
+        }
+
+        function showRandomPayoutPopup() {
+            const name = `${getRandomElement(firstNames)} ${getRandomElement(lastNames)}`;
+            const amount = getRandomAmount();
+            const message = getRandomElement(messages);
+            const timeAgo = getRandomTimeAgo();
+
+            const popup = document.createElement('div');
+            popup.className = 'payout-popup';
+            popup.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-dark-950 font-bold">💰</div>
+                    <div>
+                        <p class="text-sm font-semibold text-gold-400">${name}</p>
+                        <p class="text-xs text-gray-300">${message} <span class="text-white font-bold">₵${amount.toLocaleString()}</span></p>
+                        <p class="text-xs text-gray-500 mt-1">${timeAgo}</p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+                if (popup.parentNode) popup.parentNode.removeChild(popup);
+            }, 5000);
+        }
+
+        setInterval(showRandomPayoutPopup, 60000);
+        setTimeout(showRandomPayoutPopup, 5000);
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            if (authToken) {
+                fetch(`${API_BASE}/api/auth/me`, { headers: {'Authorization': `Bearer ${authToken}`} })
+                    .then(r => r.json())
+                    .then(d => { if (d.user) {
+    currentUser = d.user;
+    loadPaymentSettings();
+} else {
+    localStorage.removeItem('gcc_token');
+    localStorage.removeItem('gcc_user');
+    authToken = null;
+} })
+                    .catch(() => {});
+            }
+            animateCounter();
+            document.getElementById('deposit-modal').addEventListener('click', function(e) { if (e.target === this) closeDepositModal(); });
+        });
+
+document.addEventListener('DOMContentLoaded', () => {
+  // existing code...
+  // Check for reset token in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const resetToken = urlParams.get('reset-token');
+  if (resetToken) {
+    document.getElementById('reset-token').value = resetToken;
+    navigateTo('reset-password');
+  }
+});
+
+        setInterval(loadLeaderboard, 10000); // refresh leaderboard every 10 seconds
+    </script>
+    <!-- Custom Confirmation Modal -->
+<div id="custom-confirm-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl p-6 w-full max-w-sm text-center">
+    <i data-lucide="help-circle" class="w-10 h-10 text-yellow-400 mx-auto mb-3"></i>
+    <p id="custom-confirm-message" class="text-white text-sm mb-6">Are you sure?</p>
+    <div class="flex justify-center gap-4">
+      <button id="custom-confirm-cancel" class="px-6 py-2 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+      <button id="custom-confirm-ok" class="px-6 py-2 rounded-full gradient-gold text-dark-950 font-semibold text-sm hover:opacity-90 transition">Confirm</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
