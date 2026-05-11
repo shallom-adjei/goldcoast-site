@@ -1075,12 +1075,22 @@ async function loadPaymentSettings() {
         let growthChart = null;   // holds the Chart.js instance
         let countdownTimer = null; // for the live countdown
 
-        function navigateTo(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(`page-${page}`).classList.add('active');
-            if (page === 'dashboard') updateDashboard();
-            window.scrollTo(0, 0);
+       function navigateTo(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(`page-${page}`).classList.add('active');
+
+    // 🔁 Auto‑fill the referral code when navigating to the signup page
+    if (page === 'signup') {
+        const storedRef = localStorage.getItem('gcc_ref_code');
+        if (storedRef) {
+            const refInput = document.getElementById('signup-referral');
+            if (refInput) refInput.value = storedRef;
         }
+    }
+
+    if (page === 'dashboard') updateDashboard();
+    window.scrollTo(0, 0);
+}
 
         async function handleSignup(e) {
             e.preventDefault();
