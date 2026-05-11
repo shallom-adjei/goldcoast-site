@@ -417,7 +417,7 @@ async function loadUsers() {
  <td class="py-3">${safe(u.phone)}</td>
  <td class="py-3">${safe(u.referral_code||'-')}</td>
         <td class="py-3">${u.is_admin?'✅':'❌'}</td>
-        <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleDateString()}</td>
+        <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
         <td class="py-3">
           ${!u.is_admin ? `<button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>` : '<span class="text-gray-500 text-xs">Admin</span>'}
         </td>
@@ -437,11 +437,15 @@ async function showUserDetail(userId) {
     <p class="text-sm text-gray-400 mb-4">Referral Code: ${data.user.referral_code||'N/A'} | Referrals: ${data.referralCount} | Bonus: ₵${data.user.bonus||0}</p>
     <h4 class="font-semibold text-gold-400 mb-2">Investments (${data.investments.length})</h4>
     <div class="max-h-40 overflow-y-auto mb-4">
-      ${data.investments.map(i => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>${i.plan} - ₵${i.amount} (${i.status})</span><span>${new Date(i.date).toLocaleDateString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}
+      ${data.investments.map(i => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>${i.plan} - ₵${i.amount} (${i.status})</span><span>${new Date(i.date).toLocaleString()}</span>
+      </div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}
     </div>
     <h4 class="font-semibold text-gold-400 mb-2">Withdrawals (${data.withdrawals.length})</h4>
     <div class="max-h-40 overflow-y-auto">
-      ${data.withdrawals.map(w => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>₵${w.amount} (${w.status})</span><span>${new Date(w.created_at).toLocaleDateString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}
+      ${data.withdrawals.map(w => `<div class="text-xs flex justify-between py-1 border-b border-white/5">
+      <span>₵${w.amount} (${w.status})</span>
+      <span>${new Date(w.created_at).toLocaleString()}</span>
+      </div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}
     </div>
   `;
   document.getElementById('user-detail-modal').classList.remove('hidden');
@@ -460,7 +464,7 @@ function filterUsers() {
       <td class="py-3">${safe(u.phone)}</td>
       <td class="py-3">${safe(u.referral_code||'-')}</td>
       <td class="py-3">${u.is_admin?'✅':'❌'}</td>
-      <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleDateString()}</td>
+      <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
       <td class="py-3">
         ${!u.is_admin ? `<button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>` : '<span class="text-gray-500 text-xs">Admin</span>'}
       </td>
@@ -486,7 +490,7 @@ document.getElementById('investment-search').value = ''; // reset search field
         <td class="py-3">${inv.method}</td>
         <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
         <td class="py-3"><span class="status-${inv.status}">${inv.status}</span></td>
-        <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleDateString()}</td>
+        <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
         <td class="py-3">
          <select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
     <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
@@ -518,7 +522,7 @@ document.getElementById('stat-paid-count').textContent = `${paidWithdrawals.leng
     <td class="py-3 text-xs capitalize">${w.type || 'investment'}</td>
     <td class="py-3">${w.paid ? '<span class="text-green-400">Yes</span>' : '<span class="text-red-400">No</span>'}</td>
     <td class="py-3"><span class="status-${w.status}">${w.status}</span></td>
-    <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleDateString()}</td>
+    <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleString()}</td>
     <td class="py-3">
         ${w.status === 'pending' ? `
             <button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button>
@@ -545,7 +549,7 @@ function filterInvestments() {
       <td class="py-3">${inv.method}</td>
       <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
       <td class="py-3"><span class="status-${inv.status}">${inv.status}</span></td>
-      <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleDateString()}</td>
+      <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
       <td class="py-3">
          <select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
     <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
@@ -572,7 +576,7 @@ function filterWithdrawals() {
       <td class="py-3 text-xs capitalize">${w.type || 'investment'}</td>
       <td class="py-3">${w.paid ? '<span class="text-green-400">Yes</span>' : '<span class="text-red-400">No</span>'}</td>
       <td class="py-3"><span class="status-${w.status}">${w.status}</span></td>
-      <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleDateString()}</td>
+      <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleString()}</td>
       <td class="py-3">
         ${w.status === 'pending' ? `
             <button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button>
