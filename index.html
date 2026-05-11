@@ -1779,18 +1779,20 @@ if (investments.length === 0) {
         });
 
 document.addEventListener('DOMContentLoaded', () => {
-  // existing code...
- // Store referral code from URL so it survives navigation
-const urlParams = new URLSearchParams(window.location.search);
-const refCode = urlParams.get('ref');
-if (refCode) {
-  localStorage.setItem('gcc_ref_code', refCode);
-} else {
-  // If no URL ref, check localStorage (in case they navigated internally)
-  const storedRef = localStorage.getItem('gcc_ref_code');
-  if (storedRef) {
-    document.getElementById('signup-referral').value = storedRef;
+  // Store referral code from URL so it survives navigation
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get('ref');
+  if (refCode) {
+    localStorage.setItem('gcc_ref_code', refCode);
+  } else {
+    const storedRef = localStorage.getItem('gcc_ref_code');
+    if (storedRef) {
+      const refInput = document.getElementById('signup-referral');
+      if (refInput) refInput.value = storedRef;
+    }
   }
+
+  setInterval(loadLeaderboard, 10000); // refresh leaderboard every 10 seconds
 });
 
         setInterval(loadLeaderboard, 10000); // refresh leaderboard every 10 seconds
