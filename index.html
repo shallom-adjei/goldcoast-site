@@ -819,7 +819,7 @@ async function loadAnnouncement() {
             <td class="py-3">${tx.description}</td>
             <td class="py-3 ${tx.type === 'withdrawal' || tx.type === 'referral_bonus' ? 'text-red-400' : 'text-green-400'}">₵${formatNumber(tx.amount)}</td>
             <td class="py-3"><span class="status-${tx.status}">${tx.status}</span></td>
-            <td class="py-3 text-gray-400">${new Date(tx.date).toLocaleDateString()}</td>
+            <td class="py-3 text-gray-400">${new Date(tx.date).toLocaleString()}</td>
           </tr>
         `).join('');
     }
@@ -833,7 +833,7 @@ async function loadAnnouncement() {
             <div>
               <div class="font-semibold capitalize">${tx.type}</div>
               <div class="text-sm text-gray-300">${tx.description}</div>
-              <div class="text-xs text-gray-500">${new Date(tx.date).toLocaleDateString()}</div>
+              <div class="text-xs text-gray-500">${new Date(tx.date).toLocaleString()}</div>
             </div>
             <div class="text-right">
               <div class="${tx.type === 'withdrawal' || tx.type === 'referral_bonus' ? 'text-red-400' : 'text-green-400'} font-semibold">₵${formatNumber(tx.amount)}</div>
