@@ -1082,10 +1082,6 @@ async function loadPaymentSettings() {
             window.scrollTo(0, 0);
         }
 
-        if (page === 'signup' && localStorage.getItem('gcc_ref_code')) {
-  document.getElementById('signup-referral').value = localStorage.getItem('gcc_ref_code');
-}
-
         async function handleSignup(e) {
             e.preventDefault();
             const payload = {
