@@ -1216,24 +1216,24 @@ document.getElementById('transaction-cards').innerHTML = `
 }, 0);
            const activeInvs = investments.filter(i => i.status !== 'pending' && i.status !== 'rejected' && i.status !== 'matured');
 
-// --- Live countdown for Days Left ---
-// Clear any previous countdown
+// --- Live countdown for Days Left (skip already‑passed maturities) ---
 if (countdownTimer) clearInterval(countdownTimer);
+let nextMaturity = null;
 
-let earliestMaturityDate = null;
 if (activeInvs.length > 0) {
+    const now = Date.now();
     const planDays = { starter: 7, growth: 14, premium: 21 };
-    let earliest = Infinity;
     for (const inv of activeInvs) {
         const matureTime = new Date(inv.date).getTime() + (planDays[inv.plan] || 14) * 86400000;
-        if (matureTime < earliest) earliest = matureTime;
+        if (matureTime > now && (nextMaturity === null || matureTime < nextMaturity)) {
+            nextMaturity = matureTime;
+        }
     }
-    earliestMaturityDate = new Date(earliest);
+}
 
-    // Update countdown immediately, then every second
+if (nextMaturity) {
     const updateCountdown = () => {
-        const now = new Date().getTime();
-        const distance = earliestMaturityDate.getTime() - now;
+        const distance = nextMaturity - Date.now();
         if (distance <= 0) {
             document.getElementById('stat-days').textContent = 'Matured';
             clearInterval(countdownTimer);
@@ -1246,9 +1246,10 @@ if (activeInvs.length > 0) {
         document.getElementById('stat-days').textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
     };
     countdownTimer = setInterval(updateCountdown, 1000);
-    updateCountdown(); // first display
+    updateCountdown();
 } else {
-    document.getElementById('stat-days').textContent = '0';
+    // Either no active investments or all have already passed maturity
+    document.getElementById('stat-days').textContent = activeInvs.length > 0 ? 'Matured' : '0';
 }
 
             document.getElementById('stat-invested').textContent = `₵${formatNumber(totalInvested)}`;
