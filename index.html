@@ -545,6 +545,20 @@
             <h4 class="text-sm font-semibold text-green-400">Referral Bonus</h4>
             <p class="text-xl font-bold mt-1" id="dash-bonus">₵0</p>
         </div>
+        <!-- Prizes & Rewards Card -->
+<div class="glass rounded-2xl p-4 sm:p-5 mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h4 class="text-sm font-semibold text-purple-400">🏆 Prizes & Rewards</h4>
+            <p class="text-xl font-bold mt-1" id="dash-game-balance">₵0</p>
+        </div>
+        <div class="flex flex-col items-end gap-2">
+            <button id="withdraw-game-btn" onclick="requestGameRewardWithdrawal()" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-4 rounded-xl text-sm">
+                Withdraw Prizes
+            </button>
+        </div>
+    </div>
+</div>
         <div class="flex flex-col items-end gap-2">
             <button id="withdraw-bonus-btn" onclick="requestReferralWithdrawal()" class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-xl text-sm">
                 Withdraw Bonus
@@ -1170,7 +1184,8 @@ async function loadPaymentSettings() {
             document.getElementById('dash-username').textContent = safe(currentUser.name.split(' ')[0]);
             document.getElementById('dash-avatar').textContent = currentUser.name[0].toUpperCase();
             document.getElementById('dash-referral-code').textContent = currentUser.referral_code || currentUser.id;
-document.getElementById('dash-bonus').textContent = `₵${formatNumber(currentUser.bonus || 0)}`;
+            document.getElementById('dash-bonus').textContent = `₵${formatNumber(currentUser.bonus || 0)}`;
+            document.getElementById('dash-game-balance').textContent = `₵${formatNumber(currentUser.game_balance || 0)}`;
             loadLeaderboard();
             loadAnnouncement();
             
@@ -1180,6 +1195,12 @@ if (btn) {
     const b = parseFloat((currentUser.bonus || 0).toString());
     btn.disabled = b < 50;
     btn.style.opacity = b < 50 ? '0.5' : '1';
+}
+const gameBtn = document.getElementById('withdraw-game-btn');
+if (gameBtn) {
+    const gb = parseFloat((currentUser.game_balance || 0).toString());
+    gameBtn.disabled = gb < 30;
+    gameBtn.style.opacity = gb < 30 ? '0.5' : '1';
 }
 
  // ✅ INSERT SKELETON LINES HERE (right before the first fetch)
@@ -1382,6 +1403,26 @@ if (investments.length === 0) {
                 updateDashboard();
             } catch (e) { showToast('Connection error', 'error'); }
         }
+
+        async function requestGameRewardWithdrawal() {
+    const balanceText = document.getElementById('dash-game-balance').textContent.replace('₵','').replace(/,/g,'');
+    const balance = parseFloat(balanceText) || 0;
+    if (balance < 30) {
+        showToast('Minimum withdrawal is ₵30', 'error');
+        return;
+    }
+    if (!await customConfirm(`Withdraw your game rewards of ₵${balance}?`)) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/game-reward-withdrawal`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (!res.ok) return showToast(data.error, 'error');
+        showToast('Game reward withdrawal requested!', 'success');
+        updateDashboard();
+    } catch (e) { showToast('Connection error', 'error'); }
+}
 
         async function requestReferralWithdrawal() {
     const bonusText = document.getElementById('dash-bonus').textContent.replace('₵','').replace(/,/g,'');
