@@ -545,20 +545,6 @@
             <h4 class="text-sm font-semibold text-green-400">Referral Bonus</h4>
             <p class="text-xl font-bold mt-1" id="dash-bonus">₵0</p>
         </div>
-        <!-- Prizes & Rewards Card -->
-<div class="glass rounded-2xl p-4 sm:p-5 mb-6">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-            <h4 class="text-sm font-semibold text-purple-400">🏆 Prizes & Rewards</h4>
-            <p class="text-xl font-bold mt-1" id="dash-game-balance">₵0</p>
-        </div>
-        <div class="flex flex-col items-end gap-2">
-            <button id="withdraw-game-btn" onclick="requestGameRewardWithdrawal()" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-4 rounded-xl text-sm">
-                Withdraw Prizes
-            </button>
-        </div>
-    </div>
-</div>
         <div class="flex flex-col items-end gap-2">
             <button id="withdraw-bonus-btn" onclick="requestReferralWithdrawal()" class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-xl text-sm">
                 Withdraw Bonus
@@ -583,6 +569,22 @@
         </div>
     </div>
 </div>
+
+ <!-- Prizes & Rewards Card -->
+<div class="glass rounded-2xl p-4 sm:p-5 mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h4 class="text-sm font-semibold text-purple-400">🏆 Prizes & Rewards</h4>
+            <p class="text-xl font-bold mt-1" id="dash-game-balance">₵0</p>
+        </div>
+        <div class="flex flex-col items-end gap-2">
+            <button id="withdraw-game-btn" onclick="requestGameRewardWithdrawal()" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-4 rounded-xl text-sm">
+                Withdraw Prizes
+            </button>
+        </div>
+    </div>
+</div>
+                
 <!-- Referral Leaderboard -->
 <div class="glass rounded-2xl p-4 sm:p-5 mb-6">
     <h3 class="text-sm font-semibold text-gold-400 mb-3 flex items-center justify-between">
