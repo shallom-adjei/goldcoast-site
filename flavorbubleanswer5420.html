@@ -404,7 +404,6 @@ function showTab(tab) {
   } else if(tab==='settings') {
     document.getElementById('content-settings').classList.remove('hidden');
     document.getElementById('tab-settings').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
-    document.getElementById('set-referral-race-prize').value = data.settings.referral_race_prize || '₵20 airtime';
     loadSettings();
   }
 }
@@ -706,6 +705,7 @@ async function loadSettings() {
       document.getElementById('set-eth').value = data.settings.eth_address || '';
       document.getElementById('set-note').value = data.settings.payment_note || '';
       document.getElementById('set-referral-bonus').value = data.settings.referral_bonus || '5';
+      document.getElementById('set-referral-race-prize').value = data.settings.referral_race_prize || '₵20 airtime';
     }
   } catch (err) { toast('Failed to load settings', 'error'); }
 }
