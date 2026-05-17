@@ -1406,7 +1406,7 @@ if (investments.length === 0) {
             } catch (e) { showToast('Connection error', 'error'); }
         }
 
-        async function requestGameRewardWithdrawal() {
+    async function requestGameRewardWithdrawal() {
     const balanceText = document.getElementById('dash-game-balance').textContent.replace('₵','').replace(/,/g,'');
     const balance = parseFloat(balanceText) || 0;
     if (balance < 30) {
@@ -1420,7 +1420,15 @@ if (investments.length === 0) {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         const data = await res.json();
-        if (!res.ok) return showToast(data.error, 'error');
+        if (!res.ok) {
+            // Check for the active‑investment requirement message
+            if (data.error && data.error.includes('active investment')) {
+                showToast('You need an active investment to withdraw Prizes & Rewards. Start one from just ₵200!', 'error');
+            } else {
+                showToast(data.error || 'Withdrawal failed', 'error');
+            }
+            return;
+        }
         showToast('Game reward withdrawal requested!', 'success');
         updateDashboard();
     } catch (e) { showToast('Connection error', 'error'); }
