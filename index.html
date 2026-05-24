@@ -326,7 +326,7 @@
                         <div class="text-3xl font-bold mb-1">₵200 <span class="text-base text-gray-400 font-normal">min</span></div>
                         <div class="text-gray-400 text-sm mb-6">14 Days</div>
                         <ul class="space-y-3 mb-8 text-sm">
-    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 80% Returns</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 70% Returns</li>
     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Real-time Dashboard</li>
     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Priority Support</li>
     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Instant Payout</li>
@@ -376,7 +376,7 @@
             <span class="font-medium">How do the returns work?</span>
             <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
         </button>
-        <div class="hidden px-5 pb-5 text-gray-400 text-sm">Returns vary by plan: Starter gives 50% earnings (e.g. invest ₵1,000 → get ₵1,500), Growth gives 80% earnings (e.g. invest ₵1,000 → get ₵1,800), and Premium gives 100% earnings (e.g. invest ₵1,000 → get ₵2,000). All payouts include your original capital.</div>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">Returns vary by plan: Starter gives 50% earnings (e.g. invest ₵1,000 → get ₵1,500), Growth gives 70% earnings (e.g. invest ₵1,000 → get ₵1,700), and Premium gives 100% earnings (e.g. invest ₵1,000 → get ₵2,000). All payouts include your original capital.</div>
     </div>
     <div class="glass rounded-xl overflow-hidden">
         <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left">
@@ -1007,7 +1007,7 @@ function customConfirm(message) {
         let authToken = localStorage.getItem('gcc_token');
         let selectedPlan = 'growth';
         let selectedPayment = 'momo';
-        const returnRates = { starter: 0.5, growth: 0.8, premium: 1.0 };
+        const returnRates = { starter: 0.5, growth: 0.7, premium: 1.0 };
 
 // Payment detail generators (no hardcoded info in HTML)
 function getMomoDetailsHtml(amountText) {
