@@ -75,10 +75,20 @@
     </nav>
 
     <!-- Stats -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
     <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Total Users</p><p class="text-3xl font-bold mt-2" id="stat-users">0</p></div>
     <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Total Investments</p><p class="text-3xl font-bold mt-2" id="stat-investments">0</p></div>
     <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Total Amount</p><p class="text-3xl font-bold mt-2" id="stat-total">0</p></div>
+       <!-- NEW: Active Investments -->
+    <div class="glass rounded-xl p-5 border-l-4 border-green-500">
+      <p class="text-green-400 text-sm">Active Investments</p>
+      <p class="text-3xl font-bold mt-2" id="stat-active-investments">0</p>
+    </div>
+    <!-- NEW: Active Amount -->
+    <div class="glass rounded-xl p-5 border-l-4 border-green-500">
+      <p class="text-green-400 text-sm">Active Amount</p>
+      <p class="text-3xl font-bold mt-2" id="stat-active-amount">0</p>
+    </div>
     <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Payout Requests</p><p class="text-3xl font-bold mt-2" id="stat-withdrawals">0</p></div>
     <div class="glass rounded-xl p-5"><p class="text-gray-400 text-sm">Total Paid</p><p class="text-3xl font-bold mt-2" id="stat-paid-amount">0</p><p class="text-xs text-gray-400 mt-1" id="stat-paid-count">0 payouts</p></div>
 </div>
@@ -486,6 +496,11 @@ document.getElementById('investment-search').value = ''; // reset search field
     document.getElementById('stat-total').textContent = Number(
   investments.reduce((s,i) => i.status !== 'rejected' ? s + i.amount : s, 0)
 ).toLocaleString('en-GH');
+    // NEW: Active stats
+    const activeInvestments = investments.filter(i => i.status === 'active');
+    const activeAmount = activeInvestments.reduce((s,i) => s + i.amount, 0);
+    document.getElementById('stat-active-investments').textContent = activeInvestments.length;
+    document.getElementById('stat-active-amount').textContent = '₵' + activeAmount.toLocaleString('en-GH');
     document.getElementById('investments-table').innerHTML = investments.map(inv => `
       <tr class="border-b border-white/5">
         <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
