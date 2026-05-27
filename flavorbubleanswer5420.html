@@ -116,7 +116,7 @@
       </div>
     </div>
 
-       <!-- Investments Table -->
+             <!-- Investments Table -->
     <div id="content-investments" class="hidden glass rounded-xl p-6">
       <button onclick="exportCSV('investments')" class="ml-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-lg text-xs">Export</button>
       <h2 class="text-lg font-semibold mb-4">All Investments</h2>
@@ -133,8 +133,10 @@
         </div>
       </div>
 
-            <div class="mb-4">
-        <input type="text" id="investment-search" ... oninput="filterInvestments()">
+      <div class="mb-4">
+        <input type="text" id="investment-search" placeholder="Search by user name or email..." 
+          class="w-full sm:w-64 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500"
+          oninput="filterInvestments()">
       </div>
 
       <div class="overflow-x-auto">
