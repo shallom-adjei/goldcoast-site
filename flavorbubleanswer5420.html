@@ -508,7 +508,20 @@ document.getElementById('investment-search').value = ''; // reset search field
         <td class="py-3 capitalize">${inv.plan}</td>
         <td class="py-3">${inv.method}</td>
         <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
-        <td class="py-3"><span class="status-${inv.status}">${inv.status}</span></td>
+        <td class="py-3">
+  ${(() => {
+    if (inv.status === 'active') {
+      const planDays = { starter: 7, growth: 14, premium: 21 };
+      const totalDays = planDays[inv.plan] || 14;
+      const start = new Date(inv.date);
+      const now = new Date();
+      const elapsed = (now - start) / (1000 * 60 * 60 * 24);
+      const daysLeft = Math.ceil(Math.max(0, totalDays - elapsed));
+      return `<span class="status-active">Active (${daysLeft}d left)</span>`;
+    }
+    return `<span class="status-${inv.status}">${inv.status}</span>`;
+  })()}
+</td>
         <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
         <td class="py-3">
          <select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
@@ -567,7 +580,20 @@ function filterInvestments() {
       <td class="py-3 capitalize">${inv.plan}</td>
       <td class="py-3">${inv.method}</td>
       <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
-      <td class="py-3"><span class="status-${inv.status}">${inv.status}</span></td>
+      <td class="py-3">
+  ${(() => {
+    if (inv.status === 'active') {
+      const planDays = { starter: 7, growth: 14, premium: 21 };
+      const totalDays = planDays[inv.plan] || 14;
+      const start = new Date(inv.date);
+      const now = new Date();
+      const elapsed = (now - start) / (1000 * 60 * 60 * 24);
+      const daysLeft = Math.ceil(Math.max(0, totalDays - elapsed));
+      return `<span class="status-active">Active (${daysLeft}d left)</span>`;
+    }
+    return `<span class="status-${inv.status}">${inv.status}</span>`;
+  })()}
+</td>
       <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
       <td class="py-3">
          <select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
