@@ -116,18 +116,46 @@
       </div>
     </div>
 
-    <!-- Investments Table -->
+       <!-- Investments Table -->
     <div id="content-investments" class="hidden glass rounded-xl p-6">
       <button onclick="exportCSV('investments')" class="ml-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-lg text-xs">Export</button>
       <h2 class="text-lg font-semibold mb-4">All Investments</h2>
-      <div class="mb-4">
-  <input type="text" id="investment-search" placeholder="Search by user name or email..." 
-    class="w-full sm:w-64 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500"
-    oninput="filterInvestments()">
-</div>
-      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-gray-400 border-b border-white/10"><th class="text-left pb-3">User</th><th class="text-left pb-3">Amount</th><th class="text-left pb-3">Plan</th><th class="text-left pb-3">Method</th><th class="text-left pb-3">TxID</th><th class="text-left pb-3">Status</th><th class="text-left pb-3">Date</th><th class="text-left pb-3">Action</th></tr></thead><tbody id="investments-table"></tbody></table></div>
-    </div>
 
+      <!-- Status summary & filters -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div id="investment-status-summary" class="text-xs text-gray-400"></div>
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="filterInvestmentsByStatus('all')" class="status-filter-btn px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium">All</button>
+          <button onclick="filterInvestmentsByStatus('active')" class="status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Active</button>
+          <button onclick="filterInvestmentsByStatus('pending')" class="status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Pending</button>
+          <button onclick="filterInvestmentsByStatus('matured')" class="status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Matured</button>
+          <button onclick="filterInvestmentsByStatus('rejected')" class="status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Rejected</button>
+        </div>
+      </div>
+
+            <div class="mb-4">
+        <input type="text" id="investment-search" ... oninput="filterInvestments()">
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-gray-400 border-b border-white/10">
+              <th class="text-left pb-3">User</th>
+              <th class="text-left pb-3">Amount</th>
+              <th class="text-left pb-3">Plan</th>
+              <th class="text-left pb-3">Method</th>
+              <th class="text-left pb-3">TxID</th>
+              <th class="text-left pb-3">Status</th>
+              <th class="text-left pb-3">Date</th>
+              <th class="text-left pb-3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="investments-table"></tbody>
+        </table>
+      </div>
+    </div>  
+    
     <!-- Withdrawals Table -->
     <div id="content-withdrawals" class="hidden glass rounded-xl p-6">
       <button onclick="exportCSV('withdrawals')" class="ml-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-lg text-xs">Export</button>
@@ -492,6 +520,11 @@ async function loadInvestments() {
     const { investments } = await res.json();
     allInvestments = investments;
 document.getElementById('investment-search').value = ''; // reset search field
+        // Status summary
+    const statusCounts = { active:0, pending:0, matured:0, rejected:0 };
+    investments.forEach(i => { if(statusCounts[i.status] !== undefined) statusCounts[i.status]++; });
+    document.getElementById('investment-status-summary').innerHTML =
+      `Active: ${statusCounts.active} | Pending: ${statusCounts.pending} | Matured: ${statusCounts.matured} | Rejected: ${statusCounts.rejected}`;
     document.getElementById('stat-investments').textContent = investments.filter(i => i.status !== 'rejected').length;
     document.getElementById('stat-total').textContent = Number(
   investments.reduce((s,i) => i.status !== 'rejected' ? s + i.amount : s, 0)
@@ -570,9 +603,19 @@ document.getElementById('stat-paid-count').textContent = `${paidWithdrawals.leng
 
 function filterInvestments() {
   const term = document.getElementById('investment-search').value.toLowerCase().trim();
-  const filtered = allInvestments.filter(inv => 
-    inv.user_name.toLowerCase().includes(term) || inv.user_email.toLowerCase().includes(term)
-  );
+  let filtered = allInvestments;
+
+  // Apply status filter
+  if (currentStatusFilter !== 'all') {
+    filtered = filtered.filter(inv => inv.status === currentStatusFilter);
+  }
+
+  // Apply text search
+  if (term) {
+    filtered = filtered.filter(inv => 
+      inv.user_name.toLowerCase().includes(term) || inv.user_email.toLowerCase().includes(term)
+    );
+  }
   document.getElementById('investments-table').innerHTML = filtered.map(inv => `
     <tr class="border-b border-white/5">
       <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
@@ -605,6 +648,23 @@ function filterInvestments() {
       </td>
     </tr>
   `).join('');
+}
+
+  let currentStatusFilter = 'all';
+
+function filterInvestmentsByStatus(status) {
+  currentStatusFilter = status;
+
+  // Update button highlights
+  document.querySelectorAll('.status-filter-btn').forEach(btn => {
+    btn.className = 'status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs';
+  });
+  // Highlight the clicked button
+  const activeBtn = document.querySelector(`[onclick="filterInvestmentsByStatus('${status}')"]`);
+  if (activeBtn) activeBtn.className = 'status-filter-btn px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium';
+
+  // Re-render the table with both text search and status filter
+  filterInvestments();
 }
 
 function filterWithdrawals() {
