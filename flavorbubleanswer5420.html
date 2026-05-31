@@ -398,6 +398,15 @@ function toast(msg, type='success') {
   lucide.createIcons();  // <-- changed here
   setTimeout(() => el.remove(), 4000);
 }
+function copyToClipboard(text) {
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    toast('Phone number copied!');
+  }).catch(() => {
+    toast('Failed to copy', 'error');
+  });
+}
+  
 document.getElementById('login-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   const email = document.getElementById('login-email').value;
@@ -598,7 +607,10 @@ const totalPaid = paidWithdrawals.reduce((s, w) => s + w.amount, 0);
 document.getElementById('stat-paid-amount').textContent = `₵${totalPaid.toLocaleString()}`;
 document.getElementById('stat-paid-count').textContent = `${paidWithdrawals.length} payout${paidWithdrawals.length !== 1 ? 's' : ''}`;
     document.getElementById('withdrawals-table').innerHTML = withdrawals.map(w => `<tr class="border-b border-white/5">
-    <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span><br><span class="text-xs text-gray-500">${safe(w.user_phone || '')}</span></td>
+    <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span><br><span class="text-xs text-gray-500">
+  ${safe(w.user_phone || '')}
+  ${w.user_phone ? `<button onclick="copyToClipboard('${w.user_phone.replace(/'/g, "\\'")}')" class="ml-1 text-gray-400 hover:text-white text-[10px] underline">Copy</button>` : ''}
+</span></td>
     <td class="py-3">₵${w.amount.toLocaleString()}</td>
     <td class="py-3 capitalize">${w.plan || 'Referral'}</td>
     <td class="py-3">${w.invested_amount ? '₵'+w.invested_amount.toLocaleString() : '-'}</td>
@@ -690,7 +702,10 @@ function filterWithdrawals() {
   );
   document.getElementById('withdrawals-table').innerHTML = filtered.map(w => `
     <tr class="border-b border-white/5">
-      <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span><br><span class="text-xs text-gray-500">${safe(w.user_phone || '')}</span></td>
+      <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span><br><span class="text-xs text-gray-500">
+  ${safe(w.user_phone || '')}
+  ${w.user_phone ? `<button onclick="copyToClipboard('${w.user_phone.replace(/'/g, "\\'")}')" class="ml-1 text-gray-400 hover:text-white text-[10px] underline">Copy</button>` : ''}
+</span></td>
       <td class="py-3">₵${w.amount.toLocaleString()}</td>
       <td class="py-3 capitalize">${w.plan || 'Referral'}</td>
       <td class="py-3">${w.invested_amount ? '₵'+w.invested_amount.toLocaleString() : '-'}</td>
