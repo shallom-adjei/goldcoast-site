@@ -636,6 +636,7 @@ function filterInvestments() {
     );
   }
   document.getElementById('investments-table').innerHTML = filtered.map(inv => `
+  updateActiveCountdowns();
     <tr class="border-b border-white/5">
       <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
       <td class="py-3">₵${inv.amount.toLocaleString()}</td>
