@@ -544,18 +544,13 @@ document.getElementById('investment-search').value = ''; // reset search field
         <td class="py-3">${inv.method}</td>
         <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
         <td class="py-3">
-  ${(() => {
-    if (inv.status === 'active') {
-      const planDays = { starter: 7, growth: 14, premium: 21 };
-      const totalDays = planDays[inv.plan] || 14;
-      const start = new Date(inv.date);
-      const now = new Date();
-      const elapsed = (now - start) / (1000 * 60 * 60 * 24);
-      const daysLeft = Math.ceil(Math.max(0, totalDays - elapsed));
-      return `<span class="status-active">Active (${daysLeft}d left)</span>`;
-    }
-    return `<span class="status-${inv.status}">${inv.status}</span>`;
-  })()}
+ <td class="py-3" data-status="${inv.status}">
+  ${inv.status === 'active' ? (() => {
+    const planDays = { starter: 7, growth: 14, premium: 21 };
+    const totalDays = planDays[inv.plan] || 14;
+    const maturityDate = new Date(new Date(inv.date).getTime() + totalDays * 86400000);
+    return `<span data-maturity="${maturityDate.toISOString()}" class="status-active">Active</span>`;
+  })() : `<span class="status-${inv.status}">${inv.status}</span>`}
 </td>
         <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
         <td class="py-3">
@@ -569,6 +564,28 @@ document.getElementById('investment-search').value = ''; // reset search field
       </tr>`).join('');
   } catch (err) { toast('Failed to load investments', 'error'); }
 }
+
+  function updateActiveCountdowns() {
+  const now = Date.now();
+  document.querySelectorAll('[data-maturity]').forEach(el => {
+    const maturity = new Date(el.getAttribute('data-maturity')).getTime();
+    const distance = maturity - now;
+    if (distance <= 0) {
+      // If it just matured, highlight and remove the timer (no reload needed)
+      el.innerHTML = '<span class="status-matured">Matured ✅</span>';
+      el.removeAttribute('data-maturity');
+      return;
+    }
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    el.innerHTML = `<span class="status-active">Active (${days}d ${hours}h ${minutes}m ${seconds}s)</span>`;
+  });
+}
+
+// Start the global timer
+setInterval(updateActiveCountdowns, 1000);
 
 async function loadWithdrawals() {
   try {
