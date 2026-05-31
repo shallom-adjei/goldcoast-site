@@ -598,7 +598,7 @@ const totalPaid = paidWithdrawals.reduce((s, w) => s + w.amount, 0);
 document.getElementById('stat-paid-amount').textContent = `₵${totalPaid.toLocaleString()}`;
 document.getElementById('stat-paid-count').textContent = `${paidWithdrawals.length} payout${paidWithdrawals.length !== 1 ? 's' : ''}`;
     document.getElementById('withdrawals-table').innerHTML = withdrawals.map(w => `<tr class="border-b border-white/5">
-    <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span></td>
+    <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span><br><span class="text-xs text-gray-500">${safe(w.user_phone || '')}</span></td>
     <td class="py-3">₵${w.amount.toLocaleString()}</td>
     <td class="py-3 capitalize">${w.plan || 'Referral'}</td>
     <td class="py-3">${w.invested_amount ? '₵'+w.invested_amount.toLocaleString() : '-'}</td>
@@ -690,7 +690,7 @@ function filterWithdrawals() {
   );
   document.getElementById('withdrawals-table').innerHTML = filtered.map(w => `
     <tr class="border-b border-white/5">
-      <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span></td>
+      <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span><br><span class="text-xs text-gray-500">${safe(w.user_phone || '')}</span></td>
       <td class="py-3">₵${w.amount.toLocaleString()}</td>
       <td class="py-3 capitalize">${w.plan || 'Referral'}</td>
       <td class="py-3">${w.invested_amount ? '₵'+w.invested_amount.toLocaleString() : '-'}</td>
