@@ -543,7 +543,6 @@ document.getElementById('investment-search').value = ''; // reset search field
         <td class="py-3 capitalize">${inv.plan}</td>
         <td class="py-3">${inv.method}</td>
         <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
-        <td class="py-3">
  <td class="py-3" data-status="${inv.status}">
   ${inv.status === 'active' ? (() => {
     const planDays = { starter: 7, growth: 14, premium: 21 };
@@ -635,28 +634,22 @@ function filterInvestments() {
       inv.user_name.toLowerCase().includes(term) || inv.user_email.toLowerCase().includes(term)
     );
   }
-   document.getElementById('investments-table').innerHTML = filtered.map(inv => `…`).join('');
-  updateActiveCountdowns(); 
+
+  document.getElementById('investments-table').innerHTML = filtered.map(inv => `
     <tr class="border-b border-white/5">
       <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
       <td class="py-3">₵${inv.amount.toLocaleString()}</td>
       <td class="py-3 capitalize">${inv.plan}</td>
       <td class="py-3">${inv.method}</td>
       <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
-      <td class="py-3">
-  ${(() => {
-    if (inv.status === 'active') {
-      const planDays = { starter: 7, growth: 14, premium: 21 };
-      const totalDays = planDays[inv.plan] || 14;
-      const start = new Date(inv.date);
-      const now = new Date();
-      const elapsed = (now - start) / (1000 * 60 * 60 * 24);
-      const daysLeft = Math.ceil(Math.max(0, totalDays - elapsed));
-      return `<span class="status-active">Active (${daysLeft}d left)</span>`;
-    }
-    return `<span class="status-${inv.status}">${inv.status}</span>`;
-  })()}
-</td>
+      <td class="py-3" data-status="${inv.status}">
+  ${inv.status === 'active' ? (() => {
+    const planDays = { starter: 7, growth: 14, premium: 21 };
+    const totalDays = planDays[inv.plan] || 14;
+    const maturityDate = new Date(new Date(inv.date).getTime() + totalDays * 86400000);
+    return `<span data-maturity="${maturityDate.toISOString()}" class="status-active">Active</span>`;
+  })() : `<span class="status-${inv.status}">${inv.status}</span>`}
+      </td>
       <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
       <td class="py-3">
          <select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
@@ -668,6 +661,9 @@ function filterInvestments() {
       </td>
     </tr>
   `).join('');
+
+  // Immediately update the countdown for any newly rendered active rows
+  updateActiveCountdowns();
 }
 
   let currentStatusFilter = 'all';
