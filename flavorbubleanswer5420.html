@@ -15,13 +15,14 @@
     .gradient-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
     .text-dark-950 { color: #0a0a12; }
     .chart-card {
-  background: linear-gradient(180deg, rgba(31,41,55,0.9), rgba(17,24,39,0.95));
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 20px;
-  padding: 24px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
-}
+      background: linear-gradient(180deg, rgba(31,41,55,0.9), rgba(17,24,39,0.95));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .period-btn.active { background: rgba(59,130,246,0.2); color: #3b82f6; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -217,16 +218,43 @@
         </div>
       </div>
 
-    <!-- Daily Cash Flow Chart -->
-<div class="chart-card mb-6">
-  <div class="flex items-center justify-between mb-4">
-    <h3 class="text-md font-semibold">Daily Cash Flow</h3>
-    <div id="cashflow-summary" class="text-xs text-gray-400"></div>
-  </div>
-  <div style="position: relative; height: 280px;">
-    <canvas id="cashflow-chart"></canvas>
-  </div>
-</div>
+      <!-- Cash Flow Chart -->
+      <div class="chart-card mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-md font-semibold">Cash Flow</h3>
+          <div class="flex gap-2">
+            <button onclick="loadCashflowData('all')" id="cf-all" class="period-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">All Time</button>
+            <button onclick="loadCashflowData('month')" id="cf-month" class="period-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">This Month</button>
+            <button onclick="loadCashflowData('today')" id="cf-today" class="period-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Today</button>
+          </div>
+        </div>
+
+        <!-- Summary badges -->
+        <div class="flex flex-wrap gap-3 mb-4" id="cashflow-summary">
+          <div class="glass rounded-lg px-4 py-2">
+            <p class="text-xs text-gray-400">All Time</p>
+            <p class="font-bold" id="sum-all-deposits">₵0</p>
+            <p class="text-xs text-red-400" id="sum-all-payouts">Payouts: ₵0</p>
+            <p class="text-xs" id="sum-all-net"></p>
+          </div>
+          <div class="glass rounded-lg px-4 py-2">
+            <p class="text-xs text-gray-400">This Month</p>
+            <p class="font-bold" id="sum-month-deposits">₵0</p>
+            <p class="text-xs text-red-400" id="sum-month-payouts">Payouts: ₵0</p>
+            <p class="text-xs" id="sum-month-net"></p>
+          </div>
+          <div class="glass rounded-lg px-4 py-2">
+            <p class="text-xs text-gray-400">Today</p>
+            <p class="font-bold" id="sum-today-deposits">₵0</p>
+            <p class="text-xs text-red-400" id="sum-today-payouts">Payouts: ₵0</p>
+            <p class="text-xs" id="sum-today-net"></p>
+          </div>
+        </div>
+
+        <div style="position: relative; height: 280px;">
+          <canvas id="cashflow-chart"></canvas>
+        </div>
+      </div>
 
       <!-- User search & table -->
       <div class="flex items-center justify-between mb-4">
@@ -314,6 +342,7 @@
     const API = 'https://goldcoast-api.onrender.com/api/admin';
     let allUsers = [], allInvestments = [], allWithdrawals = [], token = localStorage.getItem('admin_token');
     let adminChart = null, cashFlowChart = null, cashflowChart = null, currentStatusFilter = 'all', allPortfolioUsers = [];
+    let currentCashflowPeriod = 'all';
 
     function toast(msg, type='success') {
       const c = document.getElementById('toast-container');
@@ -744,12 +773,9 @@
         document.getElementById('pf-net-exposure').textContent = '₵' + (summary.netExposure || 0).toLocaleString();
         document.getElementById('pf-total-paid').textContent = '₵' + (summary.totalPaid || 0).toLocaleString();
 
-        // Fetch cashflow chart data
-        try {
-          const cashRes = await fetch(`${API}/cashflow`, { headers: {'Authorization': `Bearer ${token}`} });
-          const cashData = await cashRes.json();
-          drawCashflowChart(cashData);
-        } catch (e) { /* ignore */ }
+        // Load cash flow data and summaries
+        loadCashflowData('all');
+        updateSummaries();
 
         // Fetch user list
         const usersRes = await fetch(`${API}/users`, { headers: {'Authorization': `Bearer ${token}`} });
@@ -828,146 +854,173 @@
       });
     }
 
-function drawCashflowChart(data) {
-  const ctx = document.getElementById('cashflow-chart').getContext('2d');
-  if (cashflowChart) cashflowChart.destroy();
+    // ── Cash Flow Chart with period selector ──
+    async function loadCashflowData(period = 'all') {
+      currentCashflowPeriod = period;
+      document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`cf-${period}`).classList.add('active');
 
-  const netDaily = data.deposits.map((d, i) => d - data.payouts[i]);
-
-  // ── Summary text ──
-  const totalDeposits = data.deposits.reduce((a,b) => a + b, 0);
-  const totalPayouts = data.payouts.reduce((a,b) => a + b, 0);
-  const totalNet = totalDeposits - totalPayouts;
-  const netSign = totalNet >= 0 ? '+' : '';
-  document.getElementById('cashflow-summary').innerHTML =
-    `Total Deposits: ₵${totalDeposits.toLocaleString()} &nbsp;|&nbsp; Total Payouts: ₵${totalPayouts.toLocaleString()} &nbsp;|&nbsp; Net Flow: <span class="${totalNet >= 0 ? 'text-green-400' : 'text-red-400'}">${netSign}₵${totalNet.toLocaleString()}</span>`;
-
-  // ── Gradient for net flow line ──
-  const gradient = ctx.createLinearGradient(0, 0, 0, 280);
-  gradient.addColorStop(0, 'rgba(59,130,246,0.35)');
-  gradient.addColorStop(1, 'rgba(59,130,246,0)');
-
-  // Detect negative segments for red coloring
-  const negativeSegments = netDaily.map((val, i) => {
-    if (i === 0) return val < 0;
-    return netDaily[i-1] < 0 || val < 0 ? true : false;
-  });
-
-  cashflowChart = new Chart(ctx, {
-    data: {
-      labels: data.days.map(d => {
-        const date = new Date(d + 'T00:00:00');
-        return date.toLocaleDateString('en-GH', { month: 'short', day: 'numeric' });
-      }),
-      datasets: [
-        {
-          label: 'Deposits',
-          data: data.deposits,
-          backgroundColor: 'rgba(34, 197, 94, 0.18)',
-          borderColor: '#22c55e',
-          borderWidth: 2,
-          borderRadius: 8,
-          borderSkipped: false,
-          categoryPercentage: 0.7,
-          barPercentage: 0.8,
-          order: 2
-        },
-        {
-          label: 'Payouts',
-          data: data.payouts,
-          backgroundColor: 'rgba(239, 68, 68, 0.18)',
-          borderColor: '#ef4444',
-          borderWidth: 2,
-          borderRadius: 8,
-          borderSkipped: false,
-          categoryPercentage: 0.7,
-          barPercentage: 0.8,
-          order: 2
-        },
-        {
-          label: 'Net Flow',
-          data: netDaily,
-          type: 'line',
-          borderColor: '#3b82f6',
-          backgroundColor: gradient,
-          borderWidth: 4,
-          tension: 0.45,
-          fill: true,
-          pointRadius: 0,
-          pointHoverRadius: 6,
-          pointHoverBorderWidth: 3,
-          pointBackgroundColor: '#3b82f6',
-          segment: {
-            borderColor: (ctx) => netDaily[ctx.p0DataIndex] < 0 ? '#ef4444' : '#3b82f6',
-            backgroundColor: (ctx) => netDaily[ctx.p0DataIndex] < 0 ? 'rgba(239,68,68,0.15)' : gradient
-          },
-          order: 1
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      animation: { duration: 1000, easing: 'easeOutQuart' },
-      plugins: {
-        tooltip: {
-          backgroundColor: '#111827',
-          borderColor: '#374151',
-          borderWidth: 1,
-          cornerRadius: 12,
-          padding: 12,
-          callbacks: {
-            label: (ctx) => {
-              const money = new Intl.NumberFormat('en-GH', {
-                style: 'currency',
-                currency: 'GHS',
-                maximumFractionDigits: 0
-              });
-              return ctx.dataset.label + ': ' + money.format(ctx.raw);
-            }
-          }
-        },
-        legend: {
-          position: 'top',
-          align: 'end',
-          labels: {
-            usePointStyle: true,
-            pointStyle: 'circle',
-            boxWidth: 8,
-            boxHeight: 8,
-            padding: 20,
-            color: '#d1d5db',
-            font: { size: 12, weight: 500 }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          grid: {
-            color: (ctx) => ctx.tick.value === 0 ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)',
-            lineWidth: (ctx) => ctx.tick.value === 0 ? 2 : 1
-          },
-          ticks: {
-            color: '#9ca3af',
-            callback: (val) => '₵' + val.toLocaleString()
-          }
-        },
-        x: {
-          grid: { display: false },
-          ticks: {
-            color: '#9ca3af',
-            maxRotation: 0,
-            autoSkip: true,
-            maxTicksLimit: 8,
-            font: { size: 11 }
-          }
-        }
+      try {
+        const res = await fetch(`${API}/cashflow?period=${period}`, { headers: {'Authorization': `Bearer ${token}`} });
+        if (!res.ok) throw new Error('Failed to fetch cashflow');
+        const data = await res.json();
+        drawCashflowChart(data);
+      } catch (e) {
+        console.error('Cashflow load error:', e);
       }
     }
-  });
-}
+
+    async function updateSummaries() {
+      try {
+        const [allRes, monthRes, todayRes] = await Promise.all([
+          fetch(`${API}/cashflow?period=all`, { headers: {'Authorization': `Bearer ${token}`} }),
+          fetch(`${API}/cashflow?period=month`, { headers: {'Authorization': `Bearer ${token}`} }),
+          fetch(`${API}/cashflow?period=today`, { headers: {'Authorization': `Bearer ${token}`} })
+        ]);
+
+        const allData = await allRes.json();
+        const monthData = await monthRes.json();
+        const todayData = await todayRes.json();
+
+        const allDeposits = allData.deposits.reduce((a,b) => a+b, 0);
+        const allPayouts = allData.payouts.reduce((a,b) => a+b, 0);
+        const monthDeposits = monthData.deposits.reduce((a,b) => a+b, 0);
+        const monthPayouts = monthData.payouts.reduce((a,b) => a+b, 0);
+        const todayDeposits = todayData.deposits.reduce((a,b) => a+b, 0);
+        const todayPayouts = todayData.payouts.reduce((a,b) => a+b, 0);
+
+        document.getElementById('sum-all-deposits').textContent = '₵' + allDeposits.toLocaleString();
+        document.getElementById('sum-all-payouts').textContent = 'Payouts: ₵' + allPayouts.toLocaleString();
+        document.getElementById('sum-all-net').innerHTML = `Net: <span class="${allDeposits - allPayouts >= 0 ? 'text-green-400' : 'text-red-400'}">₵${(allDeposits - allPayouts).toLocaleString()}</span>`;
+
+        document.getElementById('sum-month-deposits').textContent = '₵' + monthDeposits.toLocaleString();
+        document.getElementById('sum-month-payouts').textContent = 'Payouts: ₵' + monthPayouts.toLocaleString();
+        document.getElementById('sum-month-net').innerHTML = `Net: <span class="${monthDeposits - monthPayouts >= 0 ? 'text-green-400' : 'text-red-400'}">₵${(monthDeposits - monthPayouts).toLocaleString()}</span>`;
+
+        document.getElementById('sum-today-deposits').textContent = '₵' + todayDeposits.toLocaleString();
+        document.getElementById('sum-today-payouts').textContent = 'Payouts: ₵' + todayPayouts.toLocaleString();
+        document.getElementById('sum-today-net').innerHTML = `Net: <span class="${todayDeposits - todayPayouts >= 0 ? 'text-green-400' : 'text-red-400'}">₵${(todayDeposits - todayPayouts).toLocaleString()}</span>`;
+      } catch (e) { /* ignore */ }
+    }
+
+    function drawCashflowChart(data) {
+      const ctx = document.getElementById('cashflow-chart').getContext('2d');
+      if (cashflowChart) cashflowChart.destroy();
+
+      const netDaily = data.deposits.map((d, i) => d - data.payouts[i]);
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+      gradient.addColorStop(0, 'rgba(59,130,246,0.35)');
+      gradient.addColorStop(1, 'rgba(59,130,246,0)');
+
+      cashflowChart = new Chart(ctx, {
+        data: {
+          labels: data.days.map(d => new Date(d + 'T00:00:00').toLocaleDateString('en-GH', { month:'short', day:'numeric' })),
+          datasets: [
+            {
+              label: 'Deposits',
+              data: data.deposits,
+              backgroundColor: 'rgba(34, 197, 94, 0.18)',
+              borderColor: '#22c55e',
+              borderWidth: 2,
+              borderRadius: 8,
+              borderSkipped: false,
+              categoryPercentage: 0.7,
+              barPercentage: 0.8,
+              order: 2
+            },
+            {
+              label: 'Payouts',
+              data: data.payouts,
+              backgroundColor: 'rgba(239, 68, 68, 0.18)',
+              borderColor: '#ef4444',
+              borderWidth: 2,
+              borderRadius: 8,
+              borderSkipped: false,
+              categoryPercentage: 0.7,
+              barPercentage: 0.8,
+              order: 2
+            },
+            {
+              label: 'Net Flow',
+              data: netDaily,
+              type: 'line',
+              borderColor: '#3b82f6',
+              backgroundColor: gradient,
+              borderWidth: 4,
+              tension: 0.45,
+              fill: true,
+              pointRadius: 0,
+              pointHoverRadius: 6,
+              pointHoverBorderWidth: 3,
+              pointBackgroundColor: '#3b82f6',
+              segment: {
+                borderColor: (ctx) => netDaily[ctx.p0DataIndex] < 0 ? '#ef4444' : '#3b82f6',
+                backgroundColor: (ctx) => netDaily[ctx.p0DataIndex] < 0 ? 'rgba(239,68,68,0.15)' : gradient
+              },
+              order: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          animation: { duration: 1000, easing: 'easeOutQuart' },
+          plugins: {
+            tooltip: {
+              backgroundColor: '#111827',
+              borderColor: '#374151',
+              borderWidth: 1,
+              cornerRadius: 12,
+              padding: 12,
+              callbacks: {
+                label: (ctx) => {
+                  const money = new Intl.NumberFormat('en-GH', { style:'currency', currency:'GHS', maximumFractionDigits:0 });
+                  return ctx.dataset.label + ': ' + money.format(ctx.raw);
+                }
+              }
+            },
+            legend: {
+              position: 'top',
+              align: 'end',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                boxWidth: 8,
+                boxHeight: 8,
+                padding: 20,
+                color: '#d1d5db',
+                font: { size:12, weight:500 }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: (ctx) => ctx.tick.value === 0 ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)',
+                lineWidth: (ctx) => ctx.tick.value === 0 ? 2 : 1
+              },
+              ticks: {
+                color: '#9ca3af',
+                callback: (val) => '₵' + val.toLocaleString()
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: '#9ca3af',
+                maxRotation: 0,
+                autoSkip: true,
+                maxTicksLimit: 8,
+                font: { size: 11 }
+              }
+            }
+          }
+        }
+      });
+    }
 
     // ── Init ──
     document.addEventListener('DOMContentLoaded', () => {
