@@ -716,14 +716,22 @@
 
     // ── Portfolio Analyzer ──
     async function loadPortfolioUsers() {
-      try {
-        const res = await fetch(`${API}/users`, { headers:{'Authorization':`Bearer ${token}`} });
-        const { users } = await res.json();
-        allPortfolioUsers = users;
-        // platform-wide stats will be populated later
-        filterPortfolioUsers();
-      } catch(err) { toast('Failed to load portfolio users','error'); }
-    }
+  try {
+    // Fetch platform-wide summary
+    const summaryRes = await fetch(`${API}/portfolio-summary`, { headers: {'Authorization': `Bearer ${token}`} });
+    const summary = await summaryRes.json();
+    document.getElementById('pf-active-capital').textContent = '₵' + (summary.activeCapital || 0).toLocaleString();
+    document.getElementById('pf-expected-payout').textContent = '₵' + (summary.expectedPayout || 0).toLocaleString();
+    document.getElementById('pf-net-exposure').textContent = '₵' + (summary.netExposure || 0).toLocaleString();
+    document.getElementById('pf-total-paid').textContent = '₵' + (summary.totalPaid || 0).toLocaleString();
+
+    // Fetch user list
+    const usersRes = await fetch(`${API}/users`, { headers: {'Authorization': `Bearer ${token}`} });
+    const { users } = await usersRes.json();
+    allPortfolioUsers = users;
+    filterPortfolioUsers();
+  } catch (err) { toast('Failed to load portfolio data', 'error'); }
+}
 
     function filterPortfolioUsers() {
       const term = document.getElementById('portfolio-user-search').value.toLowerCase().trim();
