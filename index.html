@@ -1720,16 +1720,18 @@ if (investments.length === 0) {
             return `${Math.floor(diff/86400)}d ago`;
         }
         function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const colors = type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-red-500/20 border-red-500/50 text-red-400';
-            const icon = type === 'success' ? 'check-circle' : 'alert-circle';
-            toast.className = `toast glass ${colors} border rounded-xl px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-sm`;
-            toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5 shrink-0"></i><span class="text-sm">${message}</span>`;
-            container.appendChild(toast);
-            lucide.createIcons();
-            setTimeout(() => toast.remove(), 4000);
-        }
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    const colors = type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-red-500/20 border-red-500/50 text-red-400';
+    const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+    toast.className = `toast glass ${colors} border rounded-xl px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-sm`;
+    toast.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5 shrink-0"></i><span class="text-sm">${message}</span>`;
+    container.appendChild(toast);
+    lucide.createIcons();
+    // Keep success toasts for 4 seconds, error toasts for 8 seconds
+    const duration = type === 'error' ? 8000 : 4000;
+    setTimeout(() => toast.remove(), duration);
+}
         function copyAddress(addr) {
     navigator.clipboard.writeText(addr).then(() => showToast('Copied!', 'success'));
 }
