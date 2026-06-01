@@ -1639,16 +1639,24 @@ if (investments.length === 0) {
     }
 }
 
-        function goToStep2() {
-            const minAmounts = { starter: 200, growth: 300, premium: 500 };
-if (!amount || amount < minAmounts[selectedPlan]) {
-  showToast(`Minimum deposit for ${selectedPlan} is ₵${minAmounts[selectedPlan]}`, 'error');
-  return;
+       function goToStep2() {
+    const amount = parseFloat(document.getElementById('deposit-amount').value);
+    if (!amount) {
+        showToast('Please enter an amount', 'error');
+        return;
+    }
+
+    // Plan‑specific minimums
+    const minAmounts = { starter: 200, growth: 300, premium: 500 };
+    if (amount < minAmounts[selectedPlan]) {
+        showToast(`Minimum deposit for ${selectedPlan} is ₵${minAmounts[selectedPlan]}`, 'error');
+        return;
+    }
+
+    document.getElementById('deposit-step1').classList.add('hidden');
+    document.getElementById('deposit-step2').classList.remove('hidden');
+    selectPayment(selectedPayment);
 }
-            document.getElementById('deposit-step1').classList.add('hidden');
-            document.getElementById('deposit-step2').classList.remove('hidden');
-                selectPayment(selectedPayment);
-        }
 
         function goToStep1() {
             document.getElementById('deposit-step1').classList.remove('hidden');
