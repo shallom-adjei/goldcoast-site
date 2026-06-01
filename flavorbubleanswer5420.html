@@ -817,29 +817,85 @@
       });
     }
 
-    function drawCashflowChart(data) {
-      const ctx = document.getElementById('cashflow-chart').getContext('2d');
-      if (cashflowChart) cashflowChart.destroy();
-      const netDaily = data.deposits.map((d, i) => d - data.payouts[i]);
-      let cum = 0;
-      const cumulative = netDaily.map(v => cum += v);
-      cashflowChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: data.days.map(d => d.slice(5)),
-          datasets: [
-            { label: 'Deposits (approved)', data: data.deposits, backgroundColor: '#34d399' },
-            { label: 'Payouts', data: data.payouts, backgroundColor: '#f87171' }
-          ]
+  function drawCashflowChart(data) {
+  const ctx = document.getElementById('cashflow-chart').getContext('2d');
+  if (cashflowChart) cashflowChart.destroy();
+
+  // Calculate net flow for each day (deposits - payouts)
+  const netDaily = data.deposits.map((d, i) => d - data.payouts[i]);
+
+  cashflowChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.days.map(d => {
+        const date = new Date(d + 'T00:00:00'); // parse local date
+        return date.toLocaleDateString('en-GH', { month: 'short', day: 'numeric' });
+      }),
+      datasets: [
+        {
+          label: 'Deposits',
+          data: data.deposits,
+          backgroundColor: 'rgba(52, 211, 153, 0.7)',
+          borderColor: '#34d399',
+          borderWidth: 1,
+          borderRadius: 4,
+          order: 2
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: { y: { beginAtZero: true } },
-          plugins: { tooltip: { callbacks: { label: ctx => '₵' + ctx.raw.toLocaleString() } } }
+        {
+          label: 'Payouts',
+          data: data.payouts,
+          backgroundColor: 'rgba(248, 113, 113, 0.7)',
+          borderColor: '#f87171',
+          borderWidth: 1,
+          borderRadius: 4,
+          order: 2
+        },
+        {
+          label: 'Net Flow',
+          data: netDaily,
+          type: 'line',
+          borderColor: '#60a5fa',
+          backgroundColor: 'rgba(96, 165, 250, 0.1)',
+          borderWidth: 2.5,
+          pointRadius: 2,
+          pointBackgroundColor: '#60a5fa',
+          tension: 0.3,
+          fill: true,
+          order: 1
         }
-      });
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (ctx) => '₵' + ctx.raw.toLocaleString()
+          }
+        },
+        legend: {
+          labels: {
+            color: '#9ca3af',
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#9ca3af', callback: (val) => '₵' + val.toLocaleString() }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#9ca3af', maxTicksLimit: 7 }
+        }
+      }
     }
+  });
+}
 
     // ── Init ──
     document.addEventListener('DOMContentLoaded', () => {
