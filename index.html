@@ -1602,8 +1602,8 @@ if (investments.length === 0) {
     document.getElementById('deposit-amount').value = '';
     updateCalculator();
 
-    // ✅ Reset the minimum note to the default plan (Growth)
     document.getElementById('deposit-min-note').textContent = 'Minimum deposit is ₵300';
+    document.getElementById('deposit-amount').placeholder = 'Min ₵300';
 }
 
         function closeDepositModal() {
@@ -1611,7 +1611,7 @@ if (investments.length === 0) {
             document.getElementById('deposit-modal').classList.remove('flex');
         }
 
-      function selectPlan(plan) {
+     function selectPlan(plan) {
     selectedPlan = plan;
     document.getElementById('deposit-plan').value = plan;
     ['starter', 'growth', 'premium'].forEach(p => {
@@ -1620,9 +1620,9 @@ if (investments.length === 0) {
     });
     updateCalculator();
 
-    // ✅ Update minimum note
     const minAmounts = { starter: 200, growth: 300, premium: 500 };
     document.getElementById('deposit-min-note').textContent = `Minimum deposit is ₵${minAmounts[plan]}`;
+    document.getElementById('deposit-amount').placeholder = `Min ₵${minAmounts[plan]}`;
 }
 
         function selectPayment(method) {
