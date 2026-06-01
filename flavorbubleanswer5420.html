@@ -919,124 +919,107 @@
       } catch (e) { /* ignore */ }
     }
 
-    function drawCashflowChart(data) {
-      const ctx = document.getElementById('cashflow-chart').getContext('2d');
-      if (cashflowChart) cashflowChart.destroy();
+   function drawCashflowChart(data) {
+  const canvas = document.getElementById('cashflow-chart');
+  if (!canvas) {
+    console.error('Canvas #cashflow-chart not found');
+    return;
+  }
+  const ctx = canvas.getContext('2d');
+  if (cashflowChart) cashflowChart.destroy();
 
-      const netDaily = data.deposits.map((d, i) => d - data.payouts[i]);
+  // Make sure all necessary controllers are registered (safety net)
+  if (typeof Chart !== 'undefined' && Chart.register) {
+    Chart.register(
+      Chart.BarController,
+      Chart.LineController,
+      Chart.CategoryScale,
+      Chart.LinearScale,
+      Chart.PointElement,
+      Chart.LineElement,
+      Chart.BarElement,
+      Chart.Filler,
+      Chart.Legend,
+      Chart.Tooltip
+    );
+  }
 
-      const gradient = ctx.createLinearGradient(0, 0, 0, 280);
-      gradient.addColorStop(0, 'rgba(59,130,246,0.35)');
-      gradient.addColorStop(1, 'rgba(59,130,246,0)');
+  const netDaily = data.deposits.map((d, i) => d - data.payouts[i]);
 
-      cashflowChart = new Chart(ctx, {
-        data: {
-          labels: data.days.map(d => new Date(d + 'T00:00:00').toLocaleDateString('en-GH', { month:'short', day:'numeric' })),
-          datasets: [
-            {
-              label: 'Deposits',
-              data: data.deposits,
-              backgroundColor: 'rgba(34, 197, 94, 0.18)',
-              borderColor: '#22c55e',
-              borderWidth: 2,
-              borderRadius: 8,
-              borderSkipped: false,
-              categoryPercentage: 0.7,
-              barPercentage: 0.8,
-              order: 2
-            },
-            {
-              label: 'Payouts',
-              data: data.payouts,
-              backgroundColor: 'rgba(239, 68, 68, 0.18)',
-              borderColor: '#ef4444',
-              borderWidth: 2,
-              borderRadius: 8,
-              borderSkipped: false,
-              categoryPercentage: 0.7,
-              barPercentage: 0.8,
-              order: 2
-            },
-            {
-              label: 'Net Flow',
-              data: netDaily,
-              type: 'line',
-              borderColor: '#3b82f6',
-              backgroundColor: gradient,
-              borderWidth: 4,
-              tension: 0.45,
-              fill: true,
-              pointRadius: 0,
-              pointHoverRadius: 6,
-              pointHoverBorderWidth: 3,
-              pointBackgroundColor: '#3b82f6',
-              segment: {
-                borderColor: (ctx) => netDaily[ctx.p0DataIndex] < 0 ? '#ef4444' : '#3b82f6',
-                backgroundColor: (ctx) => netDaily[ctx.p0DataIndex] < 0 ? 'rgba(239,68,68,0.15)' : gradient
-              },
-              order: 1
-            }
-          ]
+  cashflowChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.days.map(d => {
+        const date = new Date(d + 'T00:00:00');
+        return date.toLocaleDateString('en-GH', { month: 'short', day: 'numeric' });
+      }),
+      datasets: [
+        {
+          label: 'Deposits',
+          data: data.deposits,
+          backgroundColor: 'rgba(34, 197, 94, 0.6)',
+          borderColor: '#22c55e',
+          borderWidth: 1,
+          borderRadius: 4,
+          order: 2
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          animation: { duration: 1000, easing: 'easeOutQuart' },
-          plugins: {
-            tooltip: {
-              backgroundColor: '#111827',
-              borderColor: '#374151',
-              borderWidth: 1,
-              cornerRadius: 12,
-              padding: 12,
-              callbacks: {
-                label: (ctx) => {
-                  const money = new Intl.NumberFormat('en-GH', { style:'currency', currency:'GHS', maximumFractionDigits:0 });
-                  return ctx.dataset.label + ': ' + money.format(ctx.raw);
-                }
-              }
-            },
-            legend: {
-              position: 'top',
-              align: 'end',
-              labels: {
-                usePointStyle: true,
-                pointStyle: 'circle',
-                boxWidth: 8,
-                boxHeight: 8,
-                padding: 20,
-                color: '#d1d5db',
-                font: { size:12, weight:500 }
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: {
-                color: (ctx) => ctx.tick.value === 0 ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)',
-                lineWidth: (ctx) => ctx.tick.value === 0 ? 2 : 1
-              },
-              ticks: {
-                color: '#9ca3af',
-                callback: (val) => '₵' + val.toLocaleString()
-              }
-            },
-            x: {
-              grid: { display: false },
-              ticks: {
-                color: '#9ca3af',
-                maxRotation: 0,
-                autoSkip: true,
-                maxTicksLimit: 8,
-                font: { size: 11 }
-              }
+        {
+          label: 'Payouts',
+          data: data.payouts,
+          backgroundColor: 'rgba(239, 68, 68, 0.6)',
+          borderColor: '#ef4444',
+          borderWidth: 1,
+          borderRadius: 4,
+          order: 2
+        },
+        {
+          label: 'Net Flow',
+          data: netDaily,
+          type: 'line',
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59,130,246,0.1)',
+          borderWidth: 3,
+          tension: 0.3,
+          fill: true,
+          pointRadius: 2,
+          pointBackgroundColor: '#3b82f6',
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              return ctx.dataset.label + ': ₵' + ctx.raw.toLocaleString();
             }
           }
+        },
+        legend: {
+          labels: {
+            color: '#9ca3af',
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
         }
-      });
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#9ca3af' }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#9ca3af', maxTicksLimit: 8 }
+        }
+      }
     }
+  });
+}
 
     // ── Init ──
     document.addEventListener('DOMContentLoaded', () => {
