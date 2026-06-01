@@ -311,7 +311,7 @@
                     <div class="glass rounded-2xl p-8">
                         <div class="text-gold-400 text-sm font-semibold mb-2">STARTER</div>
                         <div class="text-3xl font-bold mb-1">₵200 <span class="text-base text-gray-400 font-normal">min</span></div>
-                        <div class="text-gray-400 text-sm mb-6">7 Days</div>
+                        <div class="text-gray-400 text-sm mb-6">10 Days</div>
                         <ul class="space-y-3 mb-8 text-sm">
     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 50% Returns</li>
     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Real-time Dashboard</li>
@@ -323,8 +323,8 @@
                     <div class="glass-gold rounded-2xl p-8 relative overflow-hidden">
                         <div class="absolute top-0 right-0 gradient-gold text-dark-950 text-xs font-bold px-4 py-1 rounded-bl-xl">POPULAR</div>
                         <div class="text-gold-400 text-sm font-semibold mb-2">GROWTH</div>
-                        <div class="text-3xl font-bold mb-1">₵200 <span class="text-base text-gray-400 font-normal">min</span></div>
-                        <div class="text-gray-400 text-sm mb-6">14 Days</div>
+                        <div class="text-3xl font-bold mb-1">₵300 <span class="text-base text-gray-400 font-normal">min</span></div>
+                        <div class="text-gray-400 text-sm mb-6">20 Days</div>
                         <ul class="space-y-3 mb-8 text-sm">
     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 70% Returns</li>
     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Real-time Dashboard</li>
@@ -335,8 +335,8 @@
                     </div>
                     <div class="glass rounded-2xl p-8">
                         <div class="text-gold-400 text-sm font-semibold mb-2">PREMIUM</div>
-                        <div class="text-3xl font-bold mb-1">₵200 <span class="text-base text-gray-400 font-normal">min</span></div>
-                        <div class="text-gray-400 text-sm mb-6">21 Days</div>
+                        <div class="text-3xl font-bold mb-1">₵500 <span class="text-base text-gray-400 font-normal">min</span></div>
+                        <div class="text-gray-400 text-sm mb-6">30 Days</div>
                         <ul class="space-y-3 mb-8 text-sm">
     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 100% Returns</li>
     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> VIP Dashboard</li>
@@ -383,7 +383,7 @@
             <span class="font-medium">How long until I receive my returns?</span>
             <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
         </button>
-        <div class="hidden px-5 pb-5 text-gray-400 text-sm">Returns depend on your chosen plan: Starter (7 days), Growth (14 days), or Premium (21 days). When your investment matures – a Withdraw button will appear.</div>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">Returns depend on your chosen plan: Starter (10 days), Growth (20 days), or Premium (30 days). When your investment matures – a Withdraw button will appear.</div>
     </div>
 </div>
             </div>
@@ -1248,9 +1248,11 @@ let nextMaturity = null;
 
 if (activeInvs.length > 0) {
     const now = Date.now();
-    const planDays = { starter: 7, growth: 14, premium: 21 };
+    // Fallback planDays only used if duration_days is missing (shouldn't happen after migration)
+    const planDays = { starter: 10, growth: 20, premium: 30 };
     for (const inv of activeInvs) {
-        const matureTime = new Date(inv.date).getTime() + (planDays[inv.plan] || 14) * 86400000;
+        const effectiveDays = inv.duration_days || planDays[inv.plan] || 14;
+        const matureTime = new Date(inv.date).getTime() + effectiveDays * 86400000;
         if (matureTime > now && (nextMaturity === null || matureTime < nextMaturity)) {
             nextMaturity = matureTime;
         }
@@ -1470,7 +1472,7 @@ if (investments.length === 0) {
             if (inv.status === 'pending') return 0;
             if (inv.status === 'rejected') return 0;
             if (inv.status === 'matured') return 100;
-            const planDays = { starter: 7, growth: 14, premium: 21 };
+            const planDays = { starter: 10, growth: 20, premium: 30 };
             const totalDays = planDays[inv.plan] || 14;
             const start = new Date(inv.date);
             const now = new Date();
@@ -1479,13 +1481,13 @@ if (investments.length === 0) {
         }
 
         function getDaysLeft(inv) {
-            const planDays = { starter: 7, growth: 14, premium: 21 };
-            const totalDays = planDays[inv.plan] || 14;
-            const start = new Date(inv.date);
-            const now = new Date();
-            const elapsed = (now - start) / (1000 * 60 * 60 * 24);
-            return Math.ceil(Math.max(0, totalDays - elapsed));
-        }
+    const planDays = { starter: 10, growth: 20, premium: 30 };
+    const totalDays = inv.duration_days || planDays[inv.plan] || 14;
+    const start = new Date(inv.date);
+    const now = new Date();
+    const elapsed = (now - start) / (1000 * 60 * 60 * 24);
+    return Math.ceil(Math.max(0, totalDays - elapsed));
+}
 
         function drawChart(investments) {
     const canvas = document.getElementById('growth-chart');
@@ -1514,7 +1516,7 @@ if (investments.length === 0) {
     }
 
     const earliest = Math.min(...activeInvs.map(i => new Date(i.date).getTime()));
-    const planDays = { starter: 7, growth: 14, premium: 21 };
+    const planDays = { starter: 10, growth: 20, premium: 30 };
     const latest = Math.max(...activeInvs.map(i => {
         const d = new Date(i.date);
         d.setDate(d.getDate() + (planDays[i.plan] || 14));
@@ -1638,11 +1640,11 @@ if (investments.length === 0) {
 }
 
         function goToStep2() {
-            const amount = parseFloat(document.getElementById('deposit-amount').value);
-            if (!amount || amount < 200) {
-                showToast('Minimum deposit is ₵200', 'error');
-                return;
-            }
+            const minAmounts = { starter: 200, growth: 300, premium: 500 };
+if (!amount || amount < minAmounts[selectedPlan]) {
+  showToast(`Minimum deposit for ${selectedPlan} is ₵${minAmounts[selectedPlan]}`, 'error');
+  return;
+}
             document.getElementById('deposit-step1').classList.add('hidden');
             document.getElementById('deposit-step2').classList.remove('hidden');
                 selectPayment(selectedPayment);
