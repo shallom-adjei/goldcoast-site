@@ -14,6 +14,14 @@
     .status-pending { color: #fbbf24; } .status-active { color: #34d399; } .status-matured { color: #60a5fa; }
     .gradient-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
     .text-dark-950 { color: #0a0a12; }
+    .chart-card {
+  background: linear-gradient(180deg, rgba(31,41,55,0.9), rgba(17,24,39,0.95));
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -209,13 +217,16 @@
         </div>
       </div>
 
-      <!-- Daily Cash Flow Chart -->
-      <div class="glass rounded-xl p-4 mb-6">
-        <h3 class="text-md font-semibold mb-3">Daily Cash Flow (Last 30 Days)</h3>
-        <div style="position: relative; height: 250px;">
-          <canvas id="cashflow-chart"></canvas>
-        </div>
-      </div>
+    <!-- Daily Cash Flow Chart -->
+<div class="chart-card mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-md font-semibold">Daily Cash Flow</h3>
+    <div id="cashflow-summary" class="text-xs text-gray-400"></div>
+  </div>
+  <div style="position: relative; height: 280px;">
+    <canvas id="cashflow-chart"></canvas>
+  </div>
+</div>
 
       <!-- User search & table -->
       <div class="flex items-center justify-between mb-4">
@@ -817,50 +828,79 @@
       });
     }
 
-  function drawCashflowChart(data) {
+function drawCashflowChart(data) {
   const ctx = document.getElementById('cashflow-chart').getContext('2d');
   if (cashflowChart) cashflowChart.destroy();
 
-  // Calculate net flow for each day (deposits - payouts)
   const netDaily = data.deposits.map((d, i) => d - data.payouts[i]);
 
+  // ── Summary text ──
+  const totalDeposits = data.deposits.reduce((a,b) => a + b, 0);
+  const totalPayouts = data.payouts.reduce((a,b) => a + b, 0);
+  const totalNet = totalDeposits - totalPayouts;
+  const netSign = totalNet >= 0 ? '+' : '';
+  document.getElementById('cashflow-summary').innerHTML =
+    `Total Deposits: ₵${totalDeposits.toLocaleString()} &nbsp;|&nbsp; Total Payouts: ₵${totalPayouts.toLocaleString()} &nbsp;|&nbsp; Net Flow: <span class="${totalNet >= 0 ? 'text-green-400' : 'text-red-400'}">${netSign}₵${totalNet.toLocaleString()}</span>`;
+
+  // ── Gradient for net flow line ──
+  const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+  gradient.addColorStop(0, 'rgba(59,130,246,0.35)');
+  gradient.addColorStop(1, 'rgba(59,130,246,0)');
+
+  // Detect negative segments for red coloring
+  const negativeSegments = netDaily.map((val, i) => {
+    if (i === 0) return val < 0;
+    return netDaily[i-1] < 0 || val < 0 ? true : false;
+  });
+
   cashflowChart = new Chart(ctx, {
-    type: 'bar',
     data: {
       labels: data.days.map(d => {
-        const date = new Date(d + 'T00:00:00'); // parse local date
+        const date = new Date(d + 'T00:00:00');
         return date.toLocaleDateString('en-GH', { month: 'short', day: 'numeric' });
       }),
       datasets: [
         {
           label: 'Deposits',
           data: data.deposits,
-          backgroundColor: 'rgba(52, 211, 153, 0.7)',
-          borderColor: '#34d399',
-          borderWidth: 1,
-          borderRadius: 4,
+          backgroundColor: 'rgba(34, 197, 94, 0.18)',
+          borderColor: '#22c55e',
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+          categoryPercentage: 0.7,
+          barPercentage: 0.8,
           order: 2
         },
         {
           label: 'Payouts',
           data: data.payouts,
-          backgroundColor: 'rgba(248, 113, 113, 0.7)',
-          borderColor: '#f87171',
-          borderWidth: 1,
-          borderRadius: 4,
+          backgroundColor: 'rgba(239, 68, 68, 0.18)',
+          borderColor: '#ef4444',
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+          categoryPercentage: 0.7,
+          barPercentage: 0.8,
           order: 2
         },
         {
           label: 'Net Flow',
           data: netDaily,
           type: 'line',
-          borderColor: '#60a5fa',
-          backgroundColor: 'rgba(96, 165, 250, 0.1)',
-          borderWidth: 2.5,
-          pointRadius: 2,
-          pointBackgroundColor: '#60a5fa',
-          tension: 0.3,
+          borderColor: '#3b82f6',
+          backgroundColor: gradient,
+          borderWidth: 4,
+          tension: 0.45,
           fill: true,
+          pointRadius: 0,
+          pointHoverRadius: 6,
+          pointHoverBorderWidth: 3,
+          pointBackgroundColor: '#3b82f6',
+          segment: {
+            borderColor: (ctx) => netDaily[ctx.p0DataIndex] < 0 ? '#ef4444' : '#3b82f6',
+            backgroundColor: (ctx) => netDaily[ctx.p0DataIndex] < 0 ? 'rgba(239,68,68,0.15)' : gradient
+          },
           order: 1
         }
       ]
@@ -868,29 +908,61 @@
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      animation: { duration: 1000, easing: 'easeOutQuart' },
       plugins: {
         tooltip: {
+          backgroundColor: '#111827',
+          borderColor: '#374151',
+          borderWidth: 1,
+          cornerRadius: 12,
+          padding: 12,
           callbacks: {
-            label: (ctx) => '₵' + ctx.raw.toLocaleString()
+            label: (ctx) => {
+              const money = new Intl.NumberFormat('en-GH', {
+                style: 'currency',
+                currency: 'GHS',
+                maximumFractionDigits: 0
+              });
+              return ctx.dataset.label + ': ' + money.format(ctx.raw);
+            }
           }
         },
         legend: {
+          position: 'top',
+          align: 'end',
           labels: {
-            color: '#9ca3af',
             usePointStyle: true,
-            pointStyle: 'circle'
+            pointStyle: 'circle',
+            boxWidth: 8,
+            boxHeight: 8,
+            padding: 20,
+            color: '#d1d5db',
+            font: { size: 12, weight: 500 }
           }
         }
       },
       scales: {
         y: {
           beginAtZero: true,
-          grid: { color: 'rgba(255,255,255,0.05)' },
-          ticks: { color: '#9ca3af', callback: (val) => '₵' + val.toLocaleString() }
+          grid: {
+            color: (ctx) => ctx.tick.value === 0 ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)',
+            lineWidth: (ctx) => ctx.tick.value === 0 ? 2 : 1
+          },
+          ticks: {
+            color: '#9ca3af',
+            callback: (val) => '₵' + val.toLocaleString()
+          }
         },
         x: {
           grid: { display: false },
-          ticks: { color: '#9ca3af', maxTicksLimit: 7 }
+          ticks: {
+            color: '#9ca3af',
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 8,
+            font: { size: 11 }
+          }
         }
       }
     }
