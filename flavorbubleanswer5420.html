@@ -6,6 +6,22 @@
   <title>Admin Panel - Gold Coast Capital</title>
   <script src="https://cdn.tailwindcss.com"></script>
  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.js"></script>
+  <script>
+  if (typeof Chart !== 'undefined') {
+    Chart.register(
+      Chart.LineController,
+      Chart.BarController,
+      Chart.CategoryScale,
+      Chart.LinearScale,
+      Chart.PointElement,
+      Chart.LineElement,
+      Chart.BarElement,
+      Chart.Filler,
+      Chart.Legend,
+      Chart.Tooltip
+    );
+  }
+</script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     body { font-family: 'Inter', sans-serif; background: #0a0a12; color: white; }
