@@ -692,7 +692,7 @@
 
                     <label class="block text-sm font-medium mb-2 text-gray-300">Amount (GHS)</label>
                     <input type="number" id="deposit-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
-                    <p class="text-xs text-gray-500 mb-5">Minimum deposit is ₵200</p>
+                    <p class="text-xs text-gray-500 mb-5" id="deposit-min-note">Minimum deposit is ₵200</p>
 
                     <div class="glass-gold rounded-xl p-4 mb-5">
                         <div class="flex items-center gap-2 mb-3"><i data-lucide="calculator" class="w-4 h-4 text-gold-400"></i><span class="text-sm font-medium text-gold-400">Calculator</span></div>
@@ -1594,29 +1594,36 @@ if (investments.length === 0) {
 }
 
         // Deposit modal functions
-        function openDepositModal() {
-            document.getElementById('deposit-modal').classList.remove('hidden');
-            document.getElementById('deposit-modal').classList.add('flex');
-            document.getElementById('deposit-step1').classList.remove('hidden');
-            document.getElementById('deposit-step2').classList.add('hidden');
-            document.getElementById('deposit-amount').value = '';
-            updateCalculator();
-        }
+       function openDepositModal() {
+    document.getElementById('deposit-modal').classList.remove('hidden');
+    document.getElementById('deposit-modal').classList.add('flex');
+    document.getElementById('deposit-step1').classList.remove('hidden');
+    document.getElementById('deposit-step2').classList.add('hidden');
+    document.getElementById('deposit-amount').value = '';
+    updateCalculator();
+
+    // ✅ Reset the minimum note to the default plan (Growth)
+    document.getElementById('deposit-min-note').textContent = 'Minimum deposit is ₵300';
+}
 
         function closeDepositModal() {
             document.getElementById('deposit-modal').classList.add('hidden');
             document.getElementById('deposit-modal').classList.remove('flex');
         }
 
-        function selectPlan(plan) {
-            selectedPlan = plan;
-            document.getElementById('deposit-plan').value = plan;
-            ['starter', 'growth', 'premium'].forEach(p => {
-                const el = document.getElementById(`plan-${p}`);
-                el.className = p === plan ? 'glass-gold rounded-xl p-3 text-center' : 'glass rounded-xl p-3 text-center';
-            });
-            updateCalculator();
-        }
+      function selectPlan(plan) {
+    selectedPlan = plan;
+    document.getElementById('deposit-plan').value = plan;
+    ['starter', 'growth', 'premium'].forEach(p => {
+        const el = document.getElementById(`plan-${p}`);
+        el.className = p === plan ? 'glass-gold rounded-xl p-3 text-center' : 'glass rounded-xl p-3 text-center';
+    });
+    updateCalculator();
+
+    // ✅ Update minimum note
+    const minAmounts = { starter: 200, growth: 300, premium: 500 };
+    document.getElementById('deposit-min-note').textContent = `Minimum deposit is ₵${minAmounts[plan]}`;
+}
 
         function selectPayment(method) {
     selectedPayment = method;
