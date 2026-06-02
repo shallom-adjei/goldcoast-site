@@ -816,14 +816,14 @@ function updateTier2Bonus() {
 function updateReinvestPaymentDetails() {
   const method = document.getElementById('reinvest-method').value;
   const extraAmount = parseFloat(document.getElementById('reinvest-extra-amount').value) || 0;
-  const total = reinvestPayout + extraAmount;
   const container = document.getElementById('reinvest-payment-credentials');
   if (!container) return;
 
+  // Show only the fresh deposit amount – the user must send only this amount, not the total
   if (method === 'momo') {
-    container.innerHTML = getMomoDetailsHtml(`₵${total.toFixed(2)}`);
+    container.innerHTML = getMomoDetailsHtml(`₵${extraAmount.toFixed(2)}`);
   } else {
-    container.innerHTML = getCryptoDetailsHtml(`₵${total.toFixed(2)}`);
+    container.innerHTML = getCryptoDetailsHtml(`₵${extraAmount.toFixed(2)}`);
   }
   lucide.createIcons();
 }
