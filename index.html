@@ -1401,9 +1401,11 @@ if (investments.length === 0) {
     else statusBadge = `<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;
 
     let actionHtml = '';
-   if (isMatured && !wd) {
+  if (isMatured && !wd && inv.status !== 'reinvested') {
   actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mr-1">Reinvest</button>
                 <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500">Withdraw</button>`;
+} else if (inv.status === 'reinvested') {
+  actionHtml = '<span class="text-green-400 text-xs">Reinvested ✅</span>';
 } else if (wd) {
       if (wd.status === 'pending') actionHtml = '<span class="text-yellow-400 text-xs">Payout pending</span>';
       else if (wd.status === 'approved') actionHtml = '<span class="text-green-400 text-xs">Approved ✅</span>';
@@ -1435,12 +1437,15 @@ if (investments.length === 0) {
       if (isPending) statusBadge = '<span class="bg-yellow-500/20 text-yellow-400 rounded-full px-2 py-1 text-xs">Pending ⏳</span>';
       else if (status === 'rejected') statusBadge = '<span class="bg-red-500/20 text-red-400 rounded-full px-2 py-1 text-xs">Rejected ❌</span>';
       else if (isMatured) statusBadge = '<span class="bg-green-500/20 text-green-400 rounded-full px-2 py-1 text-xs">Matured ✅</span>';
+      else if (status === 'reinvested') statusBadge = '<span class="bg-blue-500/20 text-blue-400 rounded-full px-2 py-1 text-xs">Reinvested 🔄</span>';
       else statusBadge = `<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;
 
       let actionHtml = '';
-     if (isMatured && !wd) {
+     if (isMatured && !wd && inv.status !== 'reinvested') {
   actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mr-1">Reinvest</button>
                 <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500">Withdraw</button>`;
+} else if (inv.status === 'reinvested') {
+  actionHtml = '<span class="text-green-400 text-xs">Reinvested ✅</span>';
 } else if (wd) {
         if (wd.status === 'pending') actionHtml = '<span class="text-yellow-400 text-xs">Payout pending</span>';
         else if (wd.status === 'approved') actionHtml = '<span class="text-green-400 text-xs">Approved ✅</span>';
@@ -2026,8 +2031,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- Tier 2 -->
     <div class="glass rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier2">
-      <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade Plan</h3>
-      <p class="text-sm text-gray-300">Reinvest into a <strong>different plan</strong> + deposit the minimum</p>
+  <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade Plan</h3>
+  <p class="text-sm text-gray-300">Reinvest your payout into a <strong>different plan</strong> and add at least the minimum deposit for that plan.</p>
+  <p class="text-xs text-gray-400 mt-1">Example: Your payout is ₵867. If you choose Growth (min ₵300), you meet the minimum, so no extra deposit needed. If you choose Premium (min ₵500), you still meet the minimum, no extra needed. But if your payout was only ₵200 and you wanted Premium, you’d need to add ₵300.</p>
+  <p class="text-sm text-green-400 mt-1">Bonus: <strong>2% of total (your payout + any extra deposit), capped at ₵30</strong></p>
       <div id="reinvest-tier2-options" class="hidden mt-3">
         <label class="block text-sm mb-1">Choose Plan</label>
         <select id="reinvest-new-plan" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
