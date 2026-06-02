@@ -359,6 +359,7 @@
     let allUsers = [], allInvestments = [], allWithdrawals = [], token = localStorage.getItem('admin_token');
     let adminChart = null, cashFlowChart = null, cashflowChart = null, currentStatusFilter = 'all', allPortfolioUsers = [];
     let currentCashflowPeriod = 'all';
+    let allInvestmentsFull = []; 
 
     function toast(msg, type='success') {
       const c = document.getElementById('toast-container');
@@ -516,6 +517,20 @@
         const res = await fetch(`${API}/investments`, { headers:{'Authorization':`Bearer ${token}`} });
         const { investments } = await res.json();
         allInvestments = investments;
+        // Hide rejected investments older than 3 days by default
+const threeDaysAgo = new Date();
+threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+// Keep the full list in case admin clicks "Rejected" filter
+allInvestmentsFull = investments;
+
+// Apply the hide-old-rejected filter for the default view
+allInvestments = investments.filter(inv => {
+  if (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo) {
+    return false;
+  }
+  return true;
+});
         document.getElementById('investment-search').value = '';
         const statusCounts = { active:0, pending:0, matured:0, rejected:0 };
         investments.forEach(i => { if(statusCounts[i.status] !== undefined) statusCounts[i.status]++; });
@@ -577,13 +592,26 @@
       updateActiveCountdowns();
     }
 
-    function filterInvestmentsByStatus(status) {
-      currentStatusFilter = status;
-      document.querySelectorAll('.status-filter-btn').forEach(btn => btn.className = 'status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs');
-      const activeBtn = document.querySelector(`[onclick="filterInvestmentsByStatus('${status}')"]`);
-      if(activeBtn) activeBtn.className = 'status-filter-btn px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium';
-      filterInvestments();
-    }
+   function filterInvestmentsByStatus(status) {
+  currentStatusFilter = status;
+
+  // If "Rejected" is selected, temporarily use the full list
+  if (status === 'rejected') {
+    allInvestments = allInvestmentsFull;
+  } else {
+    // Restore the filtered list (hide old rejected)
+    allInvestments = allInvestmentsFull.filter(inv => {
+      if (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo) return false;
+      return true;
+    });
+  }
+
+  document.querySelectorAll('.status-filter-btn').forEach(btn => btn.className = 'status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs');
+  const activeBtn = document.querySelector(`[onclick="filterInvestmentsByStatus('${status}')"]`);
+  if(activeBtn) activeBtn.className = 'status-filter-btn px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium';
+
+  filterInvestments();
+}
 
     function updateActiveCountdowns() {
       const now = Date.now();
