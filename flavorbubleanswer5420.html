@@ -360,6 +360,7 @@
     let adminChart = null, cashFlowChart = null, cashflowChart = null, currentStatusFilter = 'all', allPortfolioUsers = [];
     let currentCashflowPeriod = 'all';
     let allInvestmentsFull = []; 
+    let threeDaysAgo = new Date(); // <-- add this line 
 
     function toast(msg, type='success') {
       const c = document.getElementById('toast-container');
@@ -516,15 +517,13 @@
       try {
         const res = await fetch(`${API}/investments`, { headers:{'Authorization':`Bearer ${token}`} });
         const { investments } = await res.json();
-        allInvestments = investments;
-        // Hide rejected investments older than 3 days by default
-const threeDaysAgo = new Date();
-threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-
-// Keep the full list in case admin clicks "Rejected" filter
+       // Keep the full list in case admin clicks "Rejected" filter
 allInvestmentsFull = investments;
 
-// Apply the hide-old-rejected filter for the default view
+// Update the cut‑off date and apply the hide‑old‑rejected filter
+threeDaysAgo = new Date();
+threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
 allInvestments = investments.filter(inv => {
   if (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo) {
     return false;
