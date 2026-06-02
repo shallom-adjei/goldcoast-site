@@ -769,13 +769,20 @@ function closeReinvestModal() {
 }
 
 function updateTier2Info() {
-  const plan = document.getElementById('reinvest-new-plan').value;
-  const minAmounts = { starter:200, growth:300, premium:500 };
-  const requiredFresh = minAmounts[plan];
-  document.getElementById('fresh-amount').textContent = '₵' + requiredFresh;
-  document.getElementById('reinvest-payment-section').classList.remove('hidden');
+  const planSelect = document.getElementById('reinvest-new-plan');
+  const freshEl = document.getElementById('fresh-amount');
+  const bonusEl = document.getElementById('reinvest-tier2-bonus');
+  if (!planSelect || !freshEl || !bonusEl) return;   // safety
+
+  const minAmounts = { starter: 200, growth: 300, premium: 500 };
+  const requiredFresh = minAmounts[planSelect.value] || 200;
+  freshEl.textContent = '₵' + requiredFresh;
   const bonus = Math.min(Math.floor(0.05 * requiredFresh), 30);
-  document.getElementById('reinvest-tier2-bonus').textContent = `₵${bonus} (5% of ₵${requiredFresh})`;
+  bonusEl.textContent = `₵${bonus} (5% of ₵${requiredFresh})`;
+
+  // Always show payment details for Tier 2
+  const paymentSection = document.getElementById('reinvest-payment-section');
+  if (paymentSection) paymentSection.classList.remove('hidden');
 }
 
 async function submitReinvest() {
@@ -1954,21 +1961,30 @@ if (investments.length === 0) {
             document.getElementById('deposit-modal').addEventListener('click', function(e) { if (e.target === this) closeDepositModal(); });
         });
         // Toggle tiers
+// Tier toggle – Tier 1
 document.getElementById('reinvest-tier1').addEventListener('click', () => {
   currentReinvestTier = 1;
-  document.getElementById('reinvest-tier1').classList.add('glass-gold');
-  document.getElementById('reinvest-tier2').classList.remove('glass-gold');
+  const t1 = document.getElementById('reinvest-tier1');
+  const t2 = document.getElementById('reinvest-tier2');
+  t1.classList.add('glass-gold');
+  t2.classList.remove('glass-gold');
+  // hide Tier 2 options
   document.getElementById('reinvest-tier2-options').classList.add('hidden');
 });
 
+// Tier toggle – Tier 2
 document.getElementById('reinvest-tier2').addEventListener('click', () => {
   currentReinvestTier = 2;
-  document.getElementById('reinvest-tier2').classList.add('glass-gold');
-  document.getElementById('reinvest-tier1').classList.remove('glass-gold');
+  const t1 = document.getElementById('reinvest-tier1');
+  const t2 = document.getElementById('reinvest-tier2');
+  t2.classList.add('glass-gold');
+  t1.classList.remove('glass-gold');
+  // show Tier 2 options
   document.getElementById('reinvest-tier2-options').classList.remove('hidden');
   updateTier2Info();
 });
 
+// Update Tier 2 info when plan is changed
 document.getElementById('reinvest-new-plan').addEventListener('change', updateTier2Info);
 
 document.addEventListener('DOMContentLoaded', () => {
