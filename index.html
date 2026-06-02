@@ -768,24 +768,6 @@ function closeReinvestModal() {
   document.getElementById('reinvest-modal').classList.remove('flex');
 }
 
-// Toggle tiers
-document.getElementById('reinvest-tier1').addEventListener('click', () => {
-  currentReinvestTier = 1;
-  document.getElementById('reinvest-tier1').classList.add('glass-gold');
-  document.getElementById('reinvest-tier2').classList.remove('glass-gold');
-  document.getElementById('reinvest-tier2-options').classList.add('hidden');
-});
-
-document.getElementById('reinvest-tier2').addEventListener('click', () => {
-  currentReinvestTier = 2;
-  document.getElementById('reinvest-tier2').classList.add('glass-gold');
-  document.getElementById('reinvest-tier1').classList.remove('glass-gold');
-  document.getElementById('reinvest-tier2-options').classList.remove('hidden');
-  updateTier2Info();
-});
-
-document.getElementById('reinvest-new-plan').addEventListener('change', updateTier2Info);
-
 function updateTier2Info() {
   const plan = document.getElementById('reinvest-new-plan').value;
   const minAmounts = { starter:200, growth:300, premium:500 };
@@ -1971,6 +1953,23 @@ if (investments.length === 0) {
             animateCounter();
             document.getElementById('deposit-modal').addEventListener('click', function(e) { if (e.target === this) closeDepositModal(); });
         });
+        // Toggle tiers
+document.getElementById('reinvest-tier1').addEventListener('click', () => {
+  currentReinvestTier = 1;
+  document.getElementById('reinvest-tier1').classList.add('glass-gold');
+  document.getElementById('reinvest-tier2').classList.remove('glass-gold');
+  document.getElementById('reinvest-tier2-options').classList.add('hidden');
+});
+
+document.getElementById('reinvest-tier2').addEventListener('click', () => {
+  currentReinvestTier = 2;
+  document.getElementById('reinvest-tier2').classList.add('glass-gold');
+  document.getElementById('reinvest-tier1').classList.remove('glass-gold');
+  document.getElementById('reinvest-tier2-options').classList.remove('hidden');
+  updateTier2Info();
+});
+
+document.getElementById('reinvest-new-plan').addEventListener('change', updateTier2Info);
 
 document.addEventListener('DOMContentLoaded', () => {
   // Store referral code from URL so it survives navigation
