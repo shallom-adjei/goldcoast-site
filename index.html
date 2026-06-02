@@ -733,6 +733,114 @@
     <!-- SCRIPTS -->
     <script>
 
+        let currentReinvestTier = 1;
+let reinvestPayout = 0;
+let reinvestOriginalPlan = '';
+
+function openReinvestModal(investmentId) {
+  // Find the investment in currentUser's list
+  const inv = allInvestmentsLocal.find(i => i.id === investmentId);
+  if (!inv) return;
+
+  const rate = { starter:0.5, growth:0.7, premium:1.0 }[inv.plan] || 1.0;
+  const payout = inv.amount * (1 + rate);
+  reinvestPayout = payout;
+  reinvestOriginalPlan = inv.plan;
+
+  document.getElementById('reinvest-payout').textContent = '₵' + payout.toFixed(2);
+  document.getElementById('reinvest-original-plan').textContent = inv.plan;
+  document.getElementById('reinvest-investment-id').value = inv.id;
+
+  // Reset to Tier 1
+  currentReinvestTier = 1;
+  document.getElementById('reinvest-tier1').classList.add('glass-gold');
+  document.getElementById('reinvest-tier2').classList.remove('glass-gold');
+  document.getElementById('reinvest-tier2-options').classList.add('hidden');
+  document.getElementById('reinvest-new-plan').value = inv.plan; // default to original, but Tier 2 requires different
+
+  document.getElementById('reinvest-modal').classList.remove('hidden');
+  document.getElementById('reinvest-modal').classList.add('flex');
+  lucide.createIcons();
+}
+
+function closeReinvestModal() {
+  document.getElementById('reinvest-modal').classList.add('hidden');
+  document.getElementById('reinvest-modal').classList.remove('flex');
+}
+
+// Toggle tiers
+document.getElementById('reinvest-tier1').addEventListener('click', () => {
+  currentReinvestTier = 1;
+  document.getElementById('reinvest-tier1').classList.add('glass-gold');
+  document.getElementById('reinvest-tier2').classList.remove('glass-gold');
+  document.getElementById('reinvest-tier2-options').classList.add('hidden');
+});
+
+document.getElementById('reinvest-tier2').addEventListener('click', () => {
+  currentReinvestTier = 2;
+  document.getElementById('reinvest-tier2').classList.add('glass-gold');
+  document.getElementById('reinvest-tier1').classList.remove('glass-gold');
+  document.getElementById('reinvest-tier2-options').classList.remove('hidden');
+  updateTier2Info();
+});
+
+document.getElementById('reinvest-new-plan').addEventListener('change', updateTier2Info);
+
+function updateTier2Info() {
+  const plan = document.getElementById('reinvest-new-plan').value;
+  const minAmounts = { starter:200, growth:300, premium:500 };
+  const planMin = minAmounts[plan];
+  const extraNeeded = Math.max(0, planMin - reinvestPayout);
+  document.getElementById('reinvest-extra-info').innerHTML = `You need to add at least <strong>₵${extraNeeded}</strong> to meet the ${plan} minimum.`;
+  
+  if (extraNeeded > 0) {
+    document.getElementById('reinvest-payment-section').classList.remove('hidden');
+  } else {
+    document.getElementById('reinvest-payment-section').classList.add('hidden');
+  }
+  
+  const total = reinvestPayout + extraNeeded;
+  const bonus = Math.min(Math.floor(0.02 * total), 30);
+  document.getElementById('reinvest-tier2-bonus').textContent = `₵${bonus} (2% of ₵${total})`;
+}
+
+async function submitReinvest() {
+  const invId = document.getElementById('reinvest-investment-id').value;
+  const plan = document.getElementById('reinvest-new-plan').value;
+  const extra = currentReinvestTier === 2 ? Math.max(0, ({starter:200, growth:300, premium:500}[plan]) - reinvestPayout) : 0;
+  
+  const body = {
+    original_investment_id: invId,
+    new_plan: plan,
+    extra_amount: extra,
+    method: currentReinvestTier === 2 ? document.getElementById('reinvest-method').value : undefined,
+    transaction_id: currentReinvestTier === 2 ? document.getElementById('reinvest-txid').value : undefined
+  };
+
+  if (currentReinvestTier === 2 && (!body.transaction_id || !body.method)) {
+    showToast('Please enter transaction ID and payment method', 'error');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/reinvest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.error || 'Reinvest failed', 'error');
+      return;
+    }
+    closeReinvestModal();
+    showToast(`Reinvest successful! ₵${data.bonus} bonus added to Prizes & Rewards.`, 'success');
+    updateDashboard();
+  } catch (e) {
+    showToast('Connection error', 'error');
+  }
+}
+
         // Copy referral link to clipboard
 function copyReferralLink() {
   const code = document.getElementById('dash-referral-code').textContent.trim();
@@ -1220,12 +1328,13 @@ document.getElementById('transaction-cards').innerHTML = `
 `;
 
 
-            const [invRes, wdrRes] = await Promise.all([
-                fetch(`${API_BASE}/api/investments`, { headers: {'Authorization': `Bearer ${authToken}`} }),
-                fetch(`${API_BASE}/api/withdrawals`, { headers: {'Authorization': `Bearer ${authToken}`} })
-            ]);
-            const { investments } = await invRes.json();
-            const { withdrawals } = await wdrRes.json();
+   const [invRes, wdrRes] = await Promise.all([
+    fetch(`${API_BASE}/api/investments`, { headers: {'Authorization': `Bearer ${authToken}`} }),
+    fetch(`${API_BASE}/api/withdrawals`, { headers: {'Authorization': `Bearer ${authToken}`} })
+]);
+const { investments } = await invRes.json();
+const { withdrawals } = await wdrRes.json();
+window.allInvestmentsLocal = investments;
 
             const withdrawalMap = {};
             withdrawals.forEach(w => { withdrawalMap[w.investment_id] = w; });
@@ -1315,7 +1424,7 @@ if (investments.length === 0) {
     } else if (wd) {
       if (wd.status === 'pending') actionHtml = '<span class="text-yellow-400 text-xs">Payout pending</span>';
       else if (wd.status === 'approved') actionHtml = '<span class="text-green-400 text-xs">Approved ✅</span>';
-      else if (wd.status === 'paid') actionHtml = `<span class="text-green-400 text-xs">Paid ✅</span><button onclick="openDepositModal()" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Reinvest</button>`;
+     else if (wd.status === 'paid') actionHtml = '<span class="text-green-400 text-xs">Paid ✅</span>';
       else actionHtml = '<span class="text-red-400 text-xs">Rejected ❌</span>';
     }
 
@@ -1346,12 +1455,13 @@ if (investments.length === 0) {
       else statusBadge = `<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;
 
       let actionHtml = '';
-      if (isMatured && !wd) {
-        actionHtml = `<button onclick="requestWithdrawal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500">Withdraw</button>`;
-      } else if (wd) {
+     if (isMatured && !wd) {
+  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mr-1">Reinvest</button>
+                <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500">Withdraw</button>`;
+} else if (wd) {
         if (wd.status === 'pending') actionHtml = '<span class="text-yellow-400 text-xs">Payout pending</span>';
         else if (wd.status === 'approved') actionHtml = '<span class="text-green-400 text-xs">Approved ✅</span>';
-        else if (wd.status === 'paid') actionHtml = `<span class="text-green-400 text-xs">Paid ✅</span><button onclick="openDepositModal()" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Reinvest</button>`;
+       else if (wd.status === 'paid') actionHtml = '<span class="text-green-400 text-xs">Paid ✅</span>';
         else actionHtml = '<span class="text-red-400 text-xs">Rejected ❌</span>';
       }
 
@@ -1890,6 +2000,58 @@ document.addEventListener('DOMContentLoaded', () => {
       <button id="custom-confirm-cancel" class="px-6 py-2 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
       <button id="custom-confirm-ok" class="px-6 py-2 rounded-full gradient-gold text-dark-950 font-semibold text-sm hover:opacity-90 transition">Confirm</button>
     </div>
+  </div>
+</div>
+
+    <!-- Reinvest Bonus Modal -->
+<div id="reinvest-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-md p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display text-xl font-bold">Reinvest & Earn Bonus</h2>
+      <button onclick="closeReinvestModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+    </div>
+    <input type="hidden" id="reinvest-investment-id">
+
+    <div class="mb-4">
+      <p class="text-sm text-gray-300">Your payout: <span id="reinvest-payout" class="font-bold text-white">₵0</span></p>
+      <p class="text-xs text-gray-500">Original plan: <span id="reinvest-original-plan"></span></p>
+    </div>
+
+    <!-- Tier 1 -->
+    <div class="glass-gold rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier1">
+      <h3 class="font-semibold text-gold-400">Tier 1 – Same Plan</h3>
+      <p class="text-sm text-gray-300">Reinvest full payout into <strong>same plan</strong></p>
+      <p class="text-sm text-green-400 mt-1">Bonus: <strong>₵5</strong> added to Prizes & Rewards</p>
+    </div>
+
+    <!-- Tier 2 -->
+    <div class="glass rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier2">
+      <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade Plan</h3>
+      <p class="text-sm text-gray-300">Reinvest into a <strong>different plan</strong> + deposit the minimum</p>
+      <div id="reinvest-tier2-options" class="hidden mt-3">
+        <label class="block text-sm mb-1">Choose Plan</label>
+        <select id="reinvest-new-plan" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
+          <option value="starter">Starter (min ₵200)</option>
+          <option value="growth">Growth (min ₵300)</option>
+          <option value="premium">Premium (min ₵500)</option>
+        </select>
+        <div id="reinvest-extra-info" class="text-xs text-gray-400 mt-2"></div>
+        <div id="reinvest-payment-section" class="mt-3 hidden">
+          <label class="block text-sm mb-1">Payment Method</label>
+          <select id="reinvest-method" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
+            <option value="momo">MTN MoMo</option>
+            <option value="crypto">Crypto</option>
+          </select>
+          <label class="block text-sm mb-1">Transaction ID / Reference</label>
+          <input type="text" id="reinvest-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+        </div>
+        <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">2% of total (capped ₵30)</strong></p>
+      </div>
+    </div>
+
+    <button onclick="submitReinvest()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
+      <i data-lucide="check-circle" class="w-5 h-5"></i> Claim Bonus & Reinvest
+    </button>
   </div>
 </div>
 </body>
