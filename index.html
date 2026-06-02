@@ -1401,9 +1401,10 @@ if (investments.length === 0) {
     else statusBadge = `<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;
 
     let actionHtml = '';
-    if (isMatured && !wd) {
-      actionHtml = `<button onclick="requestWithdrawal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500">Withdraw</button>`;
-    } else if (wd) {
+   if (isMatured && !wd) {
+  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mr-1">Reinvest</button>
+                <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500">Withdraw</button>`;
+} else if (wd) {
       if (wd.status === 'pending') actionHtml = '<span class="text-yellow-400 text-xs">Payout pending</span>';
       else if (wd.status === 'approved') actionHtml = '<span class="text-green-400 text-xs">Approved ✅</span>';
      else if (wd.status === 'paid') actionHtml = '<span class="text-green-400 text-xs">Paid ✅</span>';
