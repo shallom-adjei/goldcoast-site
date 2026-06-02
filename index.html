@@ -1495,8 +1495,8 @@ if (investments.length === 0) {
       else statusBadge = `<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;
 
       let actionHtml = '';
-      if (isMatured && !wd && inv.status !== 'reinvested') {
-  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="gradient-gold text-dark-950 font-bold py-3 px-5 rounded-xl text-base w-full mb-2">⚡ Reinvest & Earn</button>
+         if (isMatured && !wd && inv.status !== 'reinvested') {
+  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="gradient-gold text-dark-950 font-bold py-2.5 px-4 rounded-xl text-sm w-full mb-2">⚡ Reinvest & Earn</button>
                 <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-purple-500 w-full">Withdraw</button>`;
 } else if (inv.status === 'reinvested') {
   actionHtml = '<span class="text-green-400 text-xs">Reinvested ✅</span>';
