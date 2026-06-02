@@ -104,7 +104,7 @@
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.93 1.23-5.46 3.62-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.24.37-.49 1.02-.74 3.98-1.73 6.64-2.87 7.98-3.42 3.8-1.58 4.59-1.85 5.1-1.86.11 0 .37.03.54.17.14.12.18.28.2.45.02.16.04.53.03.55z"/>
     </svg>
 </a>
-    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2"></div>
+    <div id="toast-container" class="fixed top-4 right-4 z-[250] flex flex-col gap-2"></div>
 
     <!-- ========== LANDING PAGE ========== -->
     <div id="page-landing" class="page active">
@@ -785,31 +785,66 @@ function selectTier2() {
 function updateTier2Info() {
   const planSelect = document.getElementById('reinvest-new-plan');
   const freshEl = document.getElementById('fresh-amount');
+  const extraInput = document.getElementById('reinvest-extra-amount');
   const bonusEl = document.getElementById('reinvest-tier2-bonus');
-  if (!planSelect || !freshEl || !bonusEl) return;   // safety
+  if (!planSelect || !freshEl || !bonusEl) return;
 
   const minAmounts = { starter: 200, growth: 300, premium: 500 };
-  const requiredFresh = minAmounts[planSelect.value] || 200;
-  freshEl.textContent = '₵' + requiredFresh;
-  const bonus = Math.min(Math.floor(0.05 * requiredFresh), 30);
-  bonusEl.textContent = `₵${bonus} (5% of ₵${requiredFresh})`;
+  const requiredMin = minAmounts[planSelect.value] || 200;
+  freshEl.textContent = '₵' + requiredMin;
+  extraInput.min = requiredMin;
+  extraInput.placeholder = `Min ₵${requiredMin}`;
+  extraInput.value = '';   // reset custom amount
+  bonusEl.textContent = `5% of fresh deposit (capped ₵30)`;
 
-  // Always show payment details for Tier 2
-  const paymentSection = document.getElementById('reinvest-payment-section');
-  if (paymentSection) paymentSection.classList.remove('hidden');
+  // Show payment credentials for the current method
+  updateReinvestPaymentDetails();
+}
+
+function updateTier2Bonus() {
+  const extraInput = document.getElementById('reinvest-extra-amount');
+  const bonusEl = document.getElementById('reinvest-tier2-bonus');
+  if (!extraInput || !bonusEl) return;
+  const amount = parseFloat(extraInput.value) || 0;
+  const bonus = Math.min(Math.floor(0.05 * amount), 30);
+  bonusEl.textContent = `₵${bonus} (5% of ₵${amount})`;
+}
+
+function updateReinvestPaymentDetails() {
+  const method = document.getElementById('reinvest-method').value;
+  const extraAmount = parseFloat(document.getElementById('reinvest-extra-amount').value) || 0;
+  const total = reinvestPayout + extraAmount;
+  const container = document.getElementById('reinvest-payment-credentials');
+  if (!container) return;
+
+  if (method === 'momo') {
+    container.innerHTML = getMomoDetailsHtml(`₵${total.toFixed(2)}`);
+  } else {
+    container.innerHTML = getCryptoDetailsHtml(`₵${total.toFixed(2)}`);
+  }
+  lucide.createIcons();
 }
 
 async function submitReinvest() {
   const invId = document.getElementById('reinvest-investment-id').value;
   const plan = document.getElementById('reinvest-new-plan').value;
-  // For Tier 2, extra amount is always the plan's minimum (fresh deposit required)
-  const freshRequired = { starter:200, growth:300, premium:500 }[plan];
-  const extra = currentReinvestTier === 2 ? freshRequired : 0;
-  
+  const extraInput = document.getElementById('reinvest-extra-amount');
+  const extraAmount = parseFloat(extraInput.value) || 0;
+
+  const minAmounts = { starter: 200, growth: 300, premium: 500 };
+  const requiredMin = minAmounts[plan];
+
+  if (currentReinvestTier === 2) {
+    if (extraAmount < requiredMin) {
+      showToast(`Minimum fresh deposit for ${plan} is ₵${requiredMin}`, 'error');
+      return;
+    }
+  }
+
   const body = {
     original_investment_id: invId,
     new_plan: plan,
-    extra_amount: extra,
+    extra_amount: currentReinvestTier === 2 ? extraAmount : 0,
     method: currentReinvestTier === 2 ? document.getElementById('reinvest-method').value : undefined,
     transaction_id: currentReinvestTier === 2 ? document.getElementById('reinvest-txid').value : undefined
   };
@@ -2037,28 +2072,32 @@ document.addEventListener('DOMContentLoaded', () => {
         <!-- Tier 2 -->
    <div class="glass rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier2" onclick="selectTier2()">
       <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade & Boost</h3>
-      <p class="text-sm text-gray-300">Switch to a <strong>different plan</strong> and add fresh money to unlock a <strong>5% bonus</strong> on that deposit.</p>
-      <div id="reinvest-tier2-options" class="hidden mt-3">
+      <p class="text-sm text-gray-300">Switch to a <strong>different plan</strong> and add a new investment to unlock a <strong>5% bonus</strong> on the deposit.</p>
+            <div id="reinvest-tier2-options" class="hidden mt-3">
         <label class="block text-sm mb-1">Choose New Plan</label>
         <select id="reinvest-new-plan" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
-          <option value="starter">Starter (add ₵200 fresh)</option>
-          <option value="growth">Growth (add ₵300 fresh)</option>
-          <option value="premium">Premium (add ₵500 fresh)</option>
+          <option value="starter">Starter (min ₵200)</option>
+          <option value="growth">Growth (min ₵300)</option>
+          <option value="premium">Premium (min ₵500)</option>
         </select>
-        <p class="text-xs text-gray-400 mt-2">Fresh deposit required: <strong id="fresh-amount">₵200</strong></p>
-        <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with the fresh deposit.</p>
+        <p class="text-xs text-gray-400 mt-2">Minimum fresh deposit: <strong id="fresh-amount">₵200</strong></p>
+        <div class="mt-2">
+          <label class="block text-sm mb-1">Your Fresh Deposit (GHS)</label>
+          <input type="number" id="reinvest-extra-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2" oninput="updateTier2Bonus()">
+        </div>
+        <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with your fresh deposit.</p>
         <div id="reinvest-payment-section" class="mt-3">
           <label class="block text-sm mb-1">Payment Method</label>
-          <select id="reinvest-method" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
+          <select id="reinvest-method" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2" onchange="updateReinvestPaymentDetails()">
             <option value="momo">MTN MoMo</option>
             <option value="crypto">Crypto</option>
           </select>
+          <div id="reinvest-payment-credentials" class="glass rounded-xl p-4 mb-3 text-xs"></div>
           <label class="block text-sm mb-1">Transaction ID / Reference</label>
           <input type="text" id="reinvest-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
         </div>
         <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">5% of fresh deposit (capped ₵30)</strong></p>
       </div>
-    </div>
 
     <button onclick="submitReinvest()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
       <i data-lucide="check-circle" class="w-5 h-5"></i> Claim Bonus & Reinvest
