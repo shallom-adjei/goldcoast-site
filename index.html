@@ -767,6 +767,20 @@ function closeReinvestModal() {
   document.getElementById('reinvest-modal').classList.add('hidden');
   document.getElementById('reinvest-modal').classList.remove('flex');
 }
+function selectTier1() {
+  currentReinvestTier = 1;
+  document.getElementById('reinvest-tier1').classList.add('glass-gold');
+  document.getElementById('reinvest-tier2').classList.remove('glass-gold');
+  document.getElementById('reinvest-tier2-options').classList.add('hidden');
+}
+
+function selectTier2() {
+  currentReinvestTier = 2;
+  document.getElementById('reinvest-tier2').classList.add('glass-gold');
+  document.getElementById('reinvest-tier1').classList.remove('glass-gold');
+  document.getElementById('reinvest-tier2-options').classList.remove('hidden');
+  updateTier2Info();   // this will update the bonus & fresh amount
+}
 
 function updateTier2Info() {
   const planSelect = document.getElementById('reinvest-new-plan');
@@ -1959,33 +1973,14 @@ if (investments.length === 0) {
             }
             animateCounter();
             document.getElementById('deposit-modal').addEventListener('click', function(e) { if (e.target === this) closeDepositModal(); });
-        });
-        // Toggle tiers
-// Tier toggle – Tier 1
-document.getElementById('reinvest-tier1').addEventListener('click', () => {
-  currentReinvestTier = 1;
-  const t1 = document.getElementById('reinvest-tier1');
-  const t2 = document.getElementById('reinvest-tier2');
-  t1.classList.add('glass-gold');
-  t2.classList.remove('glass-gold');
-  // hide Tier 2 options
-  document.getElementById('reinvest-tier2-options').classList.add('hidden');
-});
-
-// Tier toggle – Tier 2
-document.getElementById('reinvest-tier2').addEventListener('click', () => {
-  currentReinvestTier = 2;
-  const t1 = document.getElementById('reinvest-tier1');
-  const t2 = document.getElementById('reinvest-tier2');
-  t2.classList.add('glass-gold');
-  t1.classList.remove('glass-gold');
-  // show Tier 2 options
-  document.getElementById('reinvest-tier2-options').classList.remove('hidden');
-  updateTier2Info();
-});
 
 // Update Tier 2 info when plan is changed
 document.getElementById('reinvest-new-plan').addEventListener('change', updateTier2Info);
+             const planSelect = document.getElementById('reinvest-new-plan');
+  if (planSelect) {
+    planSelect.addEventListener('change', updateTier2Info);
+  }
+            });
 
 document.addEventListener('DOMContentLoaded', () => {
   // Store referral code from URL so it survives navigation
@@ -2033,14 +2028,14 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 
     <!-- Tier 1 -->
-    <div class="glass-gold rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier1">
+    <div class="glass-gold rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier1" onclick="selectTier1()">
       <h3 class="font-semibold text-gold-400">Tier 1 – Same Plan</h3>
       <p class="text-sm text-gray-300">Reinvest full payout into <strong>same plan</strong></p>
       <p class="text-sm text-green-400 mt-1">Bonus: <strong>₵5</strong> added to Prizes & Rewards</p>
     </div>
 
         <!-- Tier 2 -->
-    <div class="glass rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier2">
+   <div class="glass rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier2" onclick="selectTier2()">
       <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade & Boost</h3>
       <p class="text-sm text-gray-300">Switch to a <strong>different plan</strong> and add fresh money to unlock a <strong>5% bonus</strong> on that deposit.</p>
       <div id="reinvest-tier2-options" class="hidden mt-3">
