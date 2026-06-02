@@ -83,6 +83,7 @@
             animation: payoutSlideUp 0.6s ease, payoutFadeOut 0.5s ease 4.5s forwards;
             max-width: 90vw;
         }
+        button.glass-gold { background: rgba(212,160,23,0.08); border: 1px solid rgba(212,160,23,0.2); }
         @keyframes payoutSlideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes payoutFadeOut { to { transform: translateY(100%); opacity: 0; } }
         /* Telegram pulse animation */
@@ -2048,60 +2049,66 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-    <!-- Reinvest Bonus Modal -->
+<!-- Reinvest Bonus Modal -->
 <div id="reinvest-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
-  <div class="glass rounded-2xl w-full max-w-md p-6">
-    <div class="flex items-center justify-between mb-4">
+  <div class="glass rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+    <!-- Header (fixed) -->
+    <div class="flex items-center justify-between p-6 pb-2">
       <h2 class="font-display text-xl font-bold">Reinvest & Earn Bonus</h2>
       <button onclick="closeReinvestModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
     </div>
-    <input type="hidden" id="reinvest-investment-id">
 
-    <div class="mb-4">
-      <p class="text-sm text-gray-300">Your payout: <span id="reinvest-payout" class="font-bold text-white">₵0</span></p>
-      <p class="text-xs text-gray-500">Original plan: <span id="reinvest-original-plan"></span></p>
-    </div>
+    <!-- Scrollable body -->
+    <div class="overflow-y-auto px-6 pb-6 flex-1">
+      <input type="hidden" id="reinvest-investment-id">
 
-    <!-- Tier 1 -->
-    <div class="glass-gold rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier1" onclick="selectTier1()">
-      <h3 class="font-semibold text-gold-400">Tier 1 – Same Plan</h3>
-      <p class="text-sm text-gray-300">Reinvest full payout into <strong>same plan</strong></p>
-      <p class="text-sm text-green-400 mt-1">Bonus: <strong>₵5</strong> added to Prizes & Rewards</p>
-    </div>
-
-        <!-- Tier 2 -->
-   <div class="glass rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400" id="reinvest-tier2" onclick="selectTier2()">
-      <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade & Boost</h3>
-      <p class="text-sm text-gray-300">Switch to a <strong>different plan</strong> and add a new investment to unlock a <strong>5% bonus</strong> on the deposit.</p>
-            <div id="reinvest-tier2-options" class="hidden mt-3">
-        <label class="block text-sm mb-1">Choose New Plan</label>
-        <select id="reinvest-new-plan" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
-          <option value="starter">Starter (min ₵200)</option>
-          <option value="growth">Growth (min ₵300)</option>
-          <option value="premium">Premium (min ₵500)</option>
-        </select>
-        <p class="text-xs text-gray-400 mt-2">Minimum fresh deposit: <strong id="fresh-amount">₵200</strong></p>
-        <div class="mt-2">
-          <label class="block text-sm mb-1">Your Fresh Deposit (GHS)</label>
-          <input type="number" id="reinvest-extra-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2" oninput="updateTier2Bonus()">
-        </div>
-        <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with your fresh deposit.</p>
-        <div id="reinvest-payment-section" class="mt-3">
-          <label class="block text-sm mb-1">Payment Method</label>
-          <select id="reinvest-method" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2" onchange="updateReinvestPaymentDetails()">
-            <option value="momo">MTN MoMo</option>
-            <option value="crypto">Crypto</option>
-          </select>
-          <div id="reinvest-payment-credentials" class="glass rounded-xl p-4 mb-3 text-xs"></div>
-          <label class="block text-sm mb-1">Transaction ID / Reference</label>
-          <input type="text" id="reinvest-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
-        </div>
-        <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">5% of fresh deposit (capped ₵30)</strong></p>
+      <div class="mb-4">
+        <p class="text-sm text-gray-300">Your payout: <span id="reinvest-payout" class="font-bold text-white">₵0</span></p>
+        <p class="text-xs text-gray-500">Original plan: <span id="reinvest-original-plan"></span></p>
       </div>
 
-    <button onclick="submitReinvest()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
-      <i data-lucide="check-circle" class="w-5 h-5"></i> Claim Bonus & Reinvest
-    </button>
+      <!-- Tier 1 -->
+      <button id="reinvest-tier1" onclick="selectTier1()" class="w-full text-left glass-gold rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400 focus:outline-none">
+        <h3 class="font-semibold text-gold-400">Tier 1 – Same Plan</h3>
+        <p class="text-sm text-gray-300">Reinvest full payout into <strong>same plan</strong></p>
+        <p class="text-sm text-green-400 mt-1">Bonus: <strong>₵5</strong> added to Prizes & Rewards</p>
+      </button>
+
+      <!-- Tier 2 -->
+      <button id="reinvest-tier2" onclick="selectTier2()" class="w-full text-left glass rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400 focus:outline-none">
+        <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade & Boost</h3>
+        <p class="text-sm text-gray-300">Switch to a <strong>different plan</strong> and add fresh money to unlock a <strong>5% bonus</strong> on that deposit.</p>
+        <div id="reinvest-tier2-options" class="hidden mt-3">
+          <label class="block text-sm mb-1">Choose New Plan</label>
+          <select id="reinvest-new-plan" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
+            <option value="starter">Starter (min ₵200)</option>
+            <option value="growth">Growth (min ₵300)</option>
+            <option value="premium">Premium (min ₵500)</option>
+          </select>
+          <p class="text-xs text-gray-400 mt-2">Minimum fresh deposit: <strong id="fresh-amount">₵200</strong></p>
+          <div class="mt-2">
+            <label class="block text-sm mb-1">Your Fresh Deposit (GHS)</label>
+            <input type="number" id="reinvest-extra-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2" oninput="updateTier2Bonus()">
+          </div>
+          <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with your fresh deposit.</p>
+          <div id="reinvest-payment-section" class="mt-3">
+            <label class="block text-sm mb-1">Payment Method</label>
+            <select id="reinvest-method" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2" onchange="updateReinvestPaymentDetails()">
+              <option value="momo">MTN MoMo</option>
+              <option value="crypto">Crypto</option>
+            </select>
+            <div id="reinvest-payment-credentials" class="glass rounded-xl p-4 mb-3 text-xs"></div>
+            <label class="block text-sm mb-1">Transaction ID / Reference</label>
+            <input type="text" id="reinvest-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+          </div>
+          <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">5% of fresh deposit (capped ₵30)</strong></p>
+        </div>
+      </button>
+
+      <button onclick="submitReinvest()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2 mt-4">
+        <i data-lucide="check-circle" class="w-5 h-5"></i> Claim Bonus & Reinvest
+      </button>
+    </div>
   </div>
 </div>
 </body>
