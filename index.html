@@ -809,6 +809,9 @@ function updateTier2Bonus() {
   const amount = parseFloat(extraInput.value) || 0;
   const bonus = Math.min(Math.floor(0.05 * amount), 30);
   bonusEl.textContent = `₵${bonus} (5% of ₵${amount})`;
+
+  // Refresh the MoMo/crypto details with the new total
+  updateReinvestPaymentDetails();
 }
 
 function updateReinvestPaymentDetails() {
@@ -1452,9 +1455,9 @@ if (investments.length === 0) {
     else statusBadge = `<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;
 
     let actionHtml = '';
-  if (isMatured && !wd && inv.status !== 'reinvested') {
-  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mr-1">Reinvest</button>
-                <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500">Withdraw</button>`;
+     if (isMatured && !wd && inv.status !== 'reinvested') {
+  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="gradient-gold text-dark-950 font-bold py-3 px-5 rounded-xl text-base w-full mb-2">⚡ Reinvest & Earn</button>
+                <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-purple-500 w-full">Withdraw</button>`;
 } else if (inv.status === 'reinvested') {
   actionHtml = '<span class="text-green-400 text-xs">Reinvested ✅</span>';
 } else if (wd) {
@@ -1492,9 +1495,9 @@ if (investments.length === 0) {
       else statusBadge = `<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;
 
       let actionHtml = '';
-     if (isMatured && !wd && inv.status !== 'reinvested') {
-  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mr-1">Reinvest</button>
-                <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500">Withdraw</button>`;
+      if (isMatured && !wd && inv.status !== 'reinvested') {
+  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="gradient-gold text-dark-950 font-bold py-3 px-5 rounded-xl text-base w-full mb-2">⚡ Reinvest & Earn</button>
+                <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-4 py-2 text-sm hover:bg-purple-500 w-full">Withdraw</button>`;
 } else if (inv.status === 'reinvested') {
   actionHtml = '<span class="text-green-400 text-xs">Reinvested ✅</span>';
 } else if (wd) {
@@ -1515,7 +1518,7 @@ if (investments.length === 0) {
             </div>
             <div class="mt-1">${statusBadge}</div>
           </div>
-          <div class="flex flex-col items-end gap-1">
+          <div class="flex flex-col items-end gap-2">
             ${actionHtml}
           </div>
         </div>
