@@ -1382,9 +1382,16 @@ window.allInvestmentsLocal = investments;
             withdrawals.forEach(w => { withdrawalMap[w.investment_id] = w; });
 
             const totalInvested = investments.reduce((s, i) => i.status !== 'rejected' ? s + i.amount : s, 0);
-            const totalEarnings = investments.reduce((s, i) => {
-    if (i.status === 'pending' || i.status === 'matured') return s;
-    return s + getCurrentEarnings(i);
+           const totalEarnings = investments.reduce((s, i) => {
+    if (i.status === 'pending' || i.status === 'rejected') return s;
+    if (i.status === 'matured' || i.status === 'reinvested') {
+        const rate = returnRates[i.plan] || 1;
+        return s + (i.amount * rate);
+    }
+    // active
+    const rate = returnRates[i.plan] || 1;
+    const progress = getProgress(i) / 100;
+    return s + (i.amount * rate * progress);
 }, 0);
            const totalExpected = investments.reduce((s, i) => {
     if (i.status === 'pending') return s + i.amount;
@@ -1615,31 +1622,34 @@ if (investments.length === 0) {
     } catch (e) { showToast('Connection error', 'error'); }
 }
 
-        function getCurrentEarnings(inv) {
-            if (inv.status === 'pending') return 0;
-            if (inv.status === 'rejected') return 0;
-            if (inv.status === 'matured') {
-                const rate = returnRates[inv.plan] || 1;
-                return inv.amount * rate;
-            }
-            const progress = getProgress(inv) / 100;
-            const rate = returnRates[inv.plan] || 1;
-            return inv.amount * rate * progress;
-        }
+       function getCurrentEarnings(inv) {
+    if (inv.status === 'pending') return 0;
+    if (inv.status === 'rejected') return 0;
+    if (inv.status === 'matured' || inv.status === 'reinvested') {
+        const rate = returnRates[inv.plan] || 1;
+        return inv.amount * rate;
+    }
+    // active
+    const progress = getProgress(inv) / 100;
+    const rate = returnRates[inv.plan] || 1;
+    return inv.amount * rate * progress;
+}
 
         function getProgress(inv) {
-            if (inv.status === 'pending') return 0;
-            if (inv.status === 'rejected') return 0;
-            if (inv.status === 'matured') return 100;
-            const planDays = { starter: 10, growth: 20, premium: 30 };
-            const totalDays = planDays[inv.plan] || 14;
-            const start = new Date(inv.date);
-            const now = new Date();
-            const elapsed = (now - start) / (1000 * 60 * 60 * 24);
-            return Math.min(100, (elapsed / totalDays) * 100);
-        }
+    if (inv.status === 'pending') return 0;
+    if (inv.status === 'rejected') return 0;
+    if (inv.status === 'matured' || inv.status === 'reinvested') return 100;
+    // active
+    const planDays = { starter: 10, growth: 20, premium: 30 };
+    const totalDays = inv.duration_days || planDays[inv.plan] || 14;
+    const start = new Date(inv.date);
+    const now = new Date();
+    const elapsed = (now - start) / (1000 * 60 * 60 * 24);
+    return Math.min(100, (elapsed / totalDays) * 100);
+}
 
-        function getDaysLeft(inv) {
+       function getDaysLeft(inv) {
+    if (inv.status === 'matured' || inv.status === 'reinvested') return 'Completed';
     const planDays = { starter: 10, growth: 20, premium: 30 };
     const totalDays = inv.duration_days || planDays[inv.plan] || 14;
     const start = new Date(inv.date);
