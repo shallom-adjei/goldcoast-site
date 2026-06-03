@@ -31,6 +31,7 @@
     .gradient-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
     .text-dark-950 { color: #0a0a12; }
     .status-reinvested { color: #60a5fa; }
+    .status-locked { color: #9ca3af; }
     .chart-card {
       background: linear-gradient(180deg, rgba(31,41,55,0.9), rgba(17,24,39,0.95));
       border: 1px solid rgba(255,255,255,0.06);
@@ -563,8 +564,12 @@ document.getElementById('investment-status-summary').innerHTML =
 </td>
             <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
            <td class="py-3">
-  ${inv.status === 'reinvested' 
+  ${inv.status === 'reinvested'
     ? '<span class="text-blue-400 text-xs">Reinvested 🔒</span>'
+    : (inv.status === 'matured')
+    ? '<span class="text-green-400 text-xs">Matured 🔒</span>'
+    : (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo)
+    ? '<span class="text-red-400 text-xs">Rejected 🔒</span>'
     : `<select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
          <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
          <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
@@ -596,9 +601,13 @@ document.getElementById('investment-status-summary').innerHTML =
   })() : inv.status === 'reinvested' ? `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : inv.plan}</span>` : `<span class="status-${inv.status}">${inv.status}</span>`}
 </td>
           <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
-          <td class="py-3">
-  ${inv.status === 'reinvested' 
+         <td class="py-3">
+  ${inv.status === 'reinvested'
     ? '<span class="text-blue-400 text-xs">Reinvested 🔒</span>'
+    : (inv.status === 'matured')
+    ? '<span class="text-green-400 text-xs">Matured 🔒</span>'
+    : (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo)
+    ? '<span class="text-red-400 text-xs">Rejected 🔒</span>'
     : `<select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
          <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
          <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
