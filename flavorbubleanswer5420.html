@@ -236,6 +236,14 @@
           <p class="text-red-400 text-xs">Net Exposure</p>
           <p class="text-2xl font-bold mt-1" id="pf-net-exposure">₵0</p>
         </div>
+        <div class="glass rounded-xl p-4 border-l-4 border-yellow-500">
+  <p class="text-yellow-400 text-xs">Rolled‑Over Capital</p>
+  <p class="text-2xl font-bold mt-1" id="pf-rolled-capital">₵0</p>
+</div>
+<div class="glass rounded-xl p-4 border-l-4 border-orange-500">
+  <p class="text-orange-400 text-xs">Rolled‑Over Payout (Liability)</p>
+  <p class="text-2xl font-bold mt-1" id="pf-rolled-payout">₵0</p>
+</div>
         <div class="glass rounded-xl p-4 border-l-4 border-green-500">
           <p class="text-green-400 text-xs">Total Paid Out</p>
           <p class="text-2xl font-bold mt-1" id="pf-total-paid">₵0</p>
@@ -848,6 +856,8 @@ document.getElementById('investment-status-summary').innerHTML =
         document.getElementById('pf-expected-payout').textContent = '₵' + (summary.expectedPayout || 0).toLocaleString();
         document.getElementById('pf-net-exposure').textContent = '₵' + (summary.netExposure || 0).toLocaleString();
         document.getElementById('pf-total-paid').textContent = '₵' + (summary.totalPaid || 0).toLocaleString();
+        document.getElementById('pf-rolled-capital').textContent = '₵' + (summary.rolledCapital || 0).toLocaleString();
+        document.getElementById('pf-rolled-payout').textContent = '₵' + (summary.rolledPayout || 0).toLocaleString();
 
         // Load cash flow data and summaries
         loadCashflowData('all');
