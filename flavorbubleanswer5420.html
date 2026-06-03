@@ -128,6 +128,7 @@
       <button onclick="showTab('withdrawals')" id="tab-withdrawals" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Withdrawals</button>
       <button onclick="showTab('settings')" id="tab-settings" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Settings</button>
       <button onclick="showTab('portfolio')" id="tab-portfolio" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Portfolio</button>
+      <button onclick="showTab('partners')" id="tab-partners" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Partners</button>
     </div>
 
     <!-- Users Table -->
@@ -249,6 +250,26 @@
           <p class="text-2xl font-bold mt-1" id="pf-total-paid">₵0</p>
         </div>
       </div>
+
+      <!-- Partners Tracker -->
+<div id="content-partners" class="hidden glass rounded-xl p-6">
+  <h2 class="text-lg font-semibold mb-4">Partner Performance</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-gray-400 border-b border-white/10">
+          <th class="text-left pb-3">Name</th>
+          <th class="text-left pb-3">Email</th>
+          <th class="text-left pb-3">Total Actions</th>
+          <th class="text-left pb-3">Total Earned</th>
+          <th class="text-left pb-3">Unpaid</th>
+          <th class="text-left pb-3">Action</th>
+        </tr>
+      </thead>
+      <tbody id="partners-table"></tbody>
+    </table>
+  </div>
+</div>
 
       <!-- Cash Flow Chart -->
       <div class="chart-card mb-6">
@@ -465,6 +486,10 @@
         document.getElementById('content-portfolio').classList.remove('hidden');
         document.getElementById('tab-portfolio').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
         loadPortfolioUsers();
+      } else if(tab==='partners') {
+       document.getElementById('content-partners').classList.remove('hidden');
+       document.getElementById('tab-partners').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+       loadPartners();
       }
     }
 
@@ -489,6 +514,41 @@
         document.getElementById('user-search').value = '';
       } catch(err) { toast('Failed to load users','error'); }
     }
+
+    async function loadPartners() {
+  try {
+    const res = await fetch(`${API}/partners`, { headers: {'Authorization': `Bearer ${token}`} });
+    const { partners } = await res.json();
+    document.getElementById('partners-table').innerHTML = partners.map(p => `
+      <tr class="border-b border-white/5">
+        <td class="py-3">${safe(p.name)}</td>
+        <td class="py-3 text-xs text-gray-400">${safe(p.email)}</td>
+        <td class="py-3">${p.total_actions}</td>
+        <td class="py-3">₵${(p.total_earnings || 0).toLocaleString()}</td>
+        <td class="py-3"><span class="${p.unpaid_earnings > 0 ? 'text-yellow-400' : 'text-green-400'}">₵${(p.unpaid_earnings || 0).toLocaleString()}</span></td>
+        <td class="py-3">
+          ${p.unpaid_earnings > 0 ? `<button onclick="payPartner(${p.id})" class="bg-green-600 hover:bg-green-500 text-white rounded-lg px-3 py-1 text-xs">Mark Paid</button>` : '<span class="text-gray-500 text-xs">All paid</span>'}
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) { toast('Failed to load partners', 'error'); }
+}
+
+async function payPartner(partnerId) {
+  if (!await customConfirm('Mark all unpaid earnings as paid?')) return;
+  try {
+    const res = await fetch(`${API}/partners/${partnerId}/pay`, {
+      method: 'POST',
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    if (res.ok) {
+      toast('Partner marked as paid', 'success');
+      loadPartners();
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
 
     function filterUsers() {
       const term = document.getElementById('user-search').value.toLowerCase().trim();
