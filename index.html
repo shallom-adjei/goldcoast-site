@@ -35,6 +35,13 @@
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+@keyframes gentleBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.animate-bounce-gentle {
+  animation: gentleBounce 1.5s ease-in-out infinite;
+}        
 
         body { font-family: 'Inter', sans-serif; }
         .font-display { font-family: 'Playfair Display', serif; }
@@ -1496,8 +1503,8 @@ if (investments.length === 0) {
 
       let actionHtml = '';
      if (isMatured && !wd && inv.status !== 'reinvested') {
-  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="gradient-gold text-dark-950 font-semibold py-2 px-4 rounded-lg text-sm w-full mb-1.5">Reinvest</button>
-                <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-4 py-1.5 text-sm hover:bg-purple-500 w-full">Withdraw</button>`;
+  actionHtml = `<button onclick="openReinvestModal(${inv.id})" class="gradient-gold text-dark-950 font-semibold py-1.5 px-2.5 rounded-lg text-xs mr-1 animate-bounce-gentle">Reinvest & Earn</button>
+              <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-4 py-1.5 text-sm hover:bg-purple-500 w-full">Withdraw</button>`;
 } else if (inv.status === 'reinvested') {
   actionHtml = '<span class="text-green-400 text-xs">Reinvested ✅</span>';
 } else if (wd) {
