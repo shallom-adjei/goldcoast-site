@@ -802,7 +802,7 @@ function updateTier2Info() {
   freshEl.textContent = '₵' + requiredMin;
   extraInput.min = requiredMin;
   extraInput.placeholder = `Min ₵${requiredMin}`;
-  bonusEl.textContent = `5% of new deposit`;
+  bonusEl.textContent = `7% of new deposit`;
 
   // Show payment credentials for the current method
   updateReinvestPaymentDetails();
@@ -814,7 +814,7 @@ function updateTier2Bonus() {
   if (!extraInput || !bonusEl) return;
   const amount = parseFloat(extraInput.value) || 0;
   const bonus = Math.min(Math.floor(0.05 * amount), 30);
-  bonusEl.textContent = `₵${bonus} (5% of ₵${amount})`;
+  bonusEl.textContent = `₵${bonus} (7% of ₵${amount})`;
 
   // Refresh the MoMo/crypto details with the new total
   updateReinvestPaymentDetails();
@@ -2097,7 +2097,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- Tier 2 -->
       <button id="reinvest-tier2" onclick="selectTier2()" class="w-full text-left glass rounded-xl p-4 mb-4 cursor-pointer hover:border-gold-400 focus:outline-none">
         <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade & Boost</h3>
-        <p class="text-sm text-gray-300">Switch to a <strong>different plan</strong> and add a new investment to unlock a <strong>5% bonus</strong> on the deposit.</p>
+        <p class="text-sm text-gray-300">Switch to a <strong>different plan</strong> and add a new investment to unlock a <strong>7% bonus</strong> on the deposit.</p>
         <div id="reinvest-tier2-options" class="hidden mt-3">
           <label class="block text-sm mb-1">Choose New Plan</label>
           <select id="reinvest-new-plan" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
@@ -2121,7 +2121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <label class="block text-sm mb-1">Transaction ID / Reference</label>
             <input type="text" id="reinvest-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
           </div>
-          <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">5% of new deposit</strong></p>
+          <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">7% of new deposit</strong></p>
         </div>
       </button>
 
