@@ -2095,12 +2095,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="growth">Growth (min ₵300)</option>
             <option value="premium">Premium (min ₵500)</option>
           </select>
-          <p class="text-xs text-gray-400 mt-2">Minimum fresh deposit: <strong id="fresh-amount">₵200</strong></p>
+          <p class="text-xs text-gray-400 mt-2">Minimum new deposit: <strong id="fresh-amount">₵200</strong></p>
           <div class="mt-2">
-            <label class="block text-sm mb-1">Your Fresh Deposit (GHS)</label>
+            <label class="block text-sm mb-1">Your New Deposit (GHS)</label>
             <input type="number" id="reinvest-extra-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2" oninput="updateTier2Bonus()">
           </div>
-          <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with your fresh deposit.</p>
+          <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with your new deposit.</p>
           <div id="reinvest-payment-section" class="mt-3">
             <label class="block text-sm mb-1">Payment Method</label>
             <select id="reinvest-method" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2" onchange="updateReinvestPaymentDetails()">
@@ -2111,7 +2111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <label class="block text-sm mb-1">Transaction ID / Reference</label>
             <input type="text" id="reinvest-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
           </div>
-          <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">5% of fresh deposit</strong></p>
+          <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">5% of new deposit</strong></p>
         </div>
       </button>
 
