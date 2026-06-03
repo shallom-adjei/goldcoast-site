@@ -559,7 +559,7 @@ document.getElementById('investment-status-summary').innerHTML =
     const effectiveDays = inv.duration_days || { starter:10, growth:20, premium:30 }[inv.plan] || 14;
     const maturityDate = new Date(new Date(inv.date).getTime() + effectiveDays * 86400000);
     return `<span data-maturity="${maturityDate.toISOString()}" class="status-active">Active</span>`;
-  })() : inv.status === 'reinvested' ? `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : ''}</span>` : `<span class="status-${inv.status}">${inv.status}</span>`}
+  })() : inv.status === 'reinvested' ? `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : inv.plan}</span>` : `<span class="status-${inv.status}">${inv.status}</span>`}
 </td>
             <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
            <td class="py-3">
@@ -593,7 +593,7 @@ document.getElementById('investment-status-summary').innerHTML =
     const effectiveDays = inv.duration_days || { starter:10, growth:20, premium:30 }[inv.plan] || 14;
     const maturityDate = new Date(new Date(inv.date).getTime() + effectiveDays * 86400000);
     return `<span data-maturity="${maturityDate.toISOString()}" class="status-active">Active</span>`;
-  })() : inv.status === 'reinvested' ? `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : ''}</span>` : `<span class="status-${inv.status}">${inv.status}</span>`}
+  })() : inv.status === 'reinvested' ? `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : inv.plan}</span>` : `<span class="status-${inv.status}">${inv.status}</span>`}
 </td>
           <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
           <td class="py-3">
