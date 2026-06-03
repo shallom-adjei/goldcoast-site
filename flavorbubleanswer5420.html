@@ -320,7 +320,15 @@
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
-          <thead><tr class="text-gray-400 border-b border-white/10"><th class="text-left pb-3">User</th><th class="text-left pb-3">Active</th><th class="text-left pb-3">Total Invested</th><th class="text-left pb-3">Total Withdrawn</th><th class="text-left pb-3">Net Profit</th><th class="text-left pb-3">Active Capital</th><th class="text-left pb-3">Expected Payout</th></tr></thead>
+          <thead><tr class="text-gray-400 border-b border-white/10">
+            <th class="text-left pb-3">User</th>
+            <th class="text-left pb-3">Active</th>
+            <th class="text-left pb-3">Total Invested</th>
+            <th class="text-left pb-3">Total Withdrawn</th>
+            <th class="text-left pb-3">Net Profit</th>
+            <th class="text-left pb-3">Active Capital</th>
+            <th class="text-left pb-3">Expected Payout</th>
+          </tr></thead>
           <tbody id="portfolio-users-table"></tbody>
         </table>
       </div>
@@ -332,15 +340,14 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="text-gray-400 border-b border-white/10">
-          <th class="text-left pb-3">Name</th>
-          <th class="text-left pb-3">Email</th>
-          <th class="text-left pb-3">Total Actions</th>
-          <th class="text-left pb-3">Total Earned</th>
-          <th class="text-left pb-3">Unpaid</th>
-          <th class="text-left pb-3">Action</th>
-        </tr>
-      </thead>
+  <tr class="text-gray-400 border-b border-white/10">
+    <th class="text-left pb-3">Name</th>
+    <th class="text-left pb-3">Email</th>
+    <th class="text-left pb-3">Referral Bonus</th>
+    <th class="text-left pb-3">Prizes & Rewards</th>
+    <th class="text-left pb-3">Reward</th>
+  </tr>
+</thead>
       <tbody id="partners-table"></tbody>
     </table>
   </div>
@@ -379,11 +386,25 @@
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6" id="pf-detail-summary"></div>
       <h4 class="font-semibold text-gold-400 mb-2">Investment Timeline</h4>
       <div class="overflow-x-auto mb-6">
-        <table class="w-full text-xs"><thead><tr class="text-gray-400 border-b border-white/10"><th class="text-left pb-2">Plan</th><th class="text-left pb-2">Amount</th><th class="text-left pb-2">Date</th><th class="text-left pb-2">Status</th><th class="text-left pb-2">Matured / Expected</th><th class="text-left pb-2">Profit</th></tr></thead><tbody id="pf-investment-timeline"></tbody></table>
+        <table class="w-full text-xs"><thead>
+          <tr class="text-gray-400 border-b border-white/10">
+          <th class="text-left pb-2">Plan</th>
+            <th class="text-left pb-2">Amount</th>
+            <th class="text-left pb-2">Date</th>
+            <th class="text-left pb-2">Status</th>
+            <th class="text-left pb-2">Matured / Expected</th>
+            <th class="text-left pb-2">Profit</th>
+          </tr></thead><tbody id="pf-investment-timeline"></tbody></table>
       </div>
       <h4 class="font-semibold text-gold-400 mb-2">Withdrawals</h4>
       <div class="overflow-x-auto mb-6">
-        <table class="w-full text-xs"><thead><tr class="text-gray-400 border-b border-white/10"><th class="text-left pb-2">Amount</th><th class="text-left pb-2">Type</th><th class="text-left pb-2">Status</th><th class="text-left pb-2">Date</th></tr></thead><tbody id="pf-withdrawals-timeline"></tbody></table>
+        <table class="w-full text-xs"><thead>
+          <tr class="text-gray-400 border-b border-white/10">
+            <th class="text-left pb-2">Amount</th>
+            <th class="text-left pb-2">Type</th>
+            <th class="text-left pb-2">Status</th>
+            <th class="text-left pb-2">Date</th>
+          </tr></thead><tbody id="pf-withdrawals-timeline"></tbody></table>
       </div>
       <h4 class="font-semibold text-gold-400 mb-2">Cash Flow</h4>
       <div style="position: relative; height: 250px;"><canvas id="pf-cashflow-chart"></canvas></div>
@@ -588,7 +609,7 @@ async function deleteUserFromModal(userId) {
   } catch (err) { toast('Connection error', 'error'); }
 }
 
-    async function loadPartners() {
+  async function loadPartners() {
   try {
     const res = await fetch(`${API}/partners`, { headers: {'Authorization': `Bearer ${token}`} });
     const { partners } = await res.json();
@@ -596,15 +617,37 @@ async function deleteUserFromModal(userId) {
       <tr class="border-b border-white/5">
         <td class="py-3">${safe(p.name)}</td>
         <td class="py-3 text-xs text-gray-400">${safe(p.email)}</td>
-        <td class="py-3">${p.total_actions}</td>
-        <td class="py-3">₵${(p.total_earnings || 0).toLocaleString()}</td>
-        <td class="py-3"><span class="${p.unpaid_earnings > 0 ? 'text-yellow-400' : 'text-green-400'}">₵${(p.unpaid_earnings || 0).toLocaleString()}</span></td>
+        <td class="py-3">₵${(p.bonus || 0).toLocaleString()}</td>
+        <td class="py-3">₵${(p.game_balance || 0).toLocaleString()}</td>
         <td class="py-3">
-          ${p.unpaid_earnings > 0 ? `<button onclick="payPartner(${p.id})" class="bg-green-600 hover:bg-green-500 text-white rounded-lg px-3 py-1 text-xs">Mark Paid</button>` : '<span class="text-gray-500 text-xs">All paid</span>'}
+          <button onclick="rewardPartner(${p.id})" class="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-3 py-1 text-xs">Reward</button>
         </td>
       </tr>
     `).join('');
   } catch (err) { toast('Failed to load partners', 'error'); }
+}
+
+    async function rewardPartner(partnerId) {
+  const amountStr = prompt('Enter reward amount (cedis):');
+  if (!amountStr) return;
+  const amount = parseFloat(amountStr);
+  if (isNaN(amount) || amount <= 0) {
+    toast('Invalid amount', 'error');
+    return;
+  }
+  try {
+    const res = await fetch(`${API}/partners/${partnerId}/reward`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ amount, notes: 'Manual reward' })
+    });
+    if (res.ok) {
+      toast(`₵${amount} added to partner rewards`, 'success');
+      loadPartners();
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
 }
 
 async function payPartner(partnerId) {
