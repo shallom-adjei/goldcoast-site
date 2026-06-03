@@ -802,7 +802,7 @@ function updateTier2Info() {
   freshEl.textContent = '₵' + requiredMin;
   extraInput.min = requiredMin;
   extraInput.placeholder = `Min ₵${requiredMin}`;
-  bonusEl.textContent = `5% of fresh deposit (capped ₵30)`;
+  bonusEl.textContent = `5% of fresh deposit`;
 
   // Show payment credentials for the current method
   updateReinvestPaymentDetails();
@@ -2111,7 +2111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <label class="block text-sm mb-1">Transaction ID / Reference</label>
             <input type="text" id="reinvest-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
           </div>
-          <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">5% of fresh deposit (capped ₵30)</strong></p>
+          <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">5% of fresh deposit</strong></p>
         </div>
       </button>
 
