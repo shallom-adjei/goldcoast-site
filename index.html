@@ -517,8 +517,11 @@
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center text-dark-950 font-bold text-sm" id="dash-avatar">U</div>
                                 <span class="text-sm font-medium hidden sm:block" id="dash-username">User</span>
-<span id="partner-badge" class="hidden ml-2 text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full font-semibold">VIP</span>
-                            </div>
+<span id="partner-badge" class="hidden ml-2 px-2.5 py-0.5 text-xs font-bold rounded-full uppercase tracking-wide
+  bg-gradient-to-r from-yellow-500 to-amber-400 text-dark-950
+  shadow-[0_0_10px_rgba(245,158,11,0.6)] animate-bounce-gentle">
+  ⭐ VIP
+</span>
                             <button onclick="openAnnouncementsModal()" class="text-gray-400 hover:text-yellow-400 relative">
   <i data-lucide="bell" class="w-5 h-5"></i>
   <span id="announcement-dot" class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-yellow-400 hidden"></span>
@@ -1336,11 +1339,15 @@ async function loadPaymentSettings() {
             document.getElementById('dash-name').textContent = safe(currentUser.name.split(' ')[0]);
             document.getElementById('dash-username').textContent = safe(currentUser.name.split(' ')[0]);
             document.getElementById('dash-avatar').textContent = currentUser.name[0].toUpperCase();
-            // Show VIP badge if partner
-                const badge = document.getElementById('partner-badge');
-                 if (badge) {
-                   badge.classList.toggle('hidden', !currentUser.is_partner);
-                }
+            // VIP badge
+              const badge = document.getElementById('partner-badge');
+               if (badge) {
+                if (currentUser.is_partner) {
+                 badge.classList.remove('hidden');
+                   } else {
+                      badge.classList.add('hidden');
+                       }
+                    }
             document.getElementById('dash-referral-code').textContent = currentUser.referral_code || currentUser.id;
             document.getElementById('dash-bonus').textContent = `₵${formatNumber(currentUser.bonus || 0)}`;
             document.getElementById('dash-game-balance').textContent = `₵${formatNumber(currentUser.game_balance || 0)}`;
