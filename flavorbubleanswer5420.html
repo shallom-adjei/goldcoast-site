@@ -505,25 +505,18 @@
         allUsers = users;
         document.getElementById('stat-users').textContent = users.length;
         document.getElementById('users-table').innerHTML = users.map(u => `
-          <tr class="border-b border-white/5 cursor-pointer hover:bg-white/5" onclick="showUserDetail(${u.id})">
-            <td class="py-3">${safe(u.name)}</td><td class="py-3">${safe(u.email)}</td><td class="py-3">${safe(u.phone)}</td>
-            <td class="py-3">${safe(u.referral_code||'-')}</td><td class="py-3">${u.is_admin?'✅':'❌'}</td>
-            <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
-           <td class="py-3 flex items-center gap-1">
-  ${!u.is_admin ? `
-    <button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>
-    ${!u.is_partner ? 
-      `<button onclick="makePartner(${u.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500">Make Partner</button>` :
-      `<button onclick="revokePartner(${u.id})" class="bg-yellow-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-yellow-500">Revoke Partner</button>`
-    }
-  ` : '<span class="text-gray-500 text-xs">Admin</span>'}
-</td>
-          </tr>`).join('');
+  <tr class="border-b border-white/5 cursor-pointer hover:bg-white/5" onclick="showUserDetail(${u.id})">
+    <td class="py-3">${safe(u.name)}</td>
+    <td class="py-3">${safe(u.email)}</td>
+    <td class="py-3">${safe(u.phone)}</td>
+    <td class="py-3">${safe(u.referral_code||'-')}</td>
+    <td class="py-3">${u.is_admin?'✅':'❌'}</td>
+    <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
+  </tr>`).join('');
         document.getElementById('user-search').value = '';
       } catch(err) { toast('Failed to load users','error'); }
     }
-
-    async function makePartner(userId) {
+async function makePartner(userId) {
   if (!await customConfirm('Make this user a partner?')) return;
   try {
     const res = await fetch(`${API}/users/${userId}/make-partner`, {
@@ -532,7 +525,8 @@
     });
     if (res.ok) {
       toast('User is now a partner');
-      loadUsers();
+      showUserDetail(userId);  // refresh modal to show updated button
+      loadUsers();             // refresh table (though no change visible)
     } else {
       toast('Failed', 'error');
     }
@@ -548,9 +542,26 @@ async function revokePartner(userId) {
     });
     if (res.ok) {
       toast('Partner status revoked');
+      showUserDetail(userId);
       loadUsers();
     } else {
       toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+async function deleteUserFromModal(userId) {
+  if (!await customConfirm('Are you sure you want to permanently delete this user and all their investments?')) return;
+  try {
+    const res = await fetch(`${API}/users/${userId}`, { method:'DELETE', headers:{'Authorization':`Bearer ${token}`} });
+    const data = await res.json();
+    if (res.ok) {
+      toast('User deleted successfully');
+      document.getElementById('user-detail-modal').classList.add('hidden');
+      document.getElementById('user-detail-modal').classList.remove('flex');
+      loadUsers();
+    } else {
+      toast(data.error || 'Failed to delete', 'error');
     }
   } catch (err) { toast('Connection error', 'error'); }
 }
@@ -594,37 +605,51 @@ async function payPartner(partnerId) {
       const term = document.getElementById('user-search').value.toLowerCase().trim();
       const filtered = allUsers.filter(u => u.email.toLowerCase().includes(term) || u.phone.includes(term));
       document.getElementById('users-table').innerHTML = filtered.map(u => `
-        <tr class="border-b border-white/5">
-          <td class="py-3">${safe(u.name)}</td><td class="py-3">${safe(u.email)}</td><td class="py-3">${safe(u.phone)}</td>
-          <td class="py-3">${safe(u.referral_code||'-')}</td><td class="py-3">${u.is_admin?'✅':'❌'}</td>
-          <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
-          <td class="py-3 flex items-center gap-1">
-  ${!u.is_admin ? `
-    <button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>
-    ${!u.is_partner ? 
-      `<button onclick="makePartner(${u.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500">Make Partner</button>` :
-      `<button onclick="revokePartner(${u.id})" class="bg-yellow-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-yellow-500">Revoke Partner</button>`
-    }
-  ` : '<span class="text-gray-500 text-xs">Admin</span>'}
-</td>
-        </tr>`).join('');
+        <tr class="border-b border-white/5 cursor-pointer hover:bg-white/5" onclick="showUserDetail(${u.id})">
+    <td class="py-3">${safe(u.name)}</td>
+    <td class="py-3">${safe(u.email)}</td>
+    <td class="py-3">${safe(u.phone)}</td>
+    <td class="py-3">${safe(u.referral_code||'-')}</td>
+    <td class="py-3">${u.is_admin?'✅':'❌'}</td>
+    <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
+  </tr>`).join('');
     }
 
     async function showUserDetail(userId) {
-      const res = await fetch(`${API}/user/${userId}/details`, { headers:{'Authorization':`Bearer ${token}`} });
-      const data = await res.json();
-      if(!data.user) return toast('Failed to load user','error');
-      document.getElementById('detail-name').textContent = data.user.name;
-      document.getElementById('detail-content').innerHTML = `
-        <p class="text-sm text-gray-400 mb-2">Email: ${data.user.email} | Phone: ${data.user.phone}</p>
-        <p class="text-sm text-gray-400 mb-4">Referral Code: ${data.user.referral_code||'N/A'} | Referrals: ${data.referralCount} | Bonus: ₵${data.user.bonus||0}</p>
-        <h4 class="font-semibold text-gold-400 mb-2">Investments (${data.investments.length})</h4>
-        <div class="max-h-40 overflow-y-auto mb-4">${data.investments.map(i => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>${i.plan} - ₵${i.amount} (${i.status})</span><span>${new Date(i.date).toLocaleString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}</div>
-        <h4 class="font-semibold text-gold-400 mb-2">Withdrawals (${data.withdrawals.length})</h4>
-        <div class="max-h-40 overflow-y-auto">${data.withdrawals.map(w => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>₵${w.amount} (${w.status})</span><span>${new Date(w.created_at).toLocaleString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}</div>
-      `;
-      document.getElementById('user-detail-modal').classList.remove('hidden'); document.getElementById('user-detail-modal').classList.add('flex');
+  const res = await fetch(`${API}/user/${userId}/details`, { headers:{'Authorization':`Bearer ${token}`} });
+  const data = await res.json();
+  if(!data.user) return toast('Failed to load user','error');
+  
+  const u = data.user;
+  document.getElementById('detail-name').textContent = u.name;
+  
+  let partnerButton = '';
+  if (!u.is_admin) {
+    if (u.is_partner) {
+      partnerButton = `<button onclick="revokePartner(${userId})" class="bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg px-4 py-2 text-sm">Revoke Partner</button>`;
+    } else {
+      partnerButton = `<button onclick="makePartner(${userId})" class="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm">Make Partner</button>`;
     }
+  }
+  
+  const deleteButton = !u.is_admin ? `<button onclick="deleteUserFromModal(${userId})" class="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 py-2 text-sm">Delete User</button>` : '';
+  
+  document.getElementById('detail-content').innerHTML = `
+    <p class="text-sm text-gray-400 mb-2">Email: ${u.email} | Phone: ${u.phone}</p>
+    <p class="text-sm text-gray-400 mb-4">Referral Code: ${u.referral_code||'N/A'} | Referrals: ${data.referralCount} | Bonus: ₵${u.bonus||0}</p>
+    <h4 class="font-semibold text-gold-400 mb-2">Investments (${data.investments.length})</h4>
+    <div class="max-h-40 overflow-y-auto mb-4">${data.investments.map(i => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>${i.plan} - ₵${i.amount} (${i.status})</span><span>${new Date(i.date).toLocaleString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}</div>
+    <h4 class="font-semibold text-gold-400 mb-2">Withdrawals (${data.withdrawals.length})</h4>
+    <div class="max-h-40 overflow-y-auto mb-4">${data.withdrawals.map(w => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>₵${w.amount} (${w.status})</span><span>${new Date(w.created_at).toLocaleString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}</div>
+    <div class="flex gap-3 mt-4 pt-4 border-t border-white/10">
+      ${partnerButton}
+      ${deleteButton}
+    </div>
+  `;
+  
+  document.getElementById('user-detail-modal').classList.remove('hidden');
+  document.getElementById('user-detail-modal').classList.add('flex');
+}
 
     async function deleteUser(userId) {
       if(!await customConfirm('Are you sure you want to permanently delete this user and all their investments?')) return;
