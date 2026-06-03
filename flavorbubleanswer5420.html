@@ -251,26 +251,6 @@
         </div>
       </div>
 
-      <!-- Partners Tracker -->
-<div id="content-partners" class="hidden glass rounded-xl p-6">
-  <h2 class="text-lg font-semibold mb-4">Partner Performance</h2>
-  <div class="overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead>
-        <tr class="text-gray-400 border-b border-white/10">
-          <th class="text-left pb-3">Name</th>
-          <th class="text-left pb-3">Email</th>
-          <th class="text-left pb-3">Total Actions</th>
-          <th class="text-left pb-3">Total Earned</th>
-          <th class="text-left pb-3">Unpaid</th>
-          <th class="text-left pb-3">Action</th>
-        </tr>
-      </thead>
-      <tbody id="partners-table"></tbody>
-    </table>
-  </div>
-</div>
-
       <!-- Cash Flow Chart -->
       <div class="chart-card mb-6">
         <div class="flex items-center justify-between mb-4">
@@ -323,6 +303,26 @@
         </table>
       </div>
     </div>
+
+      <!-- Partners Tracker -->
+<div id="content-partners" class="hidden glass rounded-xl p-6">
+  <h2 class="text-lg font-semibold mb-4">Partner Performance</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-gray-400 border-b border-white/10">
+          <th class="text-left pb-3">Name</th>
+          <th class="text-left pb-3">Email</th>
+          <th class="text-left pb-3">Total Actions</th>
+          <th class="text-left pb-3">Total Earned</th>
+          <th class="text-left pb-3">Unpaid</th>
+          <th class="text-left pb-3">Action</th>
+        </tr>
+      </thead>
+      <tbody id="partners-table"></tbody>
+    </table>
+  </div>
+</div>
 
     <div class="glass rounded-xl p-5 mt-8">
       <h2 class="text-lg font-semibold mb-4">Platform Overview (Last 30 Days)</h2>
@@ -466,32 +466,32 @@
     }
 
     // ── Tabs ──
-    function showTab(tab) {
-      ['content-users','content-investments','content-withdrawals','content-settings','content-portfolio'].forEach(id => document.getElementById(id).classList.add('hidden'));
-      ['tab-users','tab-investments','tab-withdrawals','tab-settings','tab-portfolio'].forEach(id => document.getElementById(id).className = 'px-4 py-2 rounded-full bg-white/5 text-gray-300');
-      if(tab==='users') {
-        document.getElementById('content-users').classList.remove('hidden');
-        document.getElementById('tab-users').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
-      } else if(tab==='investments') {
-        document.getElementById('content-investments').classList.remove('hidden');
-        document.getElementById('tab-investments').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
-      } else if(tab==='withdrawals') {
-        document.getElementById('content-withdrawals').classList.remove('hidden');
-        document.getElementById('tab-withdrawals').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
-      } else if(tab==='settings') {
-        document.getElementById('content-settings').classList.remove('hidden');
-        document.getElementById('tab-settings').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
-        loadSettings();
-      } else if(tab==='portfolio') {
-        document.getElementById('content-portfolio').classList.remove('hidden');
-        document.getElementById('tab-portfolio').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
-        loadPortfolioUsers();
-      } else if(tab==='partners') {
-       document.getElementById('content-partners').classList.remove('hidden');
-       document.getElementById('tab-partners').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
-       loadPartners();
-      }
-    }
+   function showTab(tab) {
+  ['content-users','content-investments','content-withdrawals','content-settings','content-portfolio','content-partners'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  ['tab-users','tab-investments','tab-withdrawals','tab-settings','tab-portfolio','tab-partners'].forEach(id => document.getElementById(id).className = 'px-4 py-2 rounded-full bg-white/5 text-gray-300');
+  if(tab==='users') {
+    document.getElementById('content-users').classList.remove('hidden');
+    document.getElementById('tab-users').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+  } else if(tab==='investments') {
+    document.getElementById('content-investments').classList.remove('hidden');
+    document.getElementById('tab-investments').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+  } else if(tab==='withdrawals') {
+    document.getElementById('content-withdrawals').classList.remove('hidden');
+    document.getElementById('tab-withdrawals').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+  } else if(tab==='settings') {
+    document.getElementById('content-settings').classList.remove('hidden');
+    document.getElementById('tab-settings').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+    loadSettings();
+  } else if(tab==='portfolio') {
+    document.getElementById('content-portfolio').classList.remove('hidden');
+    document.getElementById('tab-portfolio').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+    loadPortfolioUsers();
+  } else if(tab==='partners') {
+    document.getElementById('content-partners').classList.remove('hidden');
+    document.getElementById('tab-partners').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+    loadPartners();
+  }
+}
 
     function loadDashboard() {
       loadUsers(); loadInvestments(); loadWithdrawals(); showTab('users'); loadAdminChart();
