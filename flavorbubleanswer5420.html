@@ -588,7 +588,7 @@ document.getElementById('investment-status-summary').innerHTML =
           <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
           <td class="py-3">₵${inv.amount.toLocaleString()}</td><td class="py-3 capitalize">${inv.plan}</td><td class="py-3">${inv.method}</td>
           <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
-          <td class="py-3" data-status="${inv.status}">
+         <td class="py-3" data-status="${inv.status}">
   ${inv.status === 'active' ? (() => {
     const effectiveDays = inv.duration_days || { starter:10, growth:20, premium:30 }[inv.plan] || 14;
     const maturityDate = new Date(new Date(inv.date).getTime() + effectiveDays * 86400000);
