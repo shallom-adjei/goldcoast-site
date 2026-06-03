@@ -30,6 +30,7 @@
     .status-pending { color: #fbbf24; } .status-active { color: #34d399; } .status-matured { color: #60a5fa; }
     .gradient-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
     .text-dark-950 { color: #0a0a12; }
+    .status-reinvested { color: #60a5fa; }
     .chart-card {
       background: linear-gradient(180deg, rgba(31,41,55,0.9), rgba(17,24,39,0.95));
       border: 1px solid rgba(255,255,255,0.06);
@@ -154,6 +155,7 @@
           <button onclick="filterInvestmentsByStatus('active')" class="status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Active</button>
           <button onclick="filterInvestmentsByStatus('pending')" class="status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Pending</button>
           <button onclick="filterInvestmentsByStatus('matured')" class="status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Matured</button>
+          <button onclick="filterInvestmentsByStatus('reinvested')" class="status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Reinvested</button>
           <button onclick="filterInvestmentsByStatus('rejected')" class="status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Rejected</button>
         </div>
       </div>
@@ -536,9 +538,10 @@ allInvestments = investments.filter(inv => {
   return true;
 });
         document.getElementById('investment-search').value = '';
-        const statusCounts = { active:0, pending:0, matured:0, rejected:0 };
-        investments.forEach(i => { if(statusCounts[i.status] !== undefined) statusCounts[i.status]++; });
-        document.getElementById('investment-status-summary').innerHTML = `Active: ${statusCounts.active} | Pending: ${statusCounts.pending} | Matured: ${statusCounts.matured} | Rejected: ${statusCounts.rejected}`;
+       const statusCounts = { active:0, pending:0, matured:0, rejected:0, reinvested:0 };
+investments.forEach(i => { if(statusCounts[i.status] !== undefined) statusCounts[i.status]++; });
+document.getElementById('investment-status-summary').innerHTML =
+  `Active: ${statusCounts.active} | Pending: ${statusCounts.pending} | Matured: ${statusCounts.matured} | Rejected: ${statusCounts.rejected} | Reinvested: ${statusCounts.reinvested}`;
         document.getElementById('stat-investments').textContent = investments.filter(i => i.status !== 'rejected').length;
         document.getElementById('stat-total').textContent = investments.reduce((s,i) => i.status !== 'rejected' ? s + i.amount : s, 0).toLocaleString('en-GH');
         const activeInvs = investments.filter(i => i.status === 'active');
@@ -551,20 +554,25 @@ allInvestments = investments.filter(inv => {
             <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
             <td class="py-3">₵${inv.amount.toLocaleString()}</td><td class="py-3 capitalize">${inv.plan}</td><td class="py-3">${inv.method}</td>
             <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
-            <td class="py-3" data-status="${inv.status}">
+           <td class="py-3" data-status="${inv.status}">
   ${inv.status === 'active' ? (() => {
     const effectiveDays = inv.duration_days || { starter:10, growth:20, premium:30 }[inv.plan] || 14;
     const maturityDate = new Date(new Date(inv.date).getTime() + effectiveDays * 86400000);
     return `<span data-maturity="${maturityDate.toISOString()}" class="status-active">Active</span>`;
-  })() : `<span class="status-${inv.status}">${inv.status}</span>`}
+  })() : inv.status === 'reinvested' ? `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : ''}</span>` : `<span class="status-${inv.status}">${inv.status}</span>`}
 </td>
             <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
-            <td class="py-3"><select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
-              <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
-              <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
-              <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
-              <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
-            </select></td>
+           <td class="py-3">
+  ${inv.status === 'reinvested' 
+    ? '<span class="text-blue-400 text-xs">Reinvested 🔒</span>'
+    : `<select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
+         <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
+         <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
+         <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
+         <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
+       </select>`
+  }
+</td>
           </tr>`).join('');
         updateActiveCountdowns();
       } catch(err) { toast('Failed to load investments','error'); }
@@ -585,15 +593,20 @@ allInvestments = investments.filter(inv => {
     const effectiveDays = inv.duration_days || { starter:10, growth:20, premium:30 }[inv.plan] || 14;
     const maturityDate = new Date(new Date(inv.date).getTime() + effectiveDays * 86400000);
     return `<span data-maturity="${maturityDate.toISOString()}" class="status-active">Active</span>`;
-  })() : `<span class="status-${inv.status}">${inv.status}</span>`}
+  })() : inv.status === 'reinvested' ? `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : ''}</span>` : `<span class="status-${inv.status}">${inv.status}</span>`}
 </td>
           <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
-          <td class="py-3"><select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
-            <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
-            <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
-            <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
-            <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
-          </select></td>
+          <td class="py-3">
+  ${inv.status === 'reinvested' 
+    ? '<span class="text-blue-400 text-xs">Reinvested 🔒</span>'
+    : `<select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
+         <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
+         <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
+         <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
+         <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
+       </select>`
+  }
+</td>
         </tr>`).join('');
       updateActiveCountdowns();
     }
