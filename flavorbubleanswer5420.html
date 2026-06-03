@@ -509,11 +509,51 @@
             <td class="py-3">${safe(u.name)}</td><td class="py-3">${safe(u.email)}</td><td class="py-3">${safe(u.phone)}</td>
             <td class="py-3">${safe(u.referral_code||'-')}</td><td class="py-3">${u.is_admin?'✅':'❌'}</td>
             <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
-            <td class="py-3">${!u.is_admin ? `<button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>` : '<span class="text-gray-500 text-xs">Admin</span>'}</td>
+           <td class="py-3 flex items-center gap-1">
+  ${!u.is_admin ? `
+    <button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>
+    ${!u.is_partner ? 
+      `<button onclick="makePartner(${u.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500">Make Partner</button>` :
+      `<button onclick="revokePartner(${u.id})" class="bg-yellow-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-yellow-500">Revoke Partner</button>`
+    }
+  ` : '<span class="text-gray-500 text-xs">Admin</span>'}
+</td>
           </tr>`).join('');
         document.getElementById('user-search').value = '';
       } catch(err) { toast('Failed to load users','error'); }
     }
+
+    async function makePartner(userId) {
+  if (!await customConfirm('Make this user a partner?')) return;
+  try {
+    const res = await fetch(`${API}/users/${userId}/make-partner`, {
+      method: 'PUT',
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    if (res.ok) {
+      toast('User is now a partner');
+      loadUsers();
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+async function revokePartner(userId) {
+  if (!await customConfirm('Revoke partner status?')) return;
+  try {
+    const res = await fetch(`${API}/users/${userId}/revoke-partner`, {
+      method: 'PUT',
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    if (res.ok) {
+      toast('Partner status revoked');
+      loadUsers();
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
 
     async function loadPartners() {
   try {
@@ -558,7 +598,15 @@ async function payPartner(partnerId) {
           <td class="py-3">${safe(u.name)}</td><td class="py-3">${safe(u.email)}</td><td class="py-3">${safe(u.phone)}</td>
           <td class="py-3">${safe(u.referral_code||'-')}</td><td class="py-3">${u.is_admin?'✅':'❌'}</td>
           <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
-          <td class="py-3">${!u.is_admin ? `<button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>` : '<span class="text-gray-500 text-xs">Admin</span>'}</td>
+          <td class="py-3 flex items-center gap-1">
+  ${!u.is_admin ? `
+    <button onclick="deleteUser(${u.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Delete</button>
+    ${!u.is_partner ? 
+      `<button onclick="makePartner(${u.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500">Make Partner</button>` :
+      `<button onclick="revokePartner(${u.id})" class="bg-yellow-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-yellow-500">Revoke Partner</button>`
+    }
+  ` : '<span class="text-gray-500 text-xs">Admin</span>'}
+</td>
         </tr>`).join('');
     }
 
