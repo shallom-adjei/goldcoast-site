@@ -925,28 +925,25 @@
   </svg>
   </span>
 
-  <!-- Profile dropdown trigger -->
+ <!-- Profile dropdown trigger (more obvious on mobile) -->
   <div class="relative">
-    <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 cursor-pointer">
+    <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 cursor-pointer glass rounded-full pl-2 pr-3 py-1.5 hover:bg-white/10 transition">
       <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center text-dark-950 font-bold text-sm" id="dash-avatar">U</div>
       <span class="text-sm font-medium hidden sm:block" id="dash-username">User</span>
-      <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 hidden sm:block transition-transform duration-200" id="profile-chevron"></i>
+      <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" id="profile-chevron"></i>
     </button>
 
     <!-- Dropdown menu -->
-    <div id="profile-dropdown" class="absolute right-0 top-full mt-2 w-48 glass-premium rounded-xl p-1.5 hidden z-50">
-      <!-- Notification -->
+    <div id="profile-dropdown" class="absolute right-0 top-full mt-2 w-48 glass rounded-xl p-1.5 hidden z-50 shadow-2xl">
       <button onclick="openAnnouncementsModal(); toggleProfileDropdown()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-300">
         <i data-lucide="bell" class="w-4 h-4 text-gray-400"></i>
         Notifications
         <span id="announcement-dot" class="w-2 h-2 rounded-full bg-yellow-400 hidden ml-auto"></span>
       </button>
-      <!-- Refresh -->
       <button onclick="updateDashboard(); toggleProfileDropdown()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-300">
         <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-400"></i>
         Refresh
       </button>
-      <!-- Logout -->
       <button onclick="handleLogout()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-500/10 text-sm text-red-400">
         <i data-lucide="log-out" class="w-4 h-4"></i>
         Logout
