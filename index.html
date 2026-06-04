@@ -817,6 +817,15 @@
                         </table>
                     </div>
                 </div>
+
+<!-- Recent Activity -->
+<div class="glass rounded-2xl p-5 sm:p-6 mb-6">
+  <h3 class="font-semibold text-lg mb-4">Recent Activity</h3>
+  <div id="recent-activity" class="space-y-3">
+    <div class="text-gray-500 text-sm text-center py-4">Loading...</div>
+  </div>
+</div>
+                
                 <!-- Transaction History -->
 <div class="glass rounded-2xl p-5 sm:p-6 mt-6">
   <h3 class="font-semibold text-lg mb-4">Transaction History</h3>
@@ -1568,6 +1577,24 @@ window.allInvestmentsLocal = investments;
         const rate = returnRates[i.plan] || 1;
         return s + (i.amount * rate);
     }
+
+              const activityEl = document.getElementById('recent-activity');
+if (activityEl) {
+  if (investments.length === 0) {
+    activityEl.innerHTML = '<div class="text-gray-500 text-sm text-center py-4">No activity yet</div>';
+  } else {
+    activityEl.innerHTML = investments.slice(-3).reverse().map(inv => `
+      <div class="flex items-center justify-between glass rounded-lg p-2.5">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full ${inv.method==='momo'?'bg-yellow-500/20':'bg-orange-500/20'} flex items-center justify-center"><span class="text-xs">${inv.method==='momo'?'M':'₿'}</span></div>
+          <div><div class="text-xs font-medium">₵${formatNumber(inv.amount)}</div><div class="text-[10px] text-gray-500">${inv.plan}</div></div>
+        </div>
+        <span class="text-[10px] text-gray-500">${timeAgo(inv.date)}</span>
+      </div>
+    `).join('');
+  }
+}
+              
     // active
     const rate = returnRates[i.plan] || 1;
     const progress = getProgress(i) / 100;
@@ -1720,20 +1747,6 @@ if (investments.length === 0) {
     }).join('');
   }
 }
-
-            const activityEl = document.getElementById('recent-activity');
-            if (investments.length === 0) {
-                activityEl.innerHTML = '<div class="text-gray-500 text-sm text-center py-4">No activity yet</div>';
-            } else {
-                activityEl.innerHTML = investments.slice(-3).reverse().map(inv => `
-                    <div class="flex items-center justify-between glass rounded-lg p-2.5">
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-full ${inv.method==='momo'?'bg-yellow-500/20':'bg-orange-500/20'} flex items-center justify-center"><span class="text-xs">${inv.method==='momo'?'M':'₿'}</span></div>
-                            <div><div class="text-xs font-medium">₵${formatNumber(inv.amount)}</div><div class="text-[10px] text-gray-500">${inv.plan}</div></div>
-                        </div>
-                        <span class="text-[10px] text-gray-500">${timeAgo(inv.date)}</span>
-                    </div>`).join('');
-            }
 
             drawChart(investments);
             loadTransactionHistory();
