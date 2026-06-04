@@ -687,6 +687,17 @@
         <a href="terms.html" class="text-gray-500 text-xs hover:text-gray-400 hover:underline mt-2 inline-block">Terms of Service & Privacy Policy</a>
     </div>
 </footer>
+        <script>
+  // Record a page view (only once per session)
+  if (!sessionStorage.getItem('_gcc_pv')) {
+    sessionStorage.setItem('_gcc_pv', '1');
+    fetch('https://goldcoast-api.onrender.com/api/page-view', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page: 'landing' })
+    }).catch(() => {});
+  }
+</script>
     </div>
 
     <!-- SIGNUP PAGE -->
