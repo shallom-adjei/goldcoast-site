@@ -22,6 +22,21 @@
     </script>
     <style>
 
+        .collapsible-content {
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  max-height: 2000px; /* large enough to show content */
+  opacity: 1;
+}
+.collapsible-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
         .glass-premium {
   background: rgba(255,255,255,0.04);
   backdrop-filter: blur(20px);
@@ -709,26 +724,34 @@
 
                <!-- Referral Card -->
 <div class="glass-premium p-5 sm:p-6 mb-6">
-  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-    <div class="flex items-center gap-6">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-3">
       <div>
         <p class="text-xs text-gray-400 uppercase tracking-wider">Your Referral Code</p>
-        <p class="text-2xl font-bold" id="dash-referral-code">----</p>
+        <p class="text-2xl font-bold mt-0.5" id="dash-referral-code">----</p>
       </div>
-      <div class="w-px h-10 bg-white/10 hidden sm:block"></div>
+      <div class="hidden sm:block w-px h-10 bg-white/10"></div>
       <div>
         <p class="text-xs text-gray-400 uppercase tracking-wider">Referral Bonus</p>
-        <p class="text-2xl font-bold text-green-400" id="dash-bonus">₵0</p>
+        <p class="text-2xl font-bold text-green-400 mt-0.5" id="dash-bonus">₵0</p>
       </div>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
-      <button id="withdraw-bonus-btn" onclick="requestReferralWithdrawal()" class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-xl text-sm whitespace-nowrap">Withdraw Bonus</button>
-      <button onclick="copyReferralLink()" class="glass px-3 py-1.5 rounded-lg text-xs text-gray-300 hover:text-white flex items-center gap-1"><i data-lucide="copy" class="w-3 h-3"></i>Copy</button>
-      <button onclick="shareReferral('whatsapp')" class="glass px-3 py-1.5 rounded-lg text-xs text-gray-300 hover:text-white flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#25D366" width="14" height="14"><path d="..."/></svg> Share
+      <button id="withdraw-bonus-btn" onclick="requestReferralWithdrawal()"
+        class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2.5 px-5 rounded-xl text-sm whitespace-nowrap transition">
+        Withdraw Bonus
       </button>
-      <button onclick="shareReferral('telegram')" class="glass px-3 py-1.5 rounded-lg text-xs text-gray-300 hover:text-white flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0088cc" width="14" height="14"><path d="..."/></svg> Share
+      <button onclick="copyReferralLink()"
+        class="glass px-4 py-2 rounded-xl text-xs text-gray-300 hover:text-white flex items-center gap-1.5 transition">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i>Copy
+      </button>
+      <button onclick="shareReferral('whatsapp')"
+        class="glass px-4 py-2 rounded-xl text-xs text-gray-300 hover:text-white flex items-center gap-1.5 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#25D366" width="16" height="16"><path d="..."/></svg> Share
+      </button>
+      <button onclick="shareReferral('telegram')"
+        class="glass px-4 py-2 rounded-xl text-xs text-gray-300 hover:text-white flex items-center gap-1.5 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0088cc" width="16" height="16"><path d="..."/></svg> Share
       </button>
     </div>
   </div>
@@ -837,36 +860,54 @@
   }
 </style>
 
-               <div class="glass-premium p-5 sm:p-6 mt-6">
-  <div class="flex items-center justify-between mb-6">
+              <div class="glass-premium p-5 sm:p-6 mt-6">
+  <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCollapse(this)">
     <h3 class="font-semibold text-lg">My Investments</h3>
-    <button onclick="openDepositModal()" class="text-gold-400 text-sm font-medium hover:underline flex items-center gap-1"><i data-lucide="plus" class="w-4 h-4"></i> New Investment</button>
+    <div class="flex items-center gap-3">
+      <button onclick="event.stopPropagation(); openDepositModal()" class="text-gold-400 text-sm font-medium hover:underline flex items-center gap-1">
+        <i data-lucide="plus" class="w-4 h-4"></i> New Investment
+      </button>
+      <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+    </div>
   </div>
-  <div id="investments-cards" class="sm:hidden space-y-3"></div>
-  <div class="overflow-x-auto hidden sm:block">
-    <table class="w-full text-sm">
-      <thead><tr class="text-gray-400 border-b border-white/5"><th class="text-left pb-3">Amount</th><th class="text-left pb-3 hidden sm:table-cell">Plan</th><th class="text-left pb-3">Earnings</th><th class="text-left pb-3">Progress</th><th class="text-left pb-3">Status</th><th class="text-left pb-3">Action</th></tr></thead>
-      <tbody id="investments-table"></tbody>
-    </table>
+  <div class="collapsible-content mt-4">
+    <div id="investments-cards" class="sm:hidden space-y-3"></div>
+    <div class="overflow-x-auto hidden sm:block">
+      <table class="w-full text-sm">
+        <thead><tr class="text-gray-400 border-b border-white/5"><th class="text-left pb-3">Amount</th><th class="text-left pb-3 hidden sm:table-cell">Plan</th><th class="text-left pb-3">Earnings</th><th class="text-left pb-3">Progress</th><th class="text-left pb-3">Status</th><th class="text-left pb-3">Action</th></tr></thead>
+        <tbody id="investments-table"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <div class="glass-premium p-5 sm:p-6 mb-6">
-  <h3 class="font-semibold text-lg mb-4">Recent Activity</h3>
-  <div id="recent-activity" class="space-y-3">
-    <div class="text-gray-500 text-sm text-center py-4">Loading...</div>
+  <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCollapse(this)">
+    <h3 class="font-semibold text-lg">Recent Activity</h3>
+    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+  </div>
+  <div class="collapsible-content mt-4">
+    <div id="recent-activity" class="space-y-3">
+      <div class="text-gray-500 text-sm text-center py-4">Loading...</div>
+    </div>
   </div>
 </div>
+            <div class="my-2"></div>
                 
                 <!-- Transaction History -->
 <div class="glass-premium p-5 sm:p-6 mt-6">
-  <h3 class="font-semibold text-lg mb-4">Transaction History</h3>
-  <div id="transaction-cards" class="sm:hidden space-y-3"></div>
-  <div class="overflow-x-auto hidden sm:block">
-    <table class="w-full text-sm">
-      <thead><tr class="text-gray-400 border-b border-white/5"><th class="text-left pb-3">Type</th><th class="text-left pb-3">Description</th><th class="text-left pb-3">Amount</th><th class="text-left pb-3">Status</th><th class="text-left pb-3">Date</th></tr></thead>
-      <tbody id="transaction-table-body"></tbody>
-    </table>
+  <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCollapse(this)">
+    <h3 class="font-semibold text-lg">Transaction History</h3>
+    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+  </div>
+  <div class="collapsible-content mt-4">
+    <div id="transaction-cards" class="sm:hidden space-y-3"></div>
+    <div class="overflow-x-auto hidden sm:block">
+      <table class="w-full text-sm">
+        <thead><tr class="text-gray-400 border-b border-white/5"><th class="text-left pb-3">Type</th><th class="text-left pb-3">Description</th><th class="text-left pb-3">Amount</th><th class="text-left pb-3">Status</th><th class="text-left pb-3">Date</th></tr></thead>
+        <tbody id="transaction-table-body"></tbody>
+      </table>
+    </div>
   </div>
 </div>
             </div>
@@ -944,6 +985,15 @@
 
     <!-- SCRIPTS -->
     <script>
+
+        function toggleCollapse(headerEl) {
+  const content = headerEl.nextElementSibling;
+  const icon = headerEl.querySelector('[data-lucide]');
+  content.classList.toggle('collapsed');
+  if (icon) {
+    icon.style.transform = content.classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0deg)';
+  }
+}
 
         let currentReinvestTier = 1;
 let reinvestPayout = 0;
