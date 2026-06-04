@@ -35,6 +35,10 @@
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+        @keyframes vip-shimmer {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(250%); }
+}
 @keyframes gentleBounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
@@ -517,10 +521,25 @@
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center text-dark-950 font-bold text-sm" id="dash-avatar">U</div>
                                 <span class="text-sm font-medium hidden sm:block" id="dash-username">User</span>
-<span id="partner-badge" class="hidden ml-2 px-2.5 py-0.5 text-xs font-bold rounded-full uppercase tracking-wide
-  bg-gradient-to-r from-yellow-500 to-amber-400 text-dark-950
-  animate-pulse-gold">
-VIP
+<span
+  id="partner-badge"
+  class="hidden relative inline-flex items-center gap-1.5 px-2.5 py-0.5 
+  rounded-full text-[10px] font-black uppercase tracking-[0.22em]
+  text-amber-950
+  bg-gradient-to-r from-[#FFF6D6] via-[#FFD45E] to-[#C88A00]
+  border border-[#FFE9A3]
+  shadow-[0_0_18px_rgba(255,210,90,0.35),0_4px_12px_rgba(0,0,0,0.2)]
+  overflow-hidden
+"
+>
+  <!-- Shimmer overlay -->
+  <span class="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+    <span class="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+          style="animation: vip-shimmer 3.5s infinite ease-in-out; transform: translateX(-150%);">
+    </span>
+  </span>
+  ✦
+  <span class="relative z-10">VIP</span>
 </span>
                             <button onclick="openAnnouncementsModal()" class="text-gray-400 hover:text-yellow-400 relative">
   <i data-lucide="bell" class="w-5 h-5"></i>
