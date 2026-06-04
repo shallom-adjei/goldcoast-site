@@ -913,42 +913,47 @@
   <span class="anniversary-chip relative z-10">CELEBRATING 10 YEARS OF TRUST</span>
 </div>
                         
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center text-dark-950 font-bold text-sm" id="dash-avatar">U</div>
-                                <span class="text-sm font-medium hidden sm:block" id="dash-username">User</span>
-<span
-  id="partner-badge"
-  class="hidden relative inline-flex items-center gap-1.5 px-2.5 py-0.5 
-  rounded-full text-[10px] font-black uppercase tracking-[0.22em]
-  text-amber-950
-  bg-gradient-to-r from-[#FFF6D6] via-[#FFD45E] to-[#C88A00]
-  border border-[#FFE9A3]
-  shadow-[0_0_18px_rgba(255,210,90,0.35),0_4px_12px_rgba(0,0,0,0.2)]
-  overflow-hidden
-"
->
-  <!-- Shimmer overlay -->
-  <span class="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
-    <span class="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent"
-          style="animation: vip-shimmer 3.5s infinite ease-in-out; transform: translateX(-150%);">
+<div class="flex items-center gap-3">
+  <!-- VIP badge (standalone) -->
+  <span id="partner-badge" class="hidden relative inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-[0.22em] text-amber-950 bg-gradient-to-r from-[#FFF6D6] via-[#FFD45E] to-[#C88A00] border border-[#FFE9A3] shadow-[0_0_18px_rgba(255,210,90,0.35),0_4px_12px_rgba(0,0,0,0.2)] overflow-hidden">
+    <span class="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+      <span class="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent" style="animation: vip-shimmer 3.5s infinite ease-in-out; transform: translateX(-150%);"></span>
     </span>
-  </span>
-    <!-- Crown -->
+     <!-- Crown -->
   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-950 relative z-10" fill="currentColor" viewBox="0 0 24 24">
     <path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/>
   </svg>
-</span>
-                            <button onclick="openAnnouncementsModal()" class="text-gray-400 hover:text-yellow-400 relative">
-  <i data-lucide="bell" class="w-5 h-5"></i>
-  <span id="announcement-dot" class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-yellow-400 hidden"></span>
-</button>
-                            <button onclick="updateDashboard()" class="text-gray-400 hover:text-white">
-    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-</button>
-                            <button onclick="handleLogout()" class="text-gray-400 hover:text-red-400"><i data-lucide="log-out" class="w-5 h-5"></i></button>
-                        </div>
-                    </div>
+  </span>
+
+  <!-- Profile dropdown trigger -->
+  <div class="relative">
+    <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 cursor-pointer">
+      <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center text-dark-950 font-bold text-sm" id="dash-avatar">U</div>
+      <span class="text-sm font-medium hidden sm:block" id="dash-username">User</span>
+      <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 hidden sm:block transition-transform duration-200" id="profile-chevron"></i>
+    </button>
+
+    <!-- Dropdown menu -->
+    <div id="profile-dropdown" class="absolute right-0 top-full mt-2 w-48 glass-premium rounded-xl p-1.5 hidden z-50">
+      <!-- Notification -->
+      <button onclick="openAnnouncementsModal(); toggleProfileDropdown()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-300">
+        <i data-lucide="bell" class="w-4 h-4 text-gray-400"></i>
+        Notifications
+        <span id="announcement-dot" class="w-2 h-2 rounded-full bg-yellow-400 hidden ml-auto"></span>
+      </button>
+      <!-- Refresh -->
+      <button onclick="updateDashboard(); toggleProfileDropdown()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-300">
+        <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-400"></i>
+        Refresh
+      </button>
+      <!-- Logout -->
+      <button onclick="handleLogout()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-500/10 text-sm text-red-400">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
                 </div>
             </nav>
 
@@ -1250,6 +1255,26 @@
 
     <!-- SCRIPTS -->
     <script>
+
+        function toggleProfileDropdown() {
+  const dropdown = document.getElementById('profile-dropdown');
+  const chevron = document.getElementById('profile-chevron');
+  dropdown.classList.toggle('hidden');
+  if (chevron) {
+    chevron.style.transform = dropdown.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.getElementById('profile-dropdown');
+  const trigger = e.target.closest('[onclick="toggleProfileDropdown()"]');
+  if (!trigger && dropdown && !dropdown.classList.contains('hidden')) {
+    dropdown.classList.add('hidden');
+    const chevron = document.getElementById('profile-chevron');
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+  }
+});
 
         function toggleCollapse(headerEl) {
   const content = headerEl.nextElementSibling;
