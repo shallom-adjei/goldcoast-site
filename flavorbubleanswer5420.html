@@ -558,12 +558,14 @@
 }
 
     function loadDashboard() {
-      loadUsers(); loadInvestments(); loadWithdrawals(); showTab('users'); loadAdminChart();
+      loadUsers(); loadInvestments(); loadWithdrawals(); showTab('users'); loadAdminChart(); loadPageViews();
     }
 
-    async function loadPageViews() {
+   async function loadPageViews() {
   try {
-    const res = await fetch(`${API}/page-views`, { headers: {'Authorization': `Bearer ${token}`} });
+    const res = await fetch(`${API}/page-views`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     const data = await res.json();
     document.getElementById('stat-visits').textContent = data.total.toLocaleString();
     document.getElementById('stat-visits-today').textContent = data.today;
