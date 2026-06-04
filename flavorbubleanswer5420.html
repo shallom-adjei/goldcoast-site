@@ -643,6 +643,25 @@ async function deleteUserFromModal(userId) {
   } catch (err) { toast('Connection error', 'error'); }
 }
 
+    async function deleteInvestment(investmentId) {
+  if (!await customConfirm('Permanently delete this investment? This cannot be undone.')) return;
+  try {
+    const res = await fetch(`${API}/investments/${investmentId}`, {
+      method: 'DELETE',
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    if (res.ok) {
+      toast('Investment deleted', 'success');
+      loadInvestments();
+    } else {
+      const data = await res.json();
+      toast(data.error || 'Failed to delete', 'error');
+    }
+  } catch (err) {
+    toast('Connection error', 'error');
+  }
+}
+
   async function loadPartners() {
   try {
     const res = await fetch(`${API}/partners`, { headers: {'Authorization': `Bearer ${token}`} });
@@ -851,23 +870,27 @@ async function loadInvestments() {
           })() : inv.status === 'reinvested' ? `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : ''}</span>` : `<span class="status-${inv.status}">${inv.status}</span>`}
         </td>
         <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
-        <td class="py-3">
-          ${inv.status === 'reinvested' 
-            ? '<span class="text-blue-400 text-xs">Reinvested 🔒</span>'
-            : (inv.status === 'matured')
-            ? '<span class="text-green-400 text-xs">Matured 🔒</span>'
-            : (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo)
-            ? '<span class="text-red-400 text-xs">Rejected 🔒</span>'
-            : `<select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
-                 <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
-                 <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
-                 <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
-                 <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
-               </select>`
-          }
-        </td>
+<td class="py-3 flex items-center gap-2">
+  ${inv.status === 'reinvested' 
+    ? '<span class="text-blue-400 text-xs">Reinvested 🔒</span>'
+    : (inv.status === 'matured')
+    ? '<span class="text-green-400 text-xs">Matured 🔒</span>'
+    : (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo)
+    ? '<span class="text-red-400 text-xs">Rejected 🔒</span>'
+    : `<select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
+         <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
+         <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
+         <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
+         <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
+       </select>`
+  }
+  <button onclick="deleteInvestment(${inv.id})" class="text-red-400 hover:text-red-300 text-xs" title="Delete investment">
+    <i data-lucide="trash-2" class="w-4 h-4"></i>
+  </button>
+</td>
       </tr>`).join('');
     updateActiveCountdowns();
+    lucide.createIcons();  
   } catch(err) { toast('Failed to load investments','error'); }
 }
 
@@ -906,6 +929,7 @@ async function loadInvestments() {
 </td>
         </tr>`).join('');
       updateActiveCountdowns();
+      lucide.createIcons();  
     }
 
    function filterInvestmentsByStatus(status) {
