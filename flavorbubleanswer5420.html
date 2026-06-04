@@ -423,6 +423,19 @@
     </div>
   </div>
 
+  <!-- Partner Reward Modal -->
+<div id="reward-modal" class="fixed inset-0 z-[270] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-sm p-6 text-center">
+    <h3 class="text-lg font-semibold mb-1">🎁 Reward Partner</h3>
+    <p class="text-sm text-gray-400 mb-4" id="reward-partner-name"></p>
+    <input type="number" id="reward-amount" placeholder="Amount (₵)" min="1" step="any" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-center text-lg mb-3">
+    <div class="flex justify-center gap-3">
+      <button onclick="closeRewardModal()" class="px-5 py-2 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium">Cancel</button>
+      <button onclick="confirmReward()" class="px-5 py-2 rounded-full gradient-gold text-dark-950 font-semibold text-sm">Send Reward</button>
+    </div>
+  </div>
+</div>
+
   <!-- User Quick View Modal -->
   <div id="user-detail-modal" class="fixed inset-0 z-[250] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
     <div class="glass rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -620,7 +633,7 @@ async function deleteUserFromModal(userId) {
         <td class="py-3">₵${(p.bonus || 0).toLocaleString()}</td>
         <td class="py-3">₵${(p.game_balance || 0).toLocaleString()}</td>
         <td class="py-3">
-          <button onclick="rewardPartner(${p.id})" class="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-3 py-1 text-xs">Reward</button>
+        <button onclick="openRewardModal(${p.id}, '${safe(p.name).replace(/'/g, "\\'")}')" class="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-3 py-1 text-xs">Reward</button>
         </td>
       </tr>
     `).join('');
@@ -659,6 +672,46 @@ async function payPartner(partnerId) {
     });
     if (res.ok) {
       toast('Partner marked as paid', 'success');
+      loadPartners();
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+    let currentRewardPartnerId = null;
+
+function openRewardModal(partnerId, partnerName) {
+  currentRewardPartnerId = partnerId;
+  document.getElementById('reward-partner-name').textContent = partnerName;
+  document.getElementById('reward-amount').value = '';
+  const modal = document.getElementById('reward-modal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeRewardModal() {
+  document.getElementById('reward-modal').classList.add('hidden');
+  document.getElementById('reward-modal').classList.remove('flex');
+  currentRewardPartnerId = null;
+}
+
+async function confirmReward() {
+  const amountStr = document.getElementById('reward-amount').value;
+  const amount = parseFloat(amountStr);
+  if (isNaN(amount) || amount <= 0) {
+    toast('Enter a valid amount', 'error');
+    return;
+  }
+  try {
+    const res = await fetch(`${API}/partners/${currentRewardPartnerId}/reward`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ amount, notes: 'Manual reward' })
+    });
+    if (res.ok) {
+      toast(`₵${amount} added to partner rewards`, 'success');
+      closeRewardModal();
       loadPartners();
     } else {
       toast('Failed', 'error');
