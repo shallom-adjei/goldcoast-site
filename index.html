@@ -22,6 +22,47 @@
     </script>
     <style>
 
+        /* Anniversary badge luxury style */
+.anniversary-badge {
+  background: linear-gradient(135deg, #fff9df 0%, #ffe08a 25%, #ffc93c 50%, #d89a00 100%);
+  border: 1px solid rgba(255,240,180,.8);
+  box-shadow: 0 0 20px rgba(255,210,90,.25), 0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.75);
+  animation: anniversaryPulse 3s ease-in-out infinite;
+}
+
+@keyframes anniversaryPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255,210,90,.25), 0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.75);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(255,210,90,.55), 0 12px 30px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.9);
+  }
+}
+
+.anniversary-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.anniversary-shimmer::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -150%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  transform: rotate(25deg);
+  animation: anniversarySweep 4s linear infinite;
+}
+
+@keyframes anniversarySweep {
+  from { left: -150%; }
+  to { left: 250%; }
+}
+        
+
          .chart-card-premium {
     background: radial-gradient(circle at top left, rgba(255,215,120,0.12), transparent 50%),
                 linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
@@ -661,6 +702,29 @@
                             <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center"><i data-lucide="landmark" class="w-4 h-4 text-dark-950"></i></div>
                             <span class="font-display text-lg font-bold text-gradient hidden sm:block">Gold Coast Capital</span>
                         </div>
+
+                        <!-- Desktop Anniversary Badge -->
+<div class="anniversary-badge relative overflow-hidden hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full">
+  <span class="anniversary-shimmer"></span>
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-950 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/>
+  </svg>
+  <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.22em] text-amber-950">
+    Anniversary Edition
+  </span>
+  <span class="relative z-10 text-[10px] font-black px-2 py-0.5 rounded-full bg-black/10 text-amber-950">
+    1ST YEAR
+  </span>
+</div>
+
+<!-- Mobile Anniversary Badge -->
+<div class="anniversary-badge relative overflow-hidden flex sm:hidden items-center gap-1 px-2.5 py-1 rounded-full">
+  <span class="anniversary-shimmer"></span>
+  <span class="relative z-10 text-[8px] font-black uppercase tracking-[0.15em] text-amber-950">
+    ✦ 1 YEAR ✦
+  </span>
+</div>
+                        
                         <div class="flex items-center gap-4">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center text-dark-950 font-bold text-sm" id="dash-avatar">U</div>
