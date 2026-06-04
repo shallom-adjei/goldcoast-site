@@ -22,6 +22,101 @@
     </script>
     <style>
 
+        /* ── Anniversary Badge Core ── */
+.anniversary-badge {
+  position: relative;
+  overflow: visible;          /* allow sparkles outside */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1.2rem;
+  border-radius: 9999px;
+
+  background: linear-gradient(135deg, #fff9df 0%, #ffe08a 25%, #ffc93c 50%, #d89a00 100%);
+  border: 1px solid rgba(255,240,180,.8);
+  box-shadow: 0 0 20px rgba(255,210,90,.25), 0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.75);
+
+  animation: anniversaryFloat 5s ease-in-out infinite,
+             anniversaryPulse 3s ease-in-out infinite;
+}
+
+/* Gentle float */
+@keyframes anniversaryFloat {
+  0%,100% { transform: translateY(0px); }
+  25% { transform: translateY(-3px); }
+  50% { transform: translateY(-6px); }
+  75% { transform: translateY(-2px); }
+}
+
+/* Glow pulse */
+@keyframes anniversaryPulse {
+  0%,100% { box-shadow: 0 0 20px rgba(255,210,90,.25), 0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.75); }
+  50% { box-shadow: 0 0 35px rgba(255,210,90,.55), 0 12px 30px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.9); }
+}
+
+/* Moving shimmer overlay */
+.anniversary-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+.anniversary-shimmer::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -150%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  transform: rotate(25deg);
+  animation: anniversarySweep 4s linear infinite;
+}
+@keyframes anniversarySweep {
+  from { left: -150%; }
+  to { left: 250%; }
+}
+
+/* Tiny floating sparkles */
+.sparkle {
+  position: absolute;
+  color: #fff6b0;
+  font-size: 10px;
+  pointer-events: none;
+  text-shadow: 0 0 6px rgba(255,215,0,0.6);
+}
+.sparkle-1 {
+  top: -6px;
+  left: 15%;
+  animation: sparkleFloat 2s infinite;
+}
+.sparkle-2 {
+  top: -10px;
+  right: 20%;
+  animation: sparkleFloat 2.5s infinite 0.3s;
+}
+.sparkle-3 {
+  bottom: -6px;
+  right: 30%;
+  animation: sparkleFloat 3s infinite 0.7s;
+}
+@keyframes sparkleFloat {
+  0%,100% { opacity: 0.4; transform: translateY(0) scale(0.8); }
+  50% { opacity: 1; transform: translateY(-4px) scale(1.2); }
+}
+
+/* Chip for "1ST YEAR" */
+.anniversary-chip {
+  font-size: 10px;
+  font-weight: 900;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(0,0,0,0.1);
+  color: #5c3d00;
+  letter-spacing: 0.12em;
+}
+
         /* Anniversary badge luxury style */
 .anniversary-badge {
   background: linear-gradient(135deg, #fff9df 0%, #ffe08a 25%, #ffc93c 50%, #d89a00 100%);
@@ -703,25 +798,34 @@
                             <span class="font-display text-lg font-bold text-gradient hidden sm:block">Gold Coast Capital</span>
                         </div>
 
-                        <!-- Desktop Anniversary Badge -->
-<div class="anniversary-badge relative overflow-hidden hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full">
+                      <!-- Desktop Anniversary Badge -->
+<div class="anniversary-badge hidden sm:flex relative">
   <span class="anniversary-shimmer"></span>
-  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-950 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+  
+  <!-- Sparkles -->
+  <span class="sparkle sparkle-1">✦</span>
+  <span class="sparkle sparkle-2">✦</span>
+  <span class="sparkle sparkle-3">✦</span>
+
+  <!-- Crown -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-950 relative z-10" fill="currentColor" viewBox="0 0 24 24">
     <path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/>
   </svg>
-  <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.22em] text-amber-950">
-    Anniversary Edition
+  
+  <span class="relative z-10 text-[12px] font-black uppercase tracking-[0.22em] text-amber-950">
+    10 YEARS ANNIVERSARY
   </span>
-  <span class="relative z-10 text-[10px] font-black px-2 py-0.5 rounded-full bg-black/10 text-amber-950">
-    1ST YEAR
-  </span>
+  
+  <span class="anniversary-chip relative z-10">CELEBRATING 10 YEARS OF TRUST</span>
 </div>
 
 <!-- Mobile Anniversary Badge -->
-<div class="anniversary-badge relative overflow-hidden flex sm:hidden items-center gap-1 px-2.5 py-1 rounded-full">
+<div class="anniversary-badge flex sm:hidden relative">
   <span class="anniversary-shimmer"></span>
-  <span class="relative z-10 text-[8px] font-black uppercase tracking-[0.15em] text-amber-950">
-    ✦ 1 YEAR ✦
+  <span class="sparkle sparkle-1">✦</span>
+  <span class="sparkle sparkle-2">✦</span>
+  <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.18em] text-amber-950">
+    👑 CELEBRATING 10 YEARS OF TRUST
   </span>
 </div>
                         
