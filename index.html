@@ -945,6 +945,16 @@
 </div>
             </nav>
 
+            <!-- Dashboard Loader -->
+<div id="dashboard-loader" class="fixed inset-0 z-40 flex items-center justify-center bg-dark-950/90 backdrop-blur-sm">
+  <div class="flex flex-col items-center gap-4">
+    <div class="w-12 h-12 rounded-full gradient-gold flex items-center justify-center animate-bounce-gentle">
+      <i data-lucide="landmark" class="w-6 h-6 text-dark-950"></i>
+    </div>
+    <p class="text-gold-400 text-sm font-medium animate-pulse">Loading your wealth…</p>
+  </div>
+</div>
+
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 <div class="mb-8"><h1 class="font-display text-2xl sm:text-3xl font-bold">Welcome back, <span class="text-gradient" id="dash-name">User</span></h1></div>
 
@@ -1862,6 +1872,8 @@ async function loadPaymentSettings() {
                 if (!res.ok) { handleLogout(); return; }
                 const data = await res.json();
                 currentUser = data.user;
+                // Show loader
+document.getElementById('dashboard-loader').classList.remove('hidden');
             }
 
             document.getElementById('dash-name').textContent = safe(currentUser.name.split(' ')[0]);
@@ -1895,22 +1907,6 @@ if (gameBtn) {
     gameBtn.disabled = gb < 30;
     gameBtn.style.opacity = gb < 30 ? '0.5' : '1';
 }
-
- // ✅ INSERT SKELETON LINES HERE (right before the first fetch)
-   document.getElementById('investments-table').innerHTML = `
-  <tr><td colspan="6" class="py-4"><div class="skeleton h-4 w-full mb-2"></div><div class="skeleton h-4 w-3/4"></div></td></tr>
-`;
-document.getElementById('investments-cards').innerHTML = `
-  <div class="skeleton h-12 w-full mb-2"></div>
-`;
-document.getElementById('transaction-table-body').innerHTML = `
-  <tr><td colspan="5" class="py-4"><div class="skeleton h-4 w-full mb-2"></div><div class="skeleton h-4 w-3/4"></div></td></tr>
-`;
-document.getElementById('transaction-cards').innerHTML = `
-  <div class="skeleton h-12 w-full mb-2"></div>
-`;
-
-
    const [invRes, wdrRes] = await Promise.all([
     fetch(`${API_BASE}/api/investments`, { headers: {'Authorization': `Bearer ${authToken}`} }),
     fetch(`${API_BASE}/api/withdrawals`, { headers: {'Authorization': `Bearer ${authToken}`} })
@@ -2102,6 +2098,8 @@ if (investments.length === 0) {
 
             drawChart(investments);
             loadTransactionHistory();
+            // Hide loader when everything is done
+document.getElementById('dashboard-loader').classList.add('hidden');
         }
 
         async function requestWithdrawal(investmentId) {
