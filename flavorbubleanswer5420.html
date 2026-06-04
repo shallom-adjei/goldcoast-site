@@ -820,17 +820,17 @@ allInvestments = investments.filter(inv => {
 });
         document.getElementById('investment-search').value = '';
        const statusCounts = { active:0, pending:0, matured:0, rejected:0, reinvested:0 };
-investments.forEach(i => { if(statusCounts[i.status] !== undefined) statusCounts[i.status]++; });
+allinvestments.forEach(i => { if(statusCounts[i.status] !== undefined) statusCounts[i.status]++; });
 document.getElementById('investment-status-summary').innerHTML =
   `Active: ${statusCounts.active} | Pending: ${statusCounts.pending} | Matured: ${statusCounts.matured} | Rejected: ${statusCounts.rejected} | Reinvested: ${statusCounts.reinvested}`;
-        document.getElementById('stat-investments').textContent = investments.filter(i => i.status !== 'rejected').length;
+        document.getElementById('stat-investments').textContent = allinvestments.filter(i => i.status !== 'rejected').length;
         document.getElementById('stat-total').textContent = investments.reduce((s,i) => i.status !== 'rejected' ? s + i.amount : s, 0).toLocaleString('en-GH');
         const activeInvs = investments.filter(i => i.status === 'active');
         document.getElementById('stat-active-investments').textContent = activeInvs.length;
         document.getElementById('stat-active-amount').textContent = '₵' + activeInvs.reduce((s,i) => s + i.amount, 0).toLocaleString('en-GH');
         const reinvestedAmount = investments.filter(i => i.status === 'reinvested').reduce((s,i) => s + i.amount, 0);
         document.getElementById('stat-reinvested-capital').textContent = '₵' + reinvestedAmount.toLocaleString('en-GH');
-        document.getElementById('investments-table').innerHTML = investments.map(inv => `
+        document.getElementById('investments-table').innerHTML = allinvestments.map(inv => `
           <tr class="border-b border-white/5">
             <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
             <td class="py-3">₵${inv.amount.toLocaleString()}</td><td class="py-3 capitalize">${inv.plan}</td><td class="py-3">${inv.method}</td>
