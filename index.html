@@ -2553,12 +2553,11 @@ document.getElementById('dashboard-loader').classList.add('hidden');
 
     const top = data.leaderboard.slice(0, 6);
     const getTier = (count) => {
-      if (count >= 100) return 'Diamond';
-      if (count >= 50) return 'Platinum';
-      if (count >= 20) return 'Gold';
-      return 'Member';
-    };
-
+  if (count >= 100) return 'Diamond';
+  if (count >= 50) return 'Platinum';
+  if (count >= 20) return 'Gold';
+  return 'Member';
+};
     // Render top 3 as podium cards, 4-6 as simple rows
     let html = '';
 
@@ -2575,7 +2574,7 @@ document.getElementById('dashboard-loader').classList.add('hidden');
               <div class="text-base font-bold text-white mt-0.5">${safe(champ.name)}</div>
               <div class="text-xs text-gold-400 mt-0.5">
                 <span class="tier-badge">${getTier(champ.referrals)}</span>
-                <span class="ml-2">${champ.referrals} referrals</span>
+                <span class="ml-2">${champ.total_referrals} referrals</span>
               </div>
             </div>
           </div>
@@ -2598,7 +2597,7 @@ document.getElementById('dashboard-loader').classList.add('hidden');
           </div>
           <div class="text-sm font-semibold text-white truncate">${safe(entry.name)}</div>
           <div class="flex justify-between items-center mt-3">
-            <span class="text-xs text-gray-400">${entry.referrals} ref</span>
+           <span class="text-xs text-gray-400">${entry.total_referrals} ref</span>
             <span class="bonus-pill text-xs">₵${formatNumber(entry.bonus)}</span>
           </div>
         </div>`;
@@ -2619,7 +2618,7 @@ document.getElementById('dashboard-loader').classList.add('hidden');
             <span class="tier-badge">${getTier(entry.referrals)}</span>
           </div>
           <div class="flex items-center gap-3">
-            <span class="text-xs text-gray-400">${entry.referrals} ref</span>
+           <span class="text-xs text-gray-400">${entry.total_referrals} ref</span>
             <span class="bonus-pill text-xs">₵${formatNumber(entry.bonus)}</span>
           </div>
         </div>`;
