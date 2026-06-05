@@ -1399,15 +1399,18 @@ async function loadInvestments() {
 }
 
     // ── Init ──
-    document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      if(token) {
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('dashboard-screen').classList.remove('hidden');
-        document.getElementById('dashboard-screen').classList.add('flex-grow');
-        loadDashboard();
-      }
-    });
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  if(token) {
+    const gate = document.getElementById('gate-screen');
+    if (gate) gate.remove();
+    
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('dashboard-screen').classList.remove('hidden');
+    document.getElementById('dashboard-screen').classList.add('flex-grow');
+    loadDashboard();
+  }
+});
   </script>
 </body>
 </html>
