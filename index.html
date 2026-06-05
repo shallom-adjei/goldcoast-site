@@ -23,6 +23,26 @@
     </script>
     <style>
 
+        .tier-badge.text-gold-400 { color: #fbbf24; }
+.tier-badge.border-gold-500\/30 { border-color: rgba(245,158,11,0.3); }
+.tier-badge.bg-gold-500\/10 { background: rgba(245,158,11,0.1); }
+
+.tier-badge.text-gray-300 { color: #d1d5db; }
+.tier-badge.border-gray-400\/30 { border-color: rgba(156,163,175,0.3); }
+.tier-badge.bg-gray-500\/10 { background: rgba(107,114,128,0.1); }
+
+.tier-badge.text-amber-400 { color: #f59e0b; }
+.tier-badge.border-amber-500\/30 { border-color: rgba(245,158,11,0.3); }
+.tier-badge.bg-amber-500\/10 { background: rgba(245,158,11,0.1); }
+
+.tier-badge.text-emerald-400 { color: #34d399; }
+.tier-badge.border-emerald-500\/30 { border-color: rgba(16,185,129,0.3); }
+.tier-badge.bg-emerald-500\/10 { background: rgba(16,185,129,0.1); }
+
+.tier-badge.text-gray-500 { color: #6b7280; }
+.tier-badge.border-gray-500\/30 { border-color: rgba(107,114,128,0.3); }
+.tier-badge.bg-gray-500\/5 { background: rgba(107,114,128,0.05); }
+
         /* ── Luxury Logo Medallion ── */
 .logo-core {
   /* styles already inline for gradient + shadow; keep as fallback */
@@ -2552,79 +2572,98 @@ document.getElementById('dashboard-loader').classList.add('hidden');
     }
 
     const top = data.leaderboard.slice(0, 6);
-    const getTier = (count) => {
-  if (count >= 100) return 'Diamond';
-  if (count >= 50) return 'Platinum';
-  if (count >= 20) return 'Gold';
-  return 'Member';
+   const getTier = (count) => {
+  if (count >= 100) return { name: 'Diamond', class: 'text-gold-400 border-gold-500/30 bg-gold-500/10' };
+  if (count >= 50) return { name: 'Platinum', class: 'text-gray-300 border-gray-400/30 bg-gray-500/10' };
+  if (count >= 20) return { name: 'Gold', class: 'text-amber-400 border-amber-500/30 bg-amber-500/10' };
+  if (count >= 1) return { name: 'Elite', class: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' };
+  return { name: 'Newbie', class: 'text-gray-500 border-gray-500/30 bg-gray-500/5' };
 };
     // Render top 3 as podium cards, 4-6 as simple rows
     let html = '';
 
-    // Champion (#1) full-width hero
-    if (top.length >= 1) {
-      const champ = top[0];
-      html += `
-      <div class="leaderboard-champion mb-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="rank-chip gold">01</div>
-            <div>
-              <div class="champion-badge">TOP REFERRER</div>
-              <div class="text-base font-bold text-white mt-0.5">${safe(champ.name)}</div>
-              <div class="text-xs text-gold-400 mt-0.5">
-                <span class="tier-badge">${getTier(champ.referrals)}</span>
-                <span class="ml-2">${champ.total_referrals} referrals</span>
-              </div>
-            </div>
+   // Champion (#1) full-width hero
+if (top.length >= 1) {
+  const champ = top[0];
+  const champTier = getTier(champ.total_referrals);
+  html += `
+  <div class="leaderboard-champion mb-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="rank-chip gold">01</div>
+        <div>
+          <div class="champion-badge">TOP REFERRER</div>
+          <div class="text-base font-bold text-white mt-0.5">
+            ${safe(champ.name)}
+            ${champ.is_partner ? '<span  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-950 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/>
+  </svg></span>' : ''}
           </div>
-          <div class="bonus-pill">₵${formatNumber(champ.bonus)}</div>
+          <div class="text-xs text-gold-400 mt-0.5">
+            <span class="tier-badge ${champTier.class}">${champTier.name}</span>
+            <span class="ml-2">${champ.total_referrals} referrals</span>
+          </div>
         </div>
-      </div>`;
-    }
+      </div>
+      <div class="bonus-pill">₵${formatNumber(champ.bonus)}</div>
+    </div>
+  </div>`;
+}
 
-    // #2 and #3 side by side
-    if (top.length >= 2 || top.length >= 3) {
-      html += '<div class="grid grid-cols-2 gap-3 mb-3">';
-      for (let i = 1; i <= 2 && i < top.length; i++) {
-        const entry = top[i];
-        const chipClass = i === 1 ? 'silver' : 'bronze';
-        html += `
-        <div class="glass rounded-xl p-4 hover:bg-white/5 transition-all">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="rank-chip ${chipClass}">0${i+1}</div>
-            <span class="tier-badge">${getTier(entry.referrals)}</span>
-          </div>
-          <div class="text-sm font-semibold text-white truncate">${safe(entry.name)}</div>
-          <div class="flex justify-between items-center mt-3">
-           <span class="text-xs text-gray-400">${entry.total_referrals} ref</span>
-            <span class="bonus-pill text-xs">₵${formatNumber(entry.bonus)}</span>
-          </div>
-        </div>`;
-      }
-      html += '</div>';
-    }
+// #2 and #3 side by side
+if (top.length >= 2 || top.length >= 3) {
+  html += '<div class="grid grid-cols-2 gap-3 mb-3">';
+  for (let i = 1; i <= 2 && i < top.length; i++) {
+    const entry = top[i];
+    const tier = getTier(entry.total_referrals);
+    const chipClass = i === 1 ? 'silver' : 'bronze';
+    html += `
+    <div class="glass rounded-xl p-4 hover:bg-white/5 transition-all">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="rank-chip ${chipClass}">0${i+1}</div>
+        <span class="tier-badge ${tier.class}">${tier.name}</span>
+      </div>
+      <div class="text-sm font-semibold text-white truncate">
+        ${safe(entry.name)}
+        ${entry.is_partner ? ' <span <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-950 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/>
+  </svg></span>' : ''}
+      </div>
+      <div class="flex justify-between items-center mt-3">
+        <span class="text-xs text-gray-400">${entry.total_referrals} ref</span>
+        <span class="bonus-pill text-xs">₵${formatNumber(entry.bonus)}</span>
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+}
 
-    // #4–#6 as subtle rows
-    if (top.length > 3) {
-      html += '<div class="space-y-2">';
-      for (let i = 3; i < top.length; i++) {
-        const entry = top[i];
-        html += `
-        <div class="flex items-center justify-between glass rounded-lg px-4 py-2 hover:bg-white/5 transition-all">
-          <div class="flex items-center gap-3">
-            <span class="text-xs font-bold text-gray-400 w-4">${i+1}</span>
-            <span class="text-sm font-medium text-gray-200 truncate max-w-[120px]">${safe(entry.name)}</span>
-            <span class="tier-badge">${getTier(entry.referrals)}</span>
-          </div>
-          <div class="flex items-center gap-3">
-           <span class="text-xs text-gray-400">${entry.total_referrals} ref</span>
-            <span class="bonus-pill text-xs">₵${formatNumber(entry.bonus)}</span>
-          </div>
-        </div>`;
-      }
-      html += '</div>';
-    }
+// #4–#6 as subtle rows
+if (top.length > 3) {
+  html += '<div class="space-y-2">';
+  for (let i = 3; i < top.length; i++) {
+    const entry = top[i];
+    const tier = getTier(entry.total_referrals);
+    html += `
+    <div class="flex items-center justify-between glass rounded-lg px-4 py-2 hover:bg-white/5 transition-all">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-bold text-gray-400 w-4">${i+1}</span>
+        <span class="text-sm font-medium text-gray-200 truncate max-w-[120px]">
+          ${safe(entry.name)}
+          ${entry.is_partner ? ' <span <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-950 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/>
+  </svg></span>' : ''}
+        </span>
+        <span class="tier-badge ${tier.class}">${tier.name}</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs text-gray-400">${entry.total_referrals} ref</span>
+        <span class="bonus-pill text-xs">₵${formatNumber(entry.bonus)}</span>
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+}
 
     list.innerHTML = html;
   } catch(e) {
