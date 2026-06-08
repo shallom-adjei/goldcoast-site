@@ -995,10 +995,11 @@ async function loadInvestments() {
             <td class="py-3 text-xs capitalize">${w.type || 'investment'}</td><td class="py-3">${w.paid ? '<span class="text-green-400">Yes</span>' : '<span class="text-red-400">No</span>'}</td>
             <td class="py-3"><span class="status-${w.status}">${w.status}</span></td>
             <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleString()}</td>
-            <td class="py-3">
-              ${w.status === 'pending' ? `<button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button><button onclick="rejectWithdrawal(${w.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Reject</button>` : ''}
-              ${w.status === 'approved' && !w.paid ? `<button onclick="markWithdrawalPaid(${w.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mt-1">Mark Paid</button>` : ''}
-            </td>
+           <td class="py-3">
+  ${w.status === 'pending' ? `<button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button><button onclick="rejectWithdrawal(${w.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Reject</button>` : ''}
+  ${w.status === 'approved' && !w.paid ? `<button onclick="markWithdrawalPaid(${w.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mt-1">Mark Paid</button>` : ''}
+  ${w.status === 'paid' ? `<button onclick="markWithdrawalPending(${w.id})" class="bg-yellow-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-yellow-500">Undo to Pending</button>` : ''}
+</td>
           </tr>`).join('');
       } catch(err) { toast('Failed to load withdrawals','error'); }
     }
@@ -1014,9 +1015,11 @@ async function loadInvestments() {
           <td class="py-3"><span class="status-${w.status}">${w.status}</span></td>
           <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleString()}</td>
           <td class="py-3">
-            ${w.status === 'pending' ? `<button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button><button onclick="rejectWithdrawal(${w.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Reject</button>` : ''}
-            ${w.status === 'approved' && !w.paid ? `<button onclick="markWithdrawalPaid(${w.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mt-1">Mark Paid</button>` : ''}
-          </td>
+           <td class="py-3">
+  ${w.status === 'pending' ? `<button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button><button onclick="rejectWithdrawal(${w.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Reject</button>` : ''}
+  ${w.status === 'approved' && !w.paid ? `<button onclick="markWithdrawalPaid(${w.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mt-1">Mark Paid</button>` : ''}
+  ${w.status === 'paid' ? `<button onclick="markWithdrawalPending(${w.id})" class="bg-yellow-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-yellow-500">Undo to Pending</button>` : ''}
+</td>
         </tr>`).join('');
     }
 
