@@ -1044,6 +1044,24 @@ async function loadInvestments() {
       else { const data = await res.json(); toast(data.error || 'Failed','error'); }
     }
 
+    async function markWithdrawalPending(id) {
+  if (!await customConfirm('Mark this withdrawal back to pending? This will not refund the user.')) return;
+  try {
+    const res = await fetch(`${API}/withdrawals/${id}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+      body: JSON.stringify({ status: 'pending' })
+    });
+    if (res.ok) {
+      toast('Withdrawal moved back to pending', 'success');
+      loadWithdrawals();
+    } else {
+      const data = await res.json();
+      toast(data.error || 'Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
     // ── Settings ──
     async function loadSettings() {
       try {
