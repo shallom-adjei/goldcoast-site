@@ -432,12 +432,24 @@
     </div>
   </div>
 
-  <!-- Partner Reward Modal -->
+<!-- Partner Reward Modal -->
 <div id="reward-modal" class="fixed inset-0 z-[270] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
   <div class="glass rounded-2xl w-full max-w-sm p-6 text-center">
     <h3 class="text-lg font-semibold mb-1">🎁 Reward Partner</h3>
     <p class="text-sm text-gray-400 mb-4" id="reward-partner-name"></p>
+
+    <!-- Reward type selector -->
+    <label class="block text-sm text-gray-300 mb-2">Reward Type</label>
+    <select id="reward-type" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-4">
+      <option value="bonus">Referral Bonus</option>
+      <option value="game_balance">Prizes & Rewards</option>
+    </select>
+
     <input type="number" id="reward-amount" placeholder="Amount (₵)" min="1" step="any" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-center text-lg mb-3">
+
+    <label class="block text-sm text-gray-300 mb-2">Note (optional)</label>
+    <input type="text" id="reward-note" placeholder="e.g., VIP monthly bonus" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-sm mb-4">
+
     <div class="flex justify-center gap-3">
       <button onclick="closeRewardModal()" class="px-5 py-2 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium">Cancel</button>
       <button onclick="confirmReward()" class="px-5 py-2 rounded-full gradient-gold text-dark-950 font-semibold text-sm">Send Reward</button>
@@ -719,12 +731,14 @@ async function payPartner(partnerId) {
   } catch (err) { toast('Connection error', 'error'); }
 }
 
-    let currentRewardPartnerId = null;
+let currentRewardPartnerId = null;
 
 function openRewardModal(partnerId, partnerName) {
   currentRewardPartnerId = partnerId;
   document.getElementById('reward-partner-name').textContent = partnerName;
   document.getElementById('reward-amount').value = '';
+  document.getElementById('reward-type').value = 'bonus';
+  document.getElementById('reward-note').value = '';
   const modal = document.getElementById('reward-modal');
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -743,14 +757,18 @@ async function confirmReward() {
     toast('Enter a valid amount', 'error');
     return;
   }
+
+  const type = document.getElementById('reward-type').value;
+  const notes = document.getElementById('reward-note').value.trim() || 'Manual reward';
+
   try {
     const res = await fetch(`${API}/partners/${currentRewardPartnerId}/reward`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ amount, notes: 'Manual reward' })
+      body: JSON.stringify({ amount, type, notes })
     });
     if (res.ok) {
-      toast(`₵${amount} added to partner rewards`, 'success');
+      toast(`₵${amount} added to partner (${type === 'bonus' ? 'Referral Bonus' : 'Prizes & Rewards'})`, 'success');
       closeRewardModal();
       loadPartners();
     } else {
