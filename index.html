@@ -1940,13 +1940,17 @@ window.allInvestmentsLocal = investments;
 
             const totalInvested = investments.reduce((s, i) => (i.status !== 'rejected' && i.status !== 'reinvested') ? s + i.amount : s, 0);
           const totalEarnings = investments.reduce((s, i) => {
-    if (i.status === 'pending' || i.status === 'rejected' || i.status === 'reinvested') return s;
-    if (i.status === 'matured') {
-        const rate = returnRates[i.plan] || 1;
-        return s + (i.amount * rate);
-    }
-
-              const activityEl = document.getElementById('recent-activity');
+    if (i.status !== 'active') return s;  // only active investments
+    const rate = returnRates[i.plan] || 1;
+    const progress = getProgress(i) / 100;
+    return s + (i.amount * rate * progress);
+}, 0);
+          const totalExpected = investments.reduce((s, i) => {
+    if (i.status === 'pending') return s + i.amount;
+    if (i.status === 'rejected' || i.status === 'matured' || i.status === 'reinvested') return s;
+    return s + i.amount * (1 + (returnRates[i.plan] || 1));
+}, 0);
+            const activityEl = document.getElementById('recent-activity');
 if (activityEl) {
   if (investments.length === 0) {
     activityEl.innerHTML = '<div class="text-gray-500 text-sm text-center py-4">No activity yet</div>';
@@ -1962,17 +1966,6 @@ if (activityEl) {
     `).join('');
   }
 }
-              
-    // active
-    const rate = returnRates[i.plan] || 1;
-    const progress = getProgress(i) / 100;
-    return s + (i.amount * rate * progress);
-}, 0);
-          const totalExpected = investments.reduce((s, i) => {
-    if (i.status === 'pending') return s + i.amount;
-    if (i.status === 'rejected' || i.status === 'matured' || i.status === 'reinvested') return s;
-    return s + i.amount * (1 + (returnRates[i.plan] || 1));
-}, 0);
            const activeInvs = investments.filter(i => i.status !== 'pending' && i.status !== 'rejected' && i.status !== 'matured' && i.status !== 'reinvested');
 
 // --- Live countdown for Days Left (skip already‑passed maturities) ---
