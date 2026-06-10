@@ -2575,6 +2575,11 @@ document.getElementById('dashboard-loader').classList.add('hidden');
     showToast('Please select a plan and enter an amount', 'error');
     return;
   }
+            const minAmounts = { starter: 200, growth: 300, premium: 500 };
+if (amount < minAmounts[plan]) {
+  showToast(`Minimum deposit for ${plan} is ₵${minAmounts[plan]}`, 'error');
+  return;
+}
 
   if (!authToken || !currentUser) {
     showToast('You must be logged in', 'error');
