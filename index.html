@@ -1379,6 +1379,10 @@ function updateTier2Bonus() {
   const amount = parseFloat(extraInput.value) || 0;
   const bonus = Math.min(Math.floor(0.05 * amount), 30);
   bonusEl.textContent = `₵${bonus} (7% of ₵${amount})`;
+    const freshDisplay = document.getElementById('fresh-amount-display');
+if (freshDisplay) {
+  freshDisplay.textContent = `₵${amount.toFixed(2)}`;
+}
 
   // Refresh the MoMo/crypto details with the new total
   updateReinvestPaymentDetails();
@@ -1397,6 +1401,56 @@ function updateReinvestPaymentDetails() {
     container.innerHTML = getCryptoDetailsHtml(`₵${extraAmount.toFixed(2)}`);
   }
   lucide.createIcons();
+}
+
+        function initiateTier2Payment() {
+  const extraAmount = parseFloat(document.getElementById('reinvest-extra-amount').value) || 0;
+  const plan = document.getElementById('reinvest-new-plan').value;
+  const invId = document.getElementById('reinvest-investment-id').value;
+
+  if (extraAmount <= 0) {
+    showToast('Please enter a valid fresh deposit amount', 'error');
+    return;
+  }
+
+  const minAmounts = { starter: 200, growth: 300, premium: 500 };
+  if (extraAmount < minAmounts[plan]) {
+    showToast(`Minimum fresh deposit for ${plan} is ₵${minAmounts[plan]}`, 'error');
+    return;
+  }
+
+  if (!authToken || !currentUser) {
+    showToast('You must be logged in', 'error');
+    return;
+  }
+
+  const reference = `GCC-RINV-${currentUser.id}-${plan}-${Date.now()}`;
+
+  const handler = window.PaystackPop.setup({
+    key: 'pk_live_125326b0572dda7b41b6425ae2a5acd9332f0f4e',
+    email: currentUser.email,
+    amount: Math.round(extraAmount * 100), // in pesewas
+    currency: 'GHS',
+    reference,
+    label: 'Gold Coast Capital - Reinvest',
+    metadata: {
+      user_id: currentUser.id,
+      plan: plan,
+      reinvest_investment_id: invId,
+      extra_amount: extraAmount,
+      custom_fields: []
+    },
+    onClose: function() {},
+    callback: function(response) {
+      // Payment succeeded – now submit the reinvest with the transaction reference
+      submitReinvestWithPayment(response.reference);
+    },
+    onCancel: function() {
+      showToast('Payment cancelled.', 'error');
+    }
+  });
+
+  handler.openIframe();
 }
 
 async function submitReinvest() {
@@ -1427,6 +1481,38 @@ async function submitReinvest() {
     showToast('Please enter transaction ID and payment method', 'error');
     return;
   }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/reinvest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.error || 'Reinvest failed', 'error');
+      return;
+    }
+    closeReinvestModal();
+    showToast(`Reinvest successful! ₵${data.bonus} bonus added to Prizes & Rewards.`, 'success');
+    updateDashboard();
+  } catch (e) {
+    showToast('Connection error', 'error');
+  }
+}
+
+        async function submitReinvestWithPayment(transactionReference) {
+  const invId = document.getElementById('reinvest-investment-id').value;
+  const plan = document.getElementById('reinvest-new-plan').value;
+  const extraAmount = parseFloat(document.getElementById('reinvest-extra-amount').value) || 0;
+
+  const body = {
+    original_investment_id: invId,
+    new_plan: plan,
+    extra_amount: extraAmount,
+    method: 'paystack',
+    transaction_id: transactionReference
+  };
 
   try {
     const res = await fetch(`${API_BASE}/api/reinvest`, {
@@ -2847,15 +2933,12 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with your new deposit.</p>
           <div id="reinvest-payment-section" class="mt-3">
-            <label class="block text-sm mb-1">Payment Method</label>
-            <select id="reinvest-method" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2" onchange="updateReinvestPaymentDetails()">
-              <option value="momo">MTN MoMo</option>
-              <option value="crypto">Crypto</option>
-            </select>
-            <div id="reinvest-payment-credentials" class="glass rounded-xl p-4 mb-3 text-xs"></div>
-            <label class="block text-sm mb-1">Transaction ID / Reference</label>
-            <input type="text" id="reinvest-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
-          </div>
+  <p class="text-xs text-gray-400 mb-3">Your new deposit of <strong id="fresh-amount-display">₵0</strong> will be processed securely via Paystack.</p>
+  <button onclick="initiateTier2Payment()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
+    <i data-lucide="credit-card" class="w-5 h-5"></i> Pay new Deposit
+  </button>
+  <p class="text-xs text-gray-500 mt-2">You’ll be redirected to Paystack to complete payment.</p>
+</div>
           <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">7% of new deposit</strong></p>
         </div>
       </button>
