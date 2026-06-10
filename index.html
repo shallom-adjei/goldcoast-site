@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://js.paystack.co/v2/inline.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>" />
     <script>
@@ -1262,8 +1263,7 @@
                     <div id="crypto-details" class="hidden glass rounded-xl p-5 mb-5">
                     </div>
 
-                    <label class="block text-sm font-medium mb-2 text-gray-300">Transaction ID / Reference</label>
-                    <input type="text" id="deposit-txid" placeholder="Enter transaction ID" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-5">
+                <!-- Transaction ID no longer needed – Paystack handles it -->
 
                     <button onclick="submitDeposit()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2"><i data-lucide="check-circle" class="w-5 h-5"></i> Confirm Deposit</button>
                 </div>
@@ -2481,34 +2481,50 @@ document.getElementById('dashboard-loader').classList.add('hidden');
         }
 
         async function submitDeposit() {
-            const txid = document.getElementById('deposit-txid').value.trim();
-            if (!txid) {
-                showToast('Please enter your transaction ID or reference', 'error');
-                return;
-            }
-            if (!authToken) {
-                showToast('You must be logged in', 'error');
-                return;
-            }
-            const payload = {
-                amount: parseFloat(document.getElementById('deposit-amount').value),
-                plan: document.getElementById('deposit-plan').value,
-                method: document.getElementById('deposit-payment').value,
-                transaction_id: txid
-            };
-            try {
-                const res = await fetch(`${API_BASE}/api/investments`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}`},
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                if (!res.ok) return showToast(data.error || 'Deposit failed', 'error');
-                closeDepositModal();
-                showToast('Deposit submitted! Pending admin approval.', 'success');
-                updateDashboard();
-            } catch (e) { showToast('Connection error', 'error'); }
-        }
+  const amount = parseFloat(document.getElementById('deposit-amount').value);
+  const plan = document.getElementById('deposit-plan').value;
+  if (!amount || !plan) {
+    showToast('Please select a plan and enter an amount', 'error');
+    return;
+  }
+
+  if (!authToken || !currentUser) {
+    showToast('You must be logged in', 'error');
+    return;
+  }
+
+  // Generate a unique reference
+  const reference = `GCC-${currentUser.id}-${plan}-${Date.now()}`;
+
+  // Open Paystack inline checkout
+  const handler = window.PaystackPop.setup({
+    key: 'pk_live_125326b0572dda7b41b6425ae2a5acd9332f0f4e',
+    email: currentUser.email,
+    amount: Math.round(amount * 100), // convert to pesewas
+    currency: 'GHS',
+    reference,
+    label: 'Gold Coast Capital',
+    metadata: {
+      user_id: currentUser.id,
+      plan: plan,
+      custom_fields: []
+    },
+    onClose: function() {
+      // User closed the payment window – do nothing
+    },
+    callback: function(response) {
+      // Payment succeeded – close modal and refresh dashboard
+      closeDepositModal();
+      showToast('Deposit submitted! Pending admin approval.', 'success');
+      updateDashboard();
+    },
+    onCancel: function() {
+      showToast('Payment cancelled.', 'error');
+    }
+  });
+
+  handler.openIframe();
+}
 
         document.addEventListener('input', function(e) { if (e.target.id === 'deposit-amount') updateCalculator(); });
         function updateCalculator() {
