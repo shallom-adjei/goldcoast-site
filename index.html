@@ -516,7 +516,7 @@
             <div class="text-center lg:text-left">
     <div class="inline-flex items-center gap-2 glass-gold rounded-full px-4 py-2 mb-4">
         <div class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></div>
-        <span class="text-gold-400 text-sm font-medium">A modern platform for tracking savings goals and financial progress.</span>
+        <span class="text-gold-400 text-sm font-medium">A modern platform for tracking wealth and financial progress.</span>
     </div>
     <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-4">
         Grow Your <span class="text-gradient">Wealth</span> with Confidence
@@ -1234,25 +1234,83 @@
 </button>
                 </div>
 
-                <div id="deposit-step2" class="hidden">
-                    <button onclick="goToStep1()" class="flex items-center gap-1 text-gray-400 hover:text-white text-sm mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back</button>
-                    <label class="block text-sm font-medium mb-3 text-gray-300">Payment Method</label>
-                    <div class="grid grid-cols-2 gap-3 mb-5">
-                        <button onclick="selectPayment('momo')" id="pay-momo" class="glass-gold rounded-xl p-4 text-center"><div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center mx-auto mb-2"><span class="text-yellow-400 font-bold text-lg">M</span></div><span class="text-sm font-medium">MTN MoMo</span></button>
-                        <button onclick="selectPayment('crypto')" id="pay-crypto" class="glass rounded-xl p-4 text-center"><div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center mx-auto mb-2"><i data-lucide="bitcoin" class="w-6 h-6 text-orange-400"></i></div><span class="text-sm font-medium">Crypto</span></button>
-                    </div>
-                    <input type="hidden" id="deposit-payment" value="momo">
+               <div id="deposit-step2" class="hidden">
+  <button onclick="goToStep1()" class="flex items-center gap-1 text-gray-400 hover:text-white text-sm mb-4">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+  </button>
 
-                    <div id="momo-details" class="glass rounded-xl p-5 mb-5">  
-                    </div>
+  <!-- Premium Manual Payment Card -->
+  <div class="glass-premium rounded-2xl p-6 mb-5 text-center relative overflow-hidden">
+    <!-- Subtle gold glow -->
+    <div class="absolute -top-10 -right-10 w-40 h-40 bg-gold-500/10 rounded-full blur-[60px] pointer-events-none"></div>
 
-                    <div id="crypto-details" class="hidden glass rounded-xl p-5 mb-5">
-                    </div>
+    <div class="relative z-10">
+      <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-gold-400/20 to-gold-600/20 border border-gold-400/30 flex items-center justify-center">
+        <i data-lucide="shield-check" class="w-7 h-7 text-gold-400"></i>
+      </div>
+      <h3 class="text-lg font-bold text-white">Private Transfer</h3>
+      <p class="text-sm text-gray-400 mt-1">Send exactly the amount shown below to complete your deposit</p>
 
-                <!-- Transaction ID no longer needed – Paystack handles it -->
+      <div class="mt-5 space-y-4">
+        <!-- Amount -->
+        <div class="bg-dark-950/50 rounded-xl p-4 border border-white/5">
+          <p class="text-xs text-gray-400 uppercase tracking-wider">Amount to Send</p>
+          <p class="text-2xl font-bold text-white mt-1" id="pay-amount-display">₵0</p>
+        </div>
 
-                    <button onclick="submitDeposit()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2"><i data-lucide="check-circle" class="w-5 h-5"></i> Confirm Deposit</button>
-                </div>
+        <!-- MoMo Number (copyable) -->
+        <div class="bg-dark-950/50 rounded-xl p-4 border border-white/5">
+          <p class="text-xs text-gray-400 uppercase tracking-wider">MTN MoMo Number</p>
+          <div class="flex items-center justify-center gap-3 mt-2">
+            <p class="text-xl font-bold text-gradient tracking-wider" id="pay-momo-number">••••••••••</p>
+            <button onclick="copyAddress(document.getElementById('pay-momo-number').textContent)" class="text-gold-400 hover:text-gold-300 transition">
+              <i data-lucide="copy" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <p class="text-xs text-gray-400 mt-1" id="pay-momo-name"></p>
+        </div>
+
+        <!-- Reference Code -->
+        <div class="bg-dark-950/50 rounded-xl p-4 border border-white/5">
+          <p class="text-xs text-gray-400 uppercase tracking-wider">Your Reference Code</p>
+          <p class="text-2xl font-bold text-gold-400 mt-1 tracking-widest" id="pay-reference-code">------</p>
+          <p class="text-xs text-gray-500 mt-1">Please include this code in the MoMo note if possible</p>
+          <p class="text-[10px] text-gray-500 mt-1" id="pay-reference-expiry"></p>
+        </div>
+
+        <!-- Simple Steps -->
+        <div class="text-left text-sm text-gray-300 space-y-3 mt-4">
+          <div class="flex items-start gap-2">
+            <span class="text-gold-400 font-bold mt-0.5">1.</span>
+            <span>Open your MTN MoMo menu and choose <strong>Send Money</strong>.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="text-gold-400 font-bold mt-0.5">2.</span>
+            <span>Enter the number above and the exact amount shown.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="text-gold-400 font-bold mt-0.5">3.</span>
+            <span>If there's a note field, add your <strong>Reference Code</strong>.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="text-gold-400 font-bold mt-0.5">4.</span>
+            <span>After sending, copy the <strong>Transaction ID</strong> from your MoMo confirmation SMS and paste it below.</span>
+          </div>
+        </div>
+
+        <!-- Transaction ID Input -->
+        <div class="mt-5">
+          <label class="block text-sm text-gray-300 text-left mb-2">MoMo Transaction ID</label>
+          <input type="text" id="deposit-txid" placeholder="e.g., 1234567890" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="submitDeposit()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
+    <i data-lucide="check-circle" class="w-5 h-5"></i> Confirm Deposit
+  </button>
+</div>
             </div>
         </div>
     </div>
@@ -2491,6 +2549,7 @@ document.getElementById('dashboard-loader').classList.add('hidden');
         function closeDepositModal() {
             document.getElementById('deposit-modal').classList.add('hidden');
             document.getElementById('deposit-modal').classList.remove('flex');
+            sessionStorage.removeItem('gcc_deposit');
         }
 
      function selectPlan(plan) {
@@ -2528,79 +2587,113 @@ document.getElementById('dashboard-loader').classList.add('hidden');
     }
 }
 
-       function goToStep2() {
-    const amount = parseFloat(document.getElementById('deposit-amount').value);
-    if (!amount) {
-        showToast('Please enter an amount', 'error');
-        return;
-    }
+async function goToStep2() {
+  const amount = parseFloat(document.getElementById('deposit-amount').value);
+  if (!amount) {
+    showToast('Please enter an amount', 'error');
+    return;
+  }
 
-    // Plan‑specific minimums
-    const minAmounts = { starter: 200, growth: 300, premium: 500 };
-    if (amount < minAmounts[selectedPlan]) {
-        showToast(`Minimum deposit for ${selectedPlan} is ₵${minAmounts[selectedPlan]}`, 'error');
-        return;
-    }
+  const minAmounts = { starter: 200, growth: 300, premium: 500 };
+  if (amount < minAmounts[selectedPlan]) {
+    showToast(`Minimum deposit for ${selectedPlan} is ₵${minAmounts[selectedPlan]}`, 'error');
+    return;
+  }
 
-    document.getElementById('deposit-step1').classList.add('hidden');
-    document.getElementById('deposit-step2').classList.remove('hidden');
-    selectPayment(selectedPayment);
+  // Fetch a unique reference code from the backend
+  try {
+    const res = await fetch(`${API_BASE}/api/generate-reference`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ amount, plan: selectedPlan })
+    });
+    const data = await res.json();
+    document.getElementById('pay-reference-code').textContent = data.reference;
+    document.getElementById('pay-reference-expiry').textContent = `Expires in 30 minutes`;
+  } catch (e) {
+    showToast('Failed to generate reference code', 'error');
+    return;
+  }
+
+  // Populate MoMo details from settings
+  document.getElementById('pay-momo-number').textContent = paymentSettings.momo_number || '••••••••••';
+  document.getElementById('pay-momo-name').textContent = paymentSettings.momo_name || '';
+  document.getElementById('pay-amount-display').textContent = '₵' + formatNumber(amount);
+
+  document.getElementById('deposit-step1').classList.add('hidden');
+  document.getElementById('deposit-step2').classList.remove('hidden');
+  lucide.createIcons();
+
+  // Save deposit state so user can return after leaving the site
+  sessionStorage.setItem('gcc_deposit', JSON.stringify({
+    step: 2,
+    plan: selectedPlan,
+    amount: amount,
+    reference: document.getElementById('pay-reference-code').textContent,
+    expires: Date.now() + 30 * 60 * 1000
+  }));
 }
 
         function goToStep1() {
             document.getElementById('deposit-step1').classList.remove('hidden');
             document.getElementById('deposit-step2').classList.add('hidden');
+            sessionStorage.removeItem('gcc_deposit');
         }
 
-        async function submitDeposit() {
+async function submitDeposit() {
   const amount = parseFloat(document.getElementById('deposit-amount').value);
   const plan = document.getElementById('deposit-plan').value;
+  const txid = document.getElementById('deposit-txid').value.trim();
+
   if (!amount || !plan) {
     showToast('Please select a plan and enter an amount', 'error');
     return;
   }
-            const minAmounts = { starter: 200, growth: 300, premium: 500 };
-if (amount < minAmounts[plan]) {
-  showToast(`Minimum deposit for ${plan} is ₵${minAmounts[plan]}`, 'error');
-  return;
-}
+
+  const minAmounts = { starter: 200, growth: 300, premium: 500 };
+  if (amount < minAmounts[plan]) {
+    showToast(`Minimum deposit for ${plan} is ₵${minAmounts[plan]}`, 'error');
+    return;
+  }
+
+  if (!txid) {
+    showToast('Please enter your MoMo Transaction ID', 'error');
+    return;
+  }
 
   if (!authToken || !currentUser) {
     showToast('You must be logged in', 'error');
     return;
   }
 
-  // Generate a unique reference
-  const reference = `GCC-${currentUser.id}-${plan}-${Date.now()}`;
+  const reference = document.getElementById('pay-reference-code').textContent;
 
-  // Open Paystack inline checkout
-  const handler = window.PaystackPop.setup({
-    key: 'pk_live_125326b0572dda7b41b6425ae2a5acd9332f0f4e',
-    email: currentUser.email,
-    amount: Math.round(amount * 100), // convert to pesewas
-    currency: 'GHS',
-    reference,
-    label: 'Gold Coast Capital',
-    metadata: {
-      user_id: currentUser.id,
-      plan: plan,
-      custom_fields: []
-    },
-    onClose: function() {
-      // User closed the payment window – do nothing
-    },
-    callback: function(response) {
-      // Payment succeeded – close modal and refresh dashboard
-      closeDepositModal();
-      showToast('Deposit submitted! Pending admin approval.', 'success');
-      updateDashboard();
-    },
-    onCancel: function() {
-      showToast('Payment cancelled.', 'error');
+  const payload = {
+    amount: amount,
+    plan: plan,
+    method: 'momo',
+    transaction_id: txid,
+    reference: reference
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/api/investments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.error || 'Deposit failed', 'error');
+      return;
     }
-  });
-
-  handler.openIframe();
+    sessionStorage.removeItem('gcc_deposit');
+    closeDepositModal();
+    showToast('Deposit submitted! Pending admin approval.', 'success');
+    updateDashboard();
+  } catch (e) {
+    showToast('Connection error', 'error');
+  }
 }
 
         document.addEventListener('input', function(e) { if (e.target.id === 'deposit-amount') updateCalculator(); });
@@ -2846,6 +2939,32 @@ document.getElementById('reinvest-new-plan').addEventListener('change', updateTi
   if (planSelect) {
     planSelect.addEventListener('change', updateTier2Info);
   }
+            // Restore deposit modal if user was in the middle of a payment
+const savedDeposit = sessionStorage.getItem('gcc_deposit');
+if (savedDeposit) {
+  try {
+    const deposit = JSON.parse(savedDeposit);
+    if (deposit.expires > Date.now()) {
+      selectedPlan = deposit.plan;
+      document.getElementById('deposit-plan').value = deposit.plan;
+      document.getElementById('deposit-amount').value = deposit.amount;
+      document.getElementById('pay-amount-display').textContent = '₵' + formatNumber(deposit.amount);
+      document.getElementById('pay-reference-code').textContent = deposit.reference;
+      document.getElementById('pay-reference-expiry').textContent = 'Expires in 30 minutes';
+      document.getElementById('pay-momo-number').textContent = paymentSettings.momo_number || '••••••••••';
+      document.getElementById('pay-momo-name').textContent = paymentSettings.momo_name || '';
+      document.getElementById('deposit-step1').classList.add('hidden');
+      document.getElementById('deposit-step2').classList.remove('hidden');
+      document.getElementById('deposit-modal').classList.remove('hidden');
+      document.getElementById('deposit-modal').classList.add('flex');
+      lucide.createIcons();
+    } else {
+      sessionStorage.removeItem('gcc_deposit');
+    }
+  } catch(e) {
+    sessionStorage.removeItem('gcc_deposit');
+  }
+}
             });
 
 document.addEventListener('DOMContentLoaded', () => {
