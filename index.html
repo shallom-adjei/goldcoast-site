@@ -23,6 +23,27 @@
     </script>
     <style>
 
+        html {
+  scroll-behavior: smooth;
+}
+
+/* Promote heavy animated elements to the GPU */
+.logo-orbit,
+.logo-star,
+.anniversary-badge,
+.anniversary-shimmer::before,
+.chart-card-premium::after,
+.leaderboard-card .animate-\[luxurySweep_12s_linear_infinite\] {
+  will-change: transform, opacity;
+}
+
+/* Reduce blur strength on backdrop cards for better performance */
+.glass-premium,
+.leaderboard-card,
+.chart-card-premium {
+  backdrop-filter: blur(16px); /* was 20px–24px, still looks premium but lighter */
+}
+
         .tier-badge.text-gold-400 { color: #fbbf24; }
 .tier-badge.border-gold-500\/30 { border-color: rgba(245,158,11,0.3); }
 .tier-badge.bg-gold-500\/10 { background: rgba(245,158,11,0.1); }
@@ -87,6 +108,11 @@
 @keyframes crownFloat {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
+}
+        @media (max-width: 640px) {
+  .anniversary-badge {
+    animation: anniversaryPulse 3s ease-in-out infinite; /* drop float */
+  }
 }
 
         /* ── Anniversary Badge Core ── */
@@ -2571,6 +2597,12 @@ async function goToStep2() {
     return;
   }
 
+  const btn = document.querySelector('#deposit-step1 button[onclick="goToStep2()"]');
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Loading…`;
+  lucide.createIcons();
+
   // Fetch a unique reference code from the backend
   try {
     const res = await fetch(`${API_BASE}/api/generate-reference`, {
@@ -2583,6 +2615,9 @@ async function goToStep2() {
     document.getElementById('pay-reference-expiry').textContent = `Expires in 30 minutes`;
   } catch (e) {
     showToast('Failed to generate reference code', 'error');
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+    lucide.createIcons();
     return;
   }
 
@@ -2603,6 +2638,10 @@ async function goToStep2() {
     reference: document.getElementById('pay-reference-code').textContent,
     expires: Date.now() + 30 * 60 * 1000
   }));
+
+  btn.disabled = false;
+  btn.innerHTML = originalHTML;
+  lucide.createIcons();
 }
 
         function goToStep1() {
@@ -3000,17 +3039,21 @@ document.addEventListener('DOMContentLoaded', () => {
   <p class="text-sm text-green-400 mt-1 ml-13">Bonus: <strong>₵5</strong> added to Prizes & Rewards</p>
 </button>
 
-      <!-- Tier 2 -->
-<button id="reinvest-tier2" onclick="selectTier2()" class="w-full text-left glass rounded-xl p-5 mb-4 cursor-pointer hover:border-gold-400 focus:outline-none transition relative overflow-hidden group">
-  <div class="absolute inset-0 bg-gold-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-  <div class="flex items-center gap-3 mb-2">
-    <div class="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center shrink-0">
-      <i data-lucide="arrow-up-circle" class="w-5 h-5 text-gold-400"></i>
+<!-- Tier 2 – Upgrade & Boost -->
+<div id="reinvest-tier2-wrapper" class="mb-4">
+  <div onclick="selectTier2()" class="w-full text-left glass rounded-xl p-5 cursor-pointer hover:border-gold-400 focus:outline-none transition relative overflow-hidden group">
+    <div class="absolute inset-0 bg-gold-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+    <div class="flex items-center gap-3 mb-2">
+      <div class="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center shrink-0">
+        <i data-lucide="arrow-up-circle" class="w-5 h-5 text-gold-400"></i>
+      </div>
+      <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade & Boost</h3>
     </div>
-    <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade & Boost</h3>
+    <p class="text-sm text-gray-300 ml-13">Switch to a <strong>different plan</strong> + add new deposit for a <strong>7% bonus</strong>.</p>
   </div>
-  <p class="text-sm text-gray-300 ml-13">Switch to a <strong>different plan</strong> + add new deposit for a <strong>7% bonus</strong>.</p>
-  <div id="reinvest-tier2-options" class="hidden mt-3 ml-13">
+
+  <!-- Options Panel (hidden by default) -->
+  <div id="reinvest-tier2-options" class="hidden mt-3 pl-14 pr-2">
     <label class="block text-sm mb-1">Choose New Plan</label>
     <select id="reinvest-new-plan" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
       <option value="starter">Starter (min ₵200)</option>
@@ -3023,12 +3066,12 @@ document.addEventListener('DOMContentLoaded', () => {
       <input type="number" id="reinvest-extra-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2" oninput="updateTier2Bonus()">
     </div>
     <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with your new deposit.</p>
+
+    <!-- Payment Section -->
     <div id="reinvest-payment-section" class="mt-3">
       <p class="text-xs text-gray-400 mb-3">
         Send exactly <strong id="fresh-amount-display">₵0</strong> to the number below, then paste your MoMo Transaction ID.
       </p>
-
-      <!-- MoMo Number -->
       <div class="bg-dark-950/50 rounded-xl p-4 mb-3 border border-white/5 text-center">
         <p class="text-xs text-gray-400 uppercase tracking-wider">MTN MoMo Number</p>
         <div class="flex items-center justify-center gap-3 mt-2">
@@ -3039,14 +3082,12 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <p class="text-xs text-gray-400 mt-1" id="reinvest-momo-name"></p>
       </div>
-
-      <!-- Transaction ID Input -->
       <label class="block text-sm text-gray-300 text-left mb-2">MoMo Transaction ID</label>
       <input type="text" id="reinvest-txid" placeholder="e.g., 1234567890" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
     </div>
     <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">7% of new deposit</strong></p>
   </div>
-</button>
+</div>
     </div>
   </div>
 </div>
