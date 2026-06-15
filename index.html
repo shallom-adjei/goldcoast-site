@@ -1454,17 +1454,23 @@ function closeReinvestModal() {
 }
 function selectTier1() {
   currentReinvestTier = 1;
-  document.getElementById('reinvest-tier1').classList.add('glass-gold');
-  document.getElementById('reinvest-tier2').classList.remove('glass-gold');
+  const tier1 = document.getElementById('reinvest-tier1');
+  const tier2Wrapper = document.getElementById('reinvest-tier2-wrapper');
+  if (tier1) tier1.classList.add('glass-gold');
+  if (tier2Wrapper) tier2Wrapper.classList.remove('glass-gold');
   document.getElementById('reinvest-tier2-options').classList.add('hidden');
 }
 
 function selectTier2() {
   currentReinvestTier = 2;
-  document.getElementById('reinvest-tier2').classList.add('glass-gold');
-  document.getElementById('reinvest-tier1').classList.remove('glass-gold');
+  const tier2Wrapper = document.getElementById('reinvest-tier2-wrapper');
+  const tier1 = document.getElementById('reinvest-tier1');
+  if (tier2Wrapper) tier2Wrapper.classList.add('glass-gold');
+  if (tier1) tier1.classList.remove('glass-gold');
   document.getElementById('reinvest-tier2-options').classList.remove('hidden');
-  updateTier2Info();   // this will update the bonus & fresh amount
+  updateTier2Info();
+
+  // Populate MoMo number for Tier 2
   document.getElementById('reinvest-momo-number').textContent = paymentSettings.momo_number || '••••••••••';
   document.getElementById('reinvest-momo-name').textContent = paymentSettings.momo_name || '';
 }
