@@ -1497,30 +1497,40 @@ function updateTier2Bonus() {
   const extraInput = document.getElementById('reinvest-extra-amount');
   const bonusEl = document.getElementById('reinvest-tier2-bonus');
   if (!extraInput || !bonusEl) return;
-  const amount = parseFloat(extraInput.value) || 0;
-  const bonus = Math.min(Math.floor(0.05 * amount), 30);
-  bonusEl.textContent = `₵${bonus} (7% of ₵${amount})`;
-    const freshDisplay = document.getElementById('fresh-amount-display');
-if (freshDisplay) {
-  freshDisplay.textContent = `₵${amount.toFixed(2)}`;
-}
 
-  // Refresh the MoMo/crypto details with the new total
-  updateReinvestPaymentDetails();
+  const amount = parseFloat(extraInput.value) || 0;
+  const bonus = Math.min(Math.floor(0.07 * amount), 30);   // 7% capped at 30
+  bonusEl.textContent = `₵${bonus} (7% of ₵${amount})`;
+
+  const freshDisplay = document.getElementById('fresh-amount-display');
+  if (freshDisplay) {
+    freshDisplay.textContent = `₵${amount.toFixed(2)}`;
+  }
 }
 
 function updateReinvestPaymentDetails() {
-  const method = document.getElementById('reinvest-method').value;
-  const extraAmount = parseFloat(document.getElementById('reinvest-extra-amount').value) || 0;
   const container = document.getElementById('reinvest-payment-credentials');
+  const extraAmount = parseFloat(document.getElementById('reinvest-extra-amount').value) || 0;
   if (!container) return;
 
-  // Show only the fresh deposit amount – the user must send only this amount, not the total
-  if (method === 'momo') {
-    container.innerHTML = getMomoDetailsHtml(`₵${extraAmount.toFixed(2)}`);
-  } else {
-    container.innerHTML = getCryptoDetailsHtml(`₵${extraAmount.toFixed(2)}`);
-  }
+  // We only support MoMo now – no method selector needed
+  const momoNumber = paymentSettings.momo_number || '••••••••••';
+  const momoName = paymentSettings.momo_name || '';
+
+  container.innerHTML = `
+    <div class="bg-dark-950/50 rounded-xl p-4 mb-3 border border-white/5 text-center">
+      <p class="text-xs text-gray-400 uppercase tracking-wider">MTN MoMo Number</p>
+      <div class="flex items-center justify-center gap-3 mt-2">
+        <p class="text-xl font-bold text-gradient tracking-wider">${momoNumber}</p>
+        <button onclick="copyAddress('${momoNumber}')" class="text-gold-400 hover:text-gold-300">
+          <i data-lucide="copy" class="w-5 h-5"></i>
+        </button>
+      </div>
+      ${momoName ? `<p class="text-xs text-gray-400 mt-1">${momoName}</p>` : ''}
+    </div>
+    <label class="block text-sm text-gray-300 text-left mb-2">MoMo Transaction ID</label>
+    <input type="text" id="reinvest-txid" placeholder="e.g., 1234567890" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
+  `;
   lucide.createIcons();
 }
 
@@ -3092,6 +3102,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <input type="text" id="reinvest-txid" placeholder="e.g., 1234567890" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
     </div>
     <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">7% of new deposit</strong></p>
+      <button onclick="submitReinvest()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2 mt-4">
+  <i data-lucide="check-circle" class="w-5 h-5"></i> Claim Bonus & Reinvest
+</button>
   </div>
 </div>
     </div>
