@@ -1311,10 +1311,15 @@
 
         <!-- Reference Code -->
         <div class="bg-dark-950/60 rounded-xl p-4 border border-white/5">
-          <p class="text-xs text-gray-400 uppercase tracking-wider">Your Reference Code</p>
-          <p class="text-2xl font-bold text-gold-400 mt-1 tracking-widest" id="pay-reference-code">------</p>
-          <p class="text-xs text-gray-500 mt-1">Please include this code in the MoMo note if possible</p>
-          <p class="text-[10px] text-gray-500 mt-1" id="pay-reference-expiry"></p>
+        <p class="text-xs text-gray-400 uppercase tracking-wider">Your Reference Code</p>
+        <div class="flex items-center justify-center gap-3 mt-1">
+        <p class="text-2xl font-bold text-gold-400 tracking-widest" id="pay-reference-code">------</p>
+        <button onclick="copyAddress(document.getElementById('pay-reference-code').textContent)" class="text-gold-400 hover:text-gold-300 transition">
+        <i data-lucide="copy" class="w-5 h-5"></i>
+        </button>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">Please include this code in the MoMo note if possible</p>
+        <p class="text-[10px] text-gray-500 mt-1" id="pay-reference-expiry"></p>
         </div>
 
         <!-- Steps -->
