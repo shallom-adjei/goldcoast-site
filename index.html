@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://js.paystack.co/v2/inline.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>" />
     <script>
@@ -1229,12 +1228,12 @@
                         </div>
                     </div>
 
-                   <button onclick="submitDeposit()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
-  <i data-lucide="lock" class="w-5 h-5"></i> Pay
+<button onclick="goToStep2()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
+  Continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
 </button>
                 </div>
 
-               <div id="deposit-step2" class="hidden">
+<div id="deposit-step2" class="hidden">
   <button onclick="goToStep1()" class="flex items-center gap-1 text-gray-400 hover:text-white text-sm mb-4">
     <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
   </button>
@@ -1258,7 +1257,7 @@
           <p class="text-2xl font-bold text-white mt-1" id="pay-amount-display">₵0</p>
         </div>
 
-        <!-- MoMo Number (copyable) -->
+        <!-- MoMo Number -->
         <div class="bg-dark-950/50 rounded-xl p-4 border border-white/5">
           <p class="text-xs text-gray-400 uppercase tracking-wider">MTN MoMo Number</p>
           <div class="flex items-center justify-center gap-3 mt-2">
@@ -1278,7 +1277,7 @@
           <p class="text-[10px] text-gray-500 mt-1" id="pay-reference-expiry"></p>
         </div>
 
-        <!-- Simple Steps -->
+        <!-- Steps -->
         <div class="text-left text-sm text-gray-300 space-y-3 mt-4">
           <div class="flex items-start gap-2">
             <span class="text-gold-400 font-bold mt-0.5">1.</span>
@@ -1394,6 +1393,8 @@ function selectTier2() {
   document.getElementById('reinvest-tier1').classList.remove('glass-gold');
   document.getElementById('reinvest-tier2-options').classList.remove('hidden');
   updateTier2Info();   // this will update the bonus & fresh amount
+  document.getElementById('reinvest-momo-number').textContent = paymentSettings.momo_number || '••••••••••';
+  document.getElementById('reinvest-momo-name').textContent = paymentSettings.momo_name || '';
 }
 
 function updateTier2Info() {
@@ -1445,56 +1446,6 @@ function updateReinvestPaymentDetails() {
   lucide.createIcons();
 }
 
-        function initiateTier2Payment() {
-  const extraAmount = parseFloat(document.getElementById('reinvest-extra-amount').value) || 0;
-  const plan = document.getElementById('reinvest-new-plan').value;
-  const invId = document.getElementById('reinvest-investment-id').value;
-
-  if (extraAmount <= 0) {
-    showToast('Please enter a valid fresh deposit amount', 'error');
-    return;
-  }
-
-  const minAmounts = { starter: 200, growth: 300, premium: 500 };
-  if (extraAmount < minAmounts[plan]) {
-    showToast(`Minimum fresh deposit for ${plan} is ₵${minAmounts[plan]}`, 'error');
-    return;
-  }
-
-  if (!authToken || !currentUser) {
-    showToast('You must be logged in', 'error');
-    return;
-  }
-
-  const reference = `GCC-RINV-${currentUser.id}-${plan}-${Date.now()}`;
-
-  const handler = window.PaystackPop.setup({
-    key: 'pk_live_125326b0572dda7b41b6425ae2a5acd9332f0f4e',
-    email: currentUser.email,
-    amount: Math.round(extraAmount * 100), // in pesewas
-    currency: 'GHS',
-    reference,
-    label: 'Gold Coast Capital - Reinvest',
-    metadata: {
-      user_id: currentUser.id,
-      plan: plan,
-      reinvest_investment_id: invId,
-      extra_amount: extraAmount,
-      custom_fields: []
-    },
-    onClose: function() {},
-    callback: function(response) {
-      // Payment succeeded – now submit the reinvest with the transaction reference
-      submitReinvestWithPayment(response.reference);
-    },
-    onCancel: function() {
-      showToast('Payment cancelled.', 'error');
-    }
-  });
-
-  handler.openIframe();
-}
-
 async function submitReinvest() {
   const invId = document.getElementById('reinvest-investment-id').value;
   const plan = document.getElementById('reinvest-new-plan').value;
@@ -1510,12 +1461,18 @@ async function submitReinvest() {
       return;
     }
   }
-
+    if (currentReinvestTier === 2) {
+  const txid = document.getElementById('reinvest-txid').value.trim();
+  if (!txid) {
+    showToast('Please enter your MoMo Transaction ID', 'error');
+    return;
+  }
+}
   const body = {
     original_investment_id: invId,
     new_plan: plan,
     extra_amount: currentReinvestTier === 2 ? extraAmount : 0,
-    method: currentReinvestTier === 2 ? document.getElementById('reinvest-method').value : undefined,
+    method: currentReinvestTier === 2 ? 'momo' : undefined,
     transaction_id: currentReinvestTier === 2 ? document.getElementById('reinvest-txid').value : undefined
   };
 
@@ -1523,38 +1480,6 @@ async function submitReinvest() {
     showToast('Please enter transaction ID and payment method', 'error');
     return;
   }
-
-  try {
-    const res = await fetch(`${API_BASE}/api/reinvest`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      showToast(data.error || 'Reinvest failed', 'error');
-      return;
-    }
-    closeReinvestModal();
-    showToast(`Reinvest successful! ₵${data.bonus} bonus added to Prizes & Rewards.`, 'success');
-    updateDashboard();
-  } catch (e) {
-    showToast('Connection error', 'error');
-  }
-}
-
-        async function submitReinvestWithPayment(transactionReference) {
-  const invId = document.getElementById('reinvest-investment-id').value;
-  const plan = document.getElementById('reinvest-new-plan').value;
-  const extraAmount = parseFloat(document.getElementById('reinvest-extra-amount').value) || 0;
-
-  const body = {
-    original_investment_id: invId,
-    new_plan: plan,
-    extra_amount: extraAmount,
-    method: 'paystack',
-    transaction_id: transactionReference
-  };
 
   try {
     const res = await fetch(`${API_BASE}/api/reinvest`, {
@@ -3040,12 +2965,26 @@ document.addEventListener('DOMContentLoaded', () => {
             <input type="number" id="reinvest-extra-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2" oninput="updateTier2Bonus()">
           </div>
           <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with your new deposit.</p>
-          <div id="reinvest-payment-section" class="mt-3">
-  <p class="text-xs text-gray-400 mb-3">Your new deposit of <strong id="fresh-amount-display">₵0</strong> will be processed securely via Paystack.</p>
-  <button onclick="initiateTier2Payment()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
-    <i data-lucide="credit-card" class="w-5 h-5"></i> Pay new Deposit
-  </button>
-  <p class="text-xs text-gray-500 mt-2">You’ll be redirected to Paystack to complete payment.</p>
+<div id="reinvest-payment-section" class="mt-3">
+  <p class="text-xs text-gray-400 mb-3">
+    Send exactly <strong id="fresh-amount-display">₵0</strong> to the number below, then paste your MoMo Transaction ID.
+  </p>
+
+  <!-- MoMo Number -->
+  <div class="bg-dark-950/50 rounded-xl p-4 mb-3 border border-white/5 text-center">
+    <p class="text-xs text-gray-400 uppercase tracking-wider">MTN MoMo Number</p>
+    <div class="flex items-center justify-center gap-3 mt-2">
+      <p class="text-xl font-bold text-gradient tracking-wider" id="reinvest-momo-number">••••••••••</p>
+      <button onclick="copyAddress(document.getElementById('reinvest-momo-number').textContent)" class="text-gold-400 hover:text-gold-300">
+        <i data-lucide="copy" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <p class="text-xs text-gray-400 mt-1" id="reinvest-momo-name"></p>
+  </div>
+
+  <!-- Transaction ID Input -->
+  <label class="block text-sm text-gray-300 text-left mb-2">MoMo Transaction ID</label>
+  <input type="text" id="reinvest-txid" placeholder="e.g., 1234567890" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
 </div>
           <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">7% of new deposit</strong></p>
         </div>
