@@ -1423,7 +1423,6 @@ let reinvestPayout = 0;
 let reinvestOriginalPlan = '';
 
 function openReinvestModal(investmentId) {
-  // Find the investment in currentUser's list
   const inv = allInvestmentsLocal.find(i => i.id === investmentId);
   if (!inv) return;
 
@@ -1439,9 +1438,9 @@ function openReinvestModal(investmentId) {
   // Reset to Tier 1
   currentReinvestTier = 1;
   document.getElementById('reinvest-tier1').classList.add('glass-gold');
-  document.getElementById('reinvest-tier2').classList.remove('glass-gold');
+  document.getElementById('reinvest-tier2-wrapper').classList.remove('glass-gold');
   document.getElementById('reinvest-tier2-options').classList.add('hidden');
-  document.getElementById('reinvest-new-plan').value = inv.plan; // default to original, but Tier 2 requires different
+  document.getElementById('reinvest-new-plan').value = inv.plan;
 
   document.getElementById('reinvest-modal').classList.remove('hidden');
   document.getElementById('reinvest-modal').classList.add('flex');
@@ -1452,6 +1451,7 @@ function closeReinvestModal() {
   document.getElementById('reinvest-modal').classList.add('hidden');
   document.getElementById('reinvest-modal').classList.remove('flex');
 }
+        
 function selectTier1() {
   currentReinvestTier = 1;
   const tier1 = document.getElementById('reinvest-tier1');
