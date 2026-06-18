@@ -1241,9 +1241,16 @@
     <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-br from-gold-400/20 to-gold-600/20 border border-gold-400/30 flex items-center justify-center">
       <i data-lucide="wallet" class="w-6 h-6 text-gold-400"></i>
     </div>
-    <h3 class="text-lg font-bold text-white">Choose Your Plan</h3>
-    <p class="text-xs text-gray-400 mt-1">Select a plan that fits your goals</p>
+    <h3 class="text-lg font-bold text-white">Build Your Investment Position</h3>
+    <p class="text-xs text-gray-400 mt-1">Select the plan that best matches your investment horizon.</p>
   </div>
+
+    <!-- Progress indicator -->
+<div class="flex items-center justify-center gap-2 mb-4">
+  <div class="w-8 h-1.5 rounded-full bg-gold-400"></div>
+  <div class="w-8 h-1.5 rounded-full bg-white/10"></div>
+</div>
+<p class="text-center text-xs text-gray-500 mb-6">Step 1 of 2 · Select Plan &amp; Amount</p>
 
   <label class="block text-xs font-medium mb-3 text-gray-300 uppercase tracking-wider">Plan</label>
   <div class="grid grid-cols-3 gap-3 mb-6">
@@ -1251,10 +1258,15 @@
       <div class="text-gold-400 font-bold text-sm">Starter</div>
       <div class="text-gray-500 text-xs mt-1">10 Days</div>
     </button>
-    <button onclick="selectPlan('growth')" id="plan-growth" class="glass-gold rounded-xl p-4 text-center hover:border-gold-400 transition">
-      <div class="text-gold-400 font-bold text-sm">Growth</div>
-      <div class="text-gray-500 text-xs mt-1">20 Days</div>
-    </button>
+    <button onclick="selectPlan('growth')" id="plan-growth" class="glass-gold rounded-xl p-4 text-center hover:border-gold-400 transition relative">
+  <div class="absolute -top-2 left-1/2 -translate-x-1/2">
+    <span class="bg-gold-500 text-dark-950 text-[10px] px-2 py-1 rounded-full font-bold whitespace-nowrap">
+      MOST POPULAR
+    </span>
+  </div>
+  <div class="text-gold-400 font-bold text-sm">Growth</div>
+  <div class="text-gray-500 text-xs mt-1">20 Days</div>
+</button>
     <button onclick="selectPlan('premium')" id="plan-premium" class="glass rounded-xl p-4 text-center hover:border-gold-500/50 transition">
       <div class="text-gold-400 font-bold text-sm">Premium</div>
       <div class="text-gray-500 text-xs mt-1">30 Days</div>
@@ -1280,8 +1292,26 @@
       <div class="flex justify-between"><span class="text-gray-400">Returns (<span id="calc-rate-label">70</span>%)</span><span id="calc-earn" class="font-medium text-green-400">₵0</span></div>
       <div class="flex justify-between border-t border-white/10 pt-2"><span class="text-gray-400">Total Payout</span><span id="calc-total" class="font-bold text-gold-400">₵0</span></div>
     </div>
+
+      <div class="flex items-center gap-2 text-xs text-green-400 mt-2 mb-4">
+  <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+  Deposits are typically reviewed within 5–15 minutes.
+</div>
+      
   </div>
 
+<div class="glass rounded-xl p-4 mb-4">
+  <div class="flex items-start gap-3">
+    <i data-lucide="shield-check" class="w-5 h-5 text-green-400 mt-0.5"></i>
+    <div>
+      <p class="text-sm font-medium text-white">Secure &amp; Verified Process</p>
+      <p class="text-xs text-gray-400">
+        Every deposit is matched against a unique reference code and reviewed before activation.
+      </p>
+    </div>
+  </div>
+</div>
+    
   <button onclick="goToStep2()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg hover:opacity-90 transition">
     Continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
   </button>
@@ -1297,6 +1327,27 @@
   <button onclick="goToStep1()" class="flex items-center gap-1 text-gray-400 hover:text-white text-sm mb-4">
     <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
   </button>
+
+    <div class="flex items-center justify-center gap-2 mb-4">
+  <div class="w-8 h-1.5 rounded-full bg-gold-400"></div>
+  <div class="w-8 h-1.5 rounded-full bg-gold-400"></div>
+</div>
+<p class="text-center text-xs text-gray-500 mb-6">Step 2 of 2 · Complete Payment</p>
+
+    <div class="glass-gold rounded-xl p-4 mb-5 text-sm">
+  <div class="flex justify-between">
+    <span class="text-gray-400">Plan</span>
+    <span class="text-white font-medium" id="summary-plan">Growth</span>
+  </div>
+  <div class="flex justify-between mt-2">
+    <span class="text-gray-400">Amount</span>
+    <span class="text-white font-medium" id="summary-amount">₵0</span>
+  </div>
+  <div class="flex justify-between mt-2">
+    <span class="text-gray-400">Expected Bonus</span>
+    <span class="text-gold-400 font-semibold" id="summary-payout">₵0</span>
+  </div>
+</div>
 
   <!-- Premium Payment Card -->
   <div class="glass-premium rounded-2xl p-6 mb-5 text-center relative overflow-hidden">
@@ -1378,9 +1429,53 @@
     </div>
   </div>
 
+    <!-- What happens next -->
+<div class="glass rounded-xl p-4 mt-4">
+  <h4 class="text-sm font-semibold text-white mb-3">What Happens Next?</h4>
+  <div class="space-y-2 text-xs text-gray-400">
+    <div class="flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+      Payment submitted for verification
+    </div>
+    <div class="flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+      Deposit confirmed by our team
+    </div>
+    <div class="flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+      Funds activated in your dashboard
+    </div>
+    <div class="flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+      Earnings begin tracking immediately
+    </div>
+  </div>
+</div>
+
+    <div class="flex justify-center items-center gap-2 text-xs text-gray-400 mt-4">
+  <i data-lucide="headphones" class="w-3.5 h-3.5"></i>
+  Need help? Support is always available.
+</div>
+
   <button onclick="submitDeposit()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2 mt-4 shadow-lg">
     <i data-lucide="check-circle" class="w-5 h-5"></i> Confirm Deposit
   </button>
+
+    <div class="grid grid-cols-3 gap-3 mt-5 text-center text-xs text-gray-500">
+  <div class="flex flex-col items-center gap-1">
+    <i data-lucide="shield" class="w-4 h-4 text-gold-400"></i>
+    <span>Secure</span>
+  </div>
+  <div class="flex flex-col items-center gap-1">
+    <i data-lucide="clock" class="w-4 h-4 text-gold-400"></i>
+    <span>Fast Review</span>
+  </div>
+  <div class="flex flex-col items-center gap-1">
+    <i data-lucide="badge-check" class="w-4 h-4 text-gold-400"></i>
+    <span>Verified</span>
+  </div>
+</div>
+    
 </div>
             </div>
         </div>
@@ -2641,6 +2736,10 @@ async function goToStep2() {
   document.getElementById('pay-momo-number').textContent = paymentSettings.momo_number || '••••••••••';
   document.getElementById('pay-momo-name').textContent = paymentSettings.momo_name || '';
   document.getElementById('pay-amount-display').textContent = '₵' + formatNumber(amount);
+  document.getElementById('summary-plan').textContent = selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1);
+  document.getElementById('summary-amount').textContent = '₵' + formatNumber(amount);
+  const rate = returnRates[selectedPlan] || 1;
+  document.getElementById('summary-payout').textContent = '₵' + formatNumber(amount * (1 + rate));
 
   document.getElementById('deposit-step1').classList.add('hidden');
   document.getElementById('deposit-step2').classList.remove('hidden');
