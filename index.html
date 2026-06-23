@@ -1939,7 +1939,7 @@ function safe(str) {
 // Custom confirmation dialog (replaces native confirm)
 function customConfirm(message) {
   return new Promise((resolve) => {
-    document.getElementById('custom-confirm-message').textContent = message;
+    document.getElementById('custom-confirm-message').innerHTML = message;
     document.getElementById('custom-confirm-modal').classList.remove('hidden');
     document.getElementById('custom-confirm-modal').classList.add('flex');
 
@@ -2143,7 +2143,7 @@ async function loadPaymentSettings() {
                 const data = await res.json();
                 currentUser = data.user;
                 // Show loader
-document.getElementById('dashboard-loader').classList.remove('hidden');
+            document.getElementById('dashboard-loader').classList.remove('hidden');
             }
 
             document.getElementById('dash-name').textContent = safe(currentUser.name.split(' ')[0]);
@@ -2333,11 +2333,31 @@ if (investments.length === 0) {
 } else if (inv.status === 'reinvested') {
   actionHtml = '<span class="text-green-400 text-xs">Reinvested ✅</span>';
 } else if (wd) {
-        if (wd.status === 'pending') actionHtml = '<span class="text-yellow-400 text-xs">Payout pending</span>';
-        else if (wd.status === 'approved') actionHtml = '<span class="text-green-400 text-xs">Approved ✅</span>';
-       else if (wd.status === 'paid') actionHtml = '<span class="text-green-400 text-xs">Paid ✅</span>';
-        else actionHtml = '<span class="text-red-400 text-xs">Rejected ❌</span>';
-      }
+  const totalPayout = inv.amount * (1 + (returnRates[inv.plan] || 1));
+  const alreadyWithdrawn = withdrawals
+    .filter(w => w.investment_id === inv.id && w.status !== 'rejected')
+    .reduce((s, w) => s + w.amount, 0);
+  const remaining = totalPayout - alreadyWithdrawn;
+
+  let statusText = '';
+  if (wd.status === 'pending') {
+    statusText = `₵${formatNumber(wd.amount)} pending`;
+    if (remaining > 0 && wd.amount < totalPayout) {
+      statusText += `<br><span class="text-yellow-400 text-[10px]">₵${formatNumber(remaining)} locked (start active plan)</span>`;
+    }
+  } else if (wd.status === 'approved') {
+    statusText = `₵${formatNumber(wd.amount)} approved`;
+    if (remaining > 0) {
+      statusText += `<br><span class="text-yellow-400 text-[10px]">₵${formatNumber(remaining)} still locked</span>`;
+    }
+  } else if (wd.status === 'paid') {
+    statusText = `₵${formatNumber(wd.amount)} paid ✅`;
+  } else {
+    statusText = `${wd.status}`;
+  }
+
+  actionHtml = `<span class="text-xs">${statusText}</span>`;
+}
 
       return `<div class="glass rounded-lg p-3 mb-2">
         <div class="flex justify-between items-start">
@@ -2363,10 +2383,66 @@ if (investments.length === 0) {
             loadTransactionHistory();
             // Hide loader when everything is done
 document.getElementById('dashboard-loader').classList.add('hidden');
+            window.allWithdrawalsLocal = withdrawals;
         }
 
-        async function requestWithdrawal(investmentId) {
-  if (!await customConfirm('Request payout for this investment?')) return;
+       async function requestWithdrawal(investmentId) {
+  const inv = window.allInvestmentsLocal.find(i => i.id === investmentId);
+  if (!inv) return;
+
+  const rate = returnRates[inv.plan] || 1;
+  const totalPayout = inv.amount * (1 + rate);
+
+  // Sum already withdrawn for this investment (excluding rejected)
+  const alreadyWithdrawn = (window.allWithdrawalsLocal || [])
+    .filter(w => w.investment_id === investmentId && w.status !== 'rejected')
+    .reduce((s, w) => s + w.amount, 0);
+
+  const maxWithdrawable = totalPayout - alreadyWithdrawn;
+  if (maxWithdrawable <= 0) {
+    showToast('Full payout already withdrawn.', 'error');
+    return;
+  }
+
+  // Check active investment
+  const hasActive = (window.allInvestmentsLocal || []).some(i => i.status === 'active' && i.user_id === (currentUser?.id));
+  // Check loyalty: other investments besides this one
+  const otherCount = (window.allInvestmentsLocal || []).filter(i => i.user_id === (currentUser?.id) && i.id !== investmentId && i.status !== 'rejected').length;
+  const isLoyal = otherCount > 0;
+
+  let amount = maxWithdrawable;
+  let fee = 0;
+  let partial = false;
+  let note = '';
+
+  if (!hasActive) {
+    if (isLoyal) {
+      fee = Math.round(amount * 0.03 * 100) / 100;
+      amount = amount - fee;
+      note = `A 3% processing fee (₵${fee.toFixed(2)}) applies because you have no active plan. Keep a plan active to avoid fees.`;
+    } else {
+      amount = Math.floor(maxWithdrawable * 0.5 * 100) / 100;
+      partial = true;
+      note = `Since this is your first withdrawal and you have no active plan, 50% is available now. Start a new plan (min ₵200) to unlock the remaining ₵${(maxWithdrawable - amount).toFixed(2)}.`;
+    }
+  }
+
+  const confirmMessage = `
+    <div class="text-left text-sm space-y-2">
+      <p class="text-white font-semibold">Withdrawal Summary</p>
+      <p>Total payout: <span class="text-gold-400">₵${totalPayout.toFixed(2)}</span></p>
+      ${alreadyWithdrawn > 0 ? `<p>Already withdrawn: <span class="text-gray-400">₵${alreadyWithdrawn.toFixed(2)}</span></p>` : ''}
+      <p>You will receive: <span class="text-green-400 font-bold">₵${amount.toFixed(2)}</span></p>
+      ${fee > 0 ? `<p>Processing fee: <span class="text-red-400">₵${fee.toFixed(2)}</span></p>` : ''}
+      ${partial ? `<p class="text-yellow-400">Remaining ₵${(maxWithdrawable - amount).toFixed(2)} locked until you start a new active plan.</p>` : ''}
+      ${note ? `<p class="text-xs text-gray-400 mt-2">${note}</p>` : ''}
+      <p class="text-xs text-gray-500 mt-2">Proceed with withdrawal?</p>
+    </div>
+  `;
+
+  if (!await customConfirm(confirmMessage)) return;
+
+  // Submit withdrawal
   try {
     const res = await fetch(`${API_BASE}/api/withdrawals`, {
       method: 'POST',
@@ -2378,11 +2454,10 @@ document.getElementById('dashboard-loader').classList.add('hidden');
       showToast(data.error || 'Withdrawal failed', 'error');
       return;
     }
-    // Show the custom message from backend
     showToast(data.message || 'Payout request submitted!', 'success');
     updateDashboard();
   } catch (e) { showToast('Connection error', 'error'); }
-        }
+}
 
     async function requestGameRewardWithdrawal() {
     const balanceText = document.getElementById('dash-game-balance').textContent.replace('₵','').replace(/,/g,'');
