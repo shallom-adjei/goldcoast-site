@@ -2366,18 +2366,22 @@ document.getElementById('dashboard-loader').classList.add('hidden');
         }
 
         async function requestWithdrawal(investmentId) {
-            if (!await customConfirm('Request payout for this investment?')) return;
-            try {
-                const res = await fetch(`${API_BASE}/api/withdrawals`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-                    body: JSON.stringify({ investment_id: investmentId })
-                });
-                const data = await res.json();
-                if (!res.ok) return showToast(data.error, 'error');
-                showToast('Payout request submitted!', 'success');
-                updateDashboard();
-            } catch (e) { showToast('Connection error', 'error'); }
+  if (!await customConfirm('Request payout for this investment?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/withdrawals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ investment_id: investmentId })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.error || 'Withdrawal failed', 'error');
+      return;
+    }
+    // Show the custom message from backend
+    showToast(data.message || 'Payout request submitted!', 'success');
+    updateDashboard();
+  } catch (e) { showToast('Connection error', 'error'); }
         }
 
     async function requestGameRewardWithdrawal() {
