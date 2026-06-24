@@ -2298,11 +2298,29 @@ if (investments.length === 0) {
 } else if (inv.status === 'reinvested') {
   actionHtml = '<span class="text-green-400 text-xs">Reinvested ✅</span>';
 } else if (wd) {
-      if (wd.status === 'pending') actionHtml = '<span class="text-yellow-400 text-xs">Payout pending</span>';
-      else if (wd.status === 'approved') actionHtml = '<span class="text-green-400 text-xs">Approved ✅</span>';
-     else if (wd.status === 'paid') actionHtml = '<span class="text-green-400 text-xs">Paid ✅</span>';
-      else actionHtml = '<span class="text-red-400 text-xs">Rejected ❌</span>';
-    }
+  const totalPayout = inv.amount * (1 + (returnRates[inv.plan] || 1));
+  const alreadyWithdrawn = withdrawals
+    .filter(w => w.investment_id === inv.id && w.status !== 'rejected')
+    .reduce((s, w) => s + w.amount, 0);
+  const remaining = totalPayout - alreadyWithdrawn;
+
+  let statusText = '';
+  if (wd.status === 'pending') {
+    statusText = `₵${formatNumber(wd.amount)} pending`;
+  } else if (wd.status === 'approved') {
+    statusText = `₵${formatNumber(wd.amount)} approved`;
+  } else if (wd.status === 'paid') {
+    statusText = `₵${formatNumber(wd.amount)} paid ✅`;
+  } else {
+    statusText = `${wd.status}`;
+  }
+
+  if (remaining > 0) {
+    statusText += `<br><span class="text-yellow-400 text-[10px]">₵${formatNumber(remaining)} locked (start active plan)</span>`;
+  }
+
+  actionHtml = `<span class="text-xs">${statusText}</span>`;
+}
 
     return `<tr class="border-b border-white/5">
       <td class="py-4 font-medium">₵${formatNumber(inv.amount)}</td>
@@ -2347,19 +2365,18 @@ if (investments.length === 0) {
   let statusText = '';
   if (wd.status === 'pending') {
     statusText = `₵${formatNumber(wd.amount)} pending`;
-    if (remaining > 0) {
-      statusText += `<br><span class="text-yellow-400 text-[10px]">₵${formatNumber(remaining)} locked (start active plan)</span>`;
-    }
   } else if (wd.status === 'approved') {
     statusText = `₵${formatNumber(wd.amount)} approved`;
-    if (remaining > 0) {
-      statusText += `<br><span class="text-yellow-400 text-[10px]">₵${formatNumber(remaining)} still locked</span>`;
-    }
   } else if (wd.status === 'paid') {
     statusText = `₵${formatNumber(wd.amount)} paid ✅`;
   } else {
     statusText = `${wd.status}`;
   }
+
+  if (remaining > 0) {
+    statusText += `<br><span class="text-yellow-400 text-[10px]">₵${formatNumber(remaining)} locked (start active plan)</span>`;
+  }
+
   actionHtml = `<span class="text-xs">${statusText}</span>`;
 }
 
