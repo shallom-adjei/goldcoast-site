@@ -2316,16 +2316,15 @@ if (investments.length === 0) {
     .reduce((s, w) => s + w.amount, 0);
   const remaining = totalPayout - alreadyWithdrawn;
 
-  let statusText = '';
-  if (wd.status === 'pending') {
-    statusText = `₵${formatNumber(wd.amount)} pending`;
-  } else if (wd.status === 'approved') {
-    statusText = `₵${formatNumber(wd.amount)} approved`;
-  } else if (wd.status === 'paid') {
-    statusText = `₵${formatNumber(wd.amount)} paid ✅`;
-  } else {
-    statusText = `${wd.status}`;
-  }
+  // Determine overall status based on the latest withdrawal
+  const latestStatus = wd.status;  // pending / approved / paid
+  let statusBadge = '';
+  if (latestStatus === 'pending') statusBadge = '⏳';
+  else if (latestStatus === 'approved') statusBadge = '✅';
+  else if (latestStatus === 'paid') statusBadge = '✅';
+  else statusBadge = '';
+
+  let statusText = `₵${formatNumber(alreadyWithdrawn)} withdrawn ${statusBadge}`;
 
   if (remaining > 0) {
     statusText += `<br><span class="text-yellow-400 text-[10px]">₵${formatNumber(remaining)} available with next plan</span>`;
@@ -2341,7 +2340,8 @@ if (investments.length === 0) {
         </button>`;
     }
   } else {
-    actionHtml = `<span class="text-xs">${statusText}</span>`;
+    // Fully paid out
+    actionHtml = `<span class="text-xs text-green-400">${statusText}</span>`;
   }
 }
 
@@ -2385,16 +2385,15 @@ if (investments.length === 0) {
     .reduce((s, w) => s + w.amount, 0);
   const remaining = totalPayout - alreadyWithdrawn;
 
-  let statusText = '';
-  if (wd.status === 'pending') {
-    statusText = `₵${formatNumber(wd.amount)} pending`;
-  } else if (wd.status === 'approved') {
-    statusText = `₵${formatNumber(wd.amount)} approved`;
-  } else if (wd.status === 'paid') {
-    statusText = `₵${formatNumber(wd.amount)} paid ✅`;
-  } else {
-    statusText = `${wd.status}`;
-  }
+  // Determine overall status based on the latest withdrawal
+  const latestStatus = wd.status;  // pending / approved / paid
+  let statusBadge = '';
+  if (latestStatus === 'pending') statusBadge = '⏳';
+  else if (latestStatus === 'approved') statusBadge = '✅';
+  else if (latestStatus === 'paid') statusBadge = '✅';
+  else statusBadge = '';
+
+  let statusText = `₵${formatNumber(alreadyWithdrawn)} withdrawn ${statusBadge}`;
 
   if (remaining > 0) {
     statusText += `<br><span class="text-yellow-400 text-[10px]">₵${formatNumber(remaining)} available with next plan</span>`;
@@ -2410,7 +2409,8 @@ if (investments.length === 0) {
         </button>`;
     }
   } else {
-    actionHtml = `<span class="text-xs">${statusText}</span>`;
+    // Fully paid out
+    actionHtml = `<span class="text-xs text-green-400">${statusText}</span>`;
   }
 }
 
