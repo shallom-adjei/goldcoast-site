@@ -2354,6 +2354,7 @@ if (investments.length === 0) {
       <td class="py-4">${actionHtml}</td>
     </tr>`;
   }).join('');
+    lucide.createIcons();
 
   if (cardContainer) {
     cardContainer.innerHTML = investments.map(inv => {
@@ -2385,8 +2386,7 @@ if (investments.length === 0) {
     .reduce((s, w) => s + w.amount, 0);
   const remaining = totalPayout - alreadyWithdrawn;
 
-  // Determine overall status based on the latest withdrawal
-  const latestStatus = wd.status;  // pending / approved / paid
+  const latestStatus = wd.status;
   let statusBadge = '';
   if (latestStatus === 'pending') statusBadge = '⏳';
   else if (latestStatus === 'approved') statusBadge = '✅';
@@ -2397,7 +2397,7 @@ if (investments.length === 0) {
 
   if (remaining > 0) {
     statusText += `<br><span class="text-yellow-400 text-[10px]">₵${formatNumber(remaining)} available with next plan</span>`;
-    // Show withdrawal button – locked or unlocked
+
     const hasActive = (window.allInvestmentsLocal || []).some(i => i.status === 'active');
     if (hasActive) {
       actionHtml = `<span class="text-xs">${statusText}</span>
@@ -2409,7 +2409,6 @@ if (investments.length === 0) {
         </button>`;
     }
   } else {
-    // Fully paid out
     actionHtml = `<span class="text-xs text-green-400">${statusText}</span>`;
   }
 }
@@ -2433,6 +2432,7 @@ if (investments.length === 0) {
     }).join('');
   }
 }
+            lucide.createIcons();
 
             drawChart(investments);
             loadTransactionHistory();
