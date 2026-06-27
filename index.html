@@ -2392,7 +2392,7 @@ if (investments.length === 0) {
   const alreadyWithdrawn = allWithdrawals.reduce((s, w) => s + w.amount, 0);
   const remaining = totalPayout - alreadyWithdrawn;
 
-  // Build timeline of each withdrawal
+  // Timeline of each withdrawal
   let timelineHtml = '';
   allWithdrawals.forEach(w => {
     let icon = '';
@@ -2406,7 +2406,7 @@ if (investments.length === 0) {
     </div>`;
   });
 
-  // Remaining locked amount and lock/unlock button
+  // Remaining and lock/unlock button
   let remainingHtml = '';
   if (remaining > 0) {
     remainingHtml = `<div class="text-yellow-400 text-[10px] mt-1">₵${formatNumber(remaining)} available with next plan</div>`;
@@ -2480,7 +2480,7 @@ document.getElementById('dashboard-loader').classList.add('hidden');
       <p>Total payout: <span class="text-gold-400">₵${totalPayout.toFixed(2)}</span></p>
       ${alreadyWithdrawn > 0 ? `<p>Already withdrawn: <span class="text-gray-400">₵${alreadyWithdrawn.toFixed(2)}</span></p>` : ''}
       <p>You will receive now: <span class="text-green-400 font-bold">₵${amount.toFixed(2)}</span></p>
-      ${!hasActive ? `<p class="text-yellow-400">₵${locked.toFixed(2)} locked until you start a new active plan (min ₵200).</p>` : ''}
+      ${!hasActive ? `<p class="text-yellow-400">₵${locked.toFixed(2)} Kept until you start a new active plan (min ₵200).</p>` : ''}
       <p class="text-xs text-gray-500 mt-2">${hasActive ? 'You have an active plan – 100% available.' : 'Start a new plan to unlock the remaining 60%.'}</p>
       <p class="text-xs text-gray-500">Proceed with withdrawal?</p>
     </div>
@@ -3343,7 +3343,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div id="lock-info-modal" class="fixed inset-0 z-[310] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
   <div class="glass rounded-2xl w-full max-w-sm p-6 text-center">
     <i data-lucide="lock" class="w-10 h-10 text-yellow-400 mx-auto mb-3"></i>
-    <h3 class="text-lg font-bold text-white mb-2">Remaining Balance Locked</h3>
+    <h3 class="text-lg font-bold text-white mb-2">Remaining Balance Kept</h3>
     <p class="text-sm text-gray-300 mb-4" id="lock-info-message">
       You have a balance available, but it requires an active investment plan to unlock. Start a new plan (min ₵200) to access your remaining funds.
     </p>
