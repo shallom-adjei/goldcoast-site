@@ -23,6 +23,22 @@
     </script>
     <style>
 
+        .payout-popup-premium {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(10,10,18,0.98);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 20px;
+  padding: 14px 20px;
+  color: white;
+  z-index: 1000;
+  box-shadow: 0 0 40px rgba(255,215,0,0.15), 0 8px 32px rgba(0,0,0,0.4);
+  animation: payoutSlideUp 0.6s ease, payoutFadeOut 0.5s ease 4.5s forwards;
+  max-width: 95vw;
+}
+
         html {
   scroll-behavior: smooth;
 }
@@ -3225,45 +3241,69 @@ if (top.length > 3) {
             }
         }, 60000);
 
-        // ========== RANDOM PAYOUT NOTIFICATION ==========
-        const firstNames = ['Kwame', 'Ama', 'Kofi', 'Akua', 'Yaw', 'Afia', 'Kojo', 'Adwoa', 'Kwesi', 'Efua', 'Nana', 'Esi', 'Kwabena', 'Akosua', 'Kwaku', 'Abena'];
-        const lastNames = ['Mensah', 'Owusu', 'Asante', 'Adjei', 'Boateng', 'Sarpong', 'Agyeman', 'Danso', 'Osei', 'Adu', 'Tetteh', 'Nyarko', 'Frimpong', 'Annan', 'Arthur'];
-        const messages = ['just received a payout of', 'withdrew', 'got paid', 'cashed out'];
+        // ========== REAL PAYOUT NOTIFICATIONS ==========
+let recentPayouts = [];
+let currentPayoutIndex = 0;
+let payoutPopupInterval = null;
 
-        function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-        function getRandomAmount() { return Math.floor(Math.random() * (5000 - 800 + 1)) + 800; }
-        function getRandomTimeAgo() {
-            const mins = Math.floor(Math.random() * 59) + 1;
-            return mins === 1 ? '1 minute ago' : `${mins} minutes ago`;
-        }
+async function fetchRecentPayouts() {
+  try {
+    const res = await fetch(`${API_BASE}/api/recent-payouts`);
+    if (res.ok) {
+      const data = await res.json();
+      recentPayouts = data.payouts;
+      currentPayoutIndex = 0;
+    }
+  } catch (e) { /* ignore */ }
+}
 
-        function showRandomPayoutPopup() {
-            const name = `${getRandomElement(firstNames)} ${getRandomElement(lastNames)}`;
-            const amount = getRandomAmount();
-            const message = getRandomElement(messages);
-            const timeAgo = getRandomTimeAgo();
+function showNextPayoutPopup() {
+  if (recentPayouts.length === 0) return;
+  const payout = recentPayouts[currentPayoutIndex];
+  currentPayoutIndex = (currentPayoutIndex + 1) % recentPayouts.length;
 
-            const popup = document.createElement('div');
-            popup.className = 'payout-popup';
-            popup.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-dark-950 font-bold">💰</div>
-                    <div>
-                        <p class="text-sm font-semibold text-gold-400">${name}</p>
-                        <p class="text-xs text-gray-300">${message} <span class="text-white font-bold">₵${amount.toLocaleString()}</span></p>
-                        <p class="text-xs text-gray-500 mt-1">${timeAgo}</p>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(popup);
+  const displayName = formatDisplayName(payout.name);
+  const timeAgoStr = timeAgo(payout.created_at);
 
-            setTimeout(() => {
-                if (popup.parentNode) popup.parentNode.removeChild(popup);
-            }, 5000);
-        }
+  const popup = document.createElement('div');
+  popup.className = 'payout-popup-premium';
+  popup.innerHTML = `
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-lg">
+        <i data-lucide="check" class="w-5 h-5 text-dark-950"></i>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-gold-400">${displayName}</p>
+        <p class="text-xs text-gray-300">
+          just received <span class="text-white font-bold">₵${formatNumber(payout.amount)}</span> from their <span class="text-white">${payout.plan || 'investment'}</span> plan
+        </p>
+        <p class="text-[10px] text-gray-500 mt-0.5">${timeAgoStr}</p>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(popup);
 
-        setInterval(showRandomPayoutPopup, 60000);
-        setTimeout(showRandomPayoutPopup, 5000);
+  setTimeout(() => {
+    if (popup.parentNode) popup.parentNode.removeChild(popup);
+  }, 5000);
+}
+
+function formatDisplayName(fullName) {
+  if (!fullName) return 'Someone';
+  const parts = fullName.trim().split(' ');
+  if (parts.length >= 2) {
+    return `${parts[0]} ${parts[parts.length - 1].charAt(0)}.`;
+  }
+  return parts[0];
+}
+
+// Initialise (replaces the old setTimeout / setInterval)
+fetchRecentPayouts().then(() => {
+  if (recentPayouts.length > 0) {
+    setTimeout(() => showNextPayoutPopup(), 5000);
+    payoutPopupInterval = setInterval(showNextPayoutPopup, 45000);
+  }
+}).catch(() => {});
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', () => {
