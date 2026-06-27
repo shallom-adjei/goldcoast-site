@@ -2812,11 +2812,13 @@ document.getElementById('dashboard-loader').classList.add('hidden');
 function selectPlan(plan) {
   // ---- new restriction checks ----
   const check = canSelectPlan(plan);
-  if (!check.allowed) {
+if (!check.allowed) {
+  if (check.message) {
     showToast(check.message, 'error');
-    return;   // don’t change the selection
   }
-  // ---- end new checks ----
+  // If message is null, the modal has already been shown (Starter Loyalty Rule)
+  return;
+}
 
   selectedPlan = plan;
   document.getElementById('deposit-plan').value = plan;
@@ -2842,7 +2844,7 @@ function selectPlan(plan) {
     if (activeStarter) {
       return {
         allowed: false,
-        message: 'You already have an active Starter plan. Please choose Growth or Premium to diversify your investments! 🌱'
+        message: 'You already have an active Starter plan. Please choose Growth or Premium to diversify your savings! 🌱'
       };
     }
 
@@ -2860,9 +2862,39 @@ function selectPlan(plan) {
         message: 'You have an investment maturing within 10 days. Please choose Growth or Premium instead, or wait until your current plan completes! ⏳'
       };
     }
+
+    // 3. Starter Loyalty Rule – after 3 matured Starters, minimum becomes ₵400
+    const starterMaturedCount = investments.filter(
+      i => i.plan === 'starter' && i.status === 'matured'
+    ).length;
+    if (starterMaturedCount >= 3) {
+      showStarterLimitModal();   // ✨ premium modal, not a toast
+      return { allowed: false, message: null };   // already handled by modal
+    }
   }
 
   return { allowed: true };
+}
+
+        function showStarterLimitModal() {
+  const modal = document.getElementById('starter-limit-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+}
+
+function closeStarterLimitModal() {
+  const modal = document.getElementById('starter-limit-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+function selectPlanFromModal(plan) {
+  closeStarterLimitModal();
+  selectPlan(plan);   // re‑use the normal plan selection logic
 }
 
         function selectPayment(method) {
@@ -3393,6 +3425,29 @@ document.addEventListener('DOMContentLoaded', () => {
       Start New Plan
     </button>
     <button onclick="closeLockModal()" class="text-gray-400 text-xs hover:text-white">Maybe Later</button>
+  </div>
+</div>
+
+    <!-- Starter Loyalty Modal -->
+<div id="starter-limit-modal" class="fixed inset-0 z-[320] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.90); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-sm p-6 text-center">
+    <i data-lucide="award" class="w-10 h-10 text-gold-400 mx-auto mb-3"></i>
+    <h3 class="text-lg font-bold text-white mb-2">You've Reached Starter Elite!</h3>
+    <p class="text-sm text-gray-300 mb-4">
+      You've successfully completed 3 Starter plans. As a reward for your loyalty, your next Starter plan requires a <strong class="text-gold-400">minimum of ₵400</strong>.
+    </p>
+    <p class="text-xs text-gray-400 mb-4">
+      You can also upgrade to <strong class="text-white">Growth</strong> from just <strong class="text-white">₵300</strong> (70% returns) or <strong class="text-white">Premium</strong> from <strong class="text-white">₵500</strong> (100% returns).
+    </p>
+    <div class="space-y-2 mb-3">
+      <button onclick="selectPlanFromModal('growth')" class="w-full glass-gold rounded-xl py-3 font-semibold text-gold-400 hover:border-gold-400 transition">
+        Switch to Growth (₵300)
+      </button>
+      <button onclick="selectPlanFromModal('premium')" class="w-full glass-gold rounded-xl py-3 font-semibold text-gold-400 hover:border-gold-400 transition">
+        Switch to Premium (₵500)
+      </button>
+    </div>
+    <button onclick="closeStarterLimitModal()" class="text-gray-400 text-xs hover:text-white">Maybe Later</button>
   </div>
 </div>
 
