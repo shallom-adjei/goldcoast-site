@@ -26,7 +26,10 @@
         html {
   scroll-behavior: smooth;
 }
-
+#starter-limit-modal .glass {
+  max-height: 90vh;
+  overflow-y: auto;
+}
 /* Promote heavy animated elements to the GPU */
 .logo-orbit,
 .logo-star,
@@ -2867,10 +2870,10 @@ if (!check.allowed) {
     const starterMaturedCount = investments.filter(
       i => i.plan === 'starter' && i.status === 'matured'
     ).length;
-    if (starterMaturedCount >= 3) {
-      showStarterLimitModal();   // ✨ premium modal, not a toast
-      return { allowed: false, message: null };   // already handled by modal
-    }
+   if (starterMaturedCount >= 3) {
+  setTimeout(() => showStarterLimitModal(), 50);  
+  return { allowed: false, message: null };
+}
   }
 
   return { allowed: true };
