@@ -801,7 +801,7 @@
         <a href="terms.html" class="text-gray-500 text-xs hover:text-gray-400 hover:underline mt-2 inline-block">Terms of Service & Privacy Policy</a>
     </div>
 </footer>
-        <script>
+        
   // Record a page view (only once per session)
   if (!sessionStorage.getItem('_gcc_pv')) {
     sessionStorage.setItem('_gcc_pv', '1');
@@ -1697,6 +1697,25 @@ function updateReinvestPaymentDetails() {
     <input type="text" id="reinvest-txid" placeholder="e.g., 1234567890" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
   `;
   lucide.createIcons();
+}
+
+        async function processWithdrawal(investmentId, amount) {
+  try {
+    const res = await fetch(`${API_BASE}/api/withdrawals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ investment_id: investmentId })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.error || 'Withdrawal failed', 'error');
+      return;
+    }
+    showToast(data.message || 'Payout request submitted!', 'success');
+    updateDashboard();
+  } catch (e) {
+    showToast('Connection error', 'error');
+  }
 }
 
 async function submitReinvest() {
