@@ -2376,11 +2376,11 @@ if (investments.length === 0) {
   let remainingHtml = '';
   if (remaining > 0) {
     remainingHtml = `<div class="text-yellow-400 text-[10px] mt-1">₵${formatNumber(remaining)} available with next plan</div>`;
-    const activeInvs = (window.allInvestmentsLocal || []).filter(i => i.status === 'active');
-const highestActiveAmount = activeInvs.length > 0
-  ? Math.max(...activeInvs.map(i => i.amount))
-  : 0;
-const hasQualifyingActive = highestActiveAmount >= inv.amount;
+   const totalActiveAmount = (window.allInvestmentsLocal || [])
+  .filter(i => i.status === 'active')
+  .reduce((sum, i) => sum + i.amount, 0);
+
+const hasQualifyingActive = totalActiveAmount >= inv.amount;
     if (hasQualifyingActive) {
       remainingHtml += `<button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Withdraw</button>`;
     } else {
@@ -2455,11 +2455,11 @@ const hasQualifyingActive = highestActiveAmount >= inv.amount;
   let remainingHtml = '';
   if (remaining > 0) {
     remainingHtml = `<div class="text-yellow-400 text-[10px] mt-1">₵${formatNumber(remaining)} available with next plan</div>`;
-    const activeInvs = (window.allInvestmentsLocal || []).filter(i => i.status === 'active');
-const highestActiveAmount = activeInvs.length > 0
-  ? Math.max(...activeInvs.map(i => i.amount))
-  : 0;
-const hasQualifyingActive = highestActiveAmount >= inv.amount;
+   const totalActiveAmount = (window.allInvestmentsLocal || [])
+  .filter(i => i.status === 'active')
+  .reduce((sum, i) => sum + i.amount, 0);
+
+const hasQualifyingActive = totalActiveAmount >= inv.amount;
     if (hasQualifyingActive) {
       remainingHtml += `<button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Withdraw</button>`;
     } else {
@@ -2520,88 +2520,103 @@ async function requestWithdrawal(investmentId) {
     return;
   }
 
+  // Total active balance across all active plans
+  const totalActiveAmount = (window.allInvestmentsLocal || [])
+    .filter(i => i.status === 'active')
+    .reduce((sum, i) => sum + i.amount, 0);
+
+  const hasQualifyingActive = totalActiveAmount >= inv.amount;
+
   let amount, confirmMessage;
 
-if (alreadyWithdrawn === 0) {
-  amount = Math.floor(profit * 0.2 * 100) / 100;
-  const locked = totalPayout - amount;
-  const encouragement = inv.amount >= 500
-    ? 'Most members immediately reinvest and double their returns within weeks.'
-    : 'Members who keep a plan active earn 3× more bonuses over time.';
+  // ── FIRST WITHDRAWAL ──
+  if (alreadyWithdrawn === 0) {
 
-  // Store for button actions
-  window._pendingWithdrawalId = investmentId;
-  window._pendingWithdrawalAmount = amount;
+    if (hasQualifyingActive) {
+      // Qualifying active balance → allow 100% immediately
+      amount = maxWithdrawable;
+      confirmMessage = `
+        <div class="text-left text-sm space-y-2">
+          <p class="text-white font-semibold">Full Withdrawal Available</p>
+          <p>Total payout: <span class="text-gold-400">₵${totalPayout.toFixed(2)}</span></p>
+          <p>You will receive now: <span class="text-green-400 font-bold">₵${amount.toFixed(2)}</span></p>
+          <p class="text-xs text-gray-400">Your total active balance (₵${totalActiveAmount}) qualifies you for instant full access.</p>
+          <p class="text-xs text-gray-500">Proceed with withdrawal?</p>
+        </div>
+      `;
 
-  document.getElementById('withdraw-confirm-content').innerHTML = `
-    <div class="text-left text-sm space-y-3">
-      <div class="text-center">
-        <p class="text-lg font-bold text-white">🎉 Your Money Has Grown</p>
-        <p class="text-xs text-gray-400 mt-1">Total value: <span class="text-gold-400 font-semibold">₵${totalPayout.toFixed(2)}</span></p>
-      </div>
-
-      <div class="bg-dark-950/60 rounded-xl p-4 text-center border border-gold-500/30">
-        <p class="text-xs text-gray-400 uppercase tracking-wider">Cash Out Instantly</p>
-        <p class="text-3xl font-black text-green-400 mt-1">₵${amount.toFixed(2)}</p>
-        <p class="text-xs text-green-400/70 mt-1">Sent to your wallet immediately</p>
-      </div>
-
-      <div class="text-center text-xs text-gray-400 mt-3">
-        <p>Your <strong class="text-white">₵${inv.amount.toFixed(2)}</strong> principal is held securely and ready to be reactivated.</p>
-        <p class="text-yellow-400 mt-1">Start a new plan of <strong>₵${inv.amount}</strong> to unlock the full <strong>₵${locked.toFixed(2)}</strong> balance.</p>
-      </div>
-
-      <div class="text-[10px] text-gray-500 text-center italic">${encouragement}</div>
-
-<div class="flex gap-2 mt-2">
-  <button onclick="withdrawConfirmUnlock()" class="flex-1 gradient-gold text-dark-950 font-semibold py-2.5 rounded-xl text-xs hover:opacity-90 transition">
-    ⚡ Unlock & Grow
-  </button>
-  <button onclick="withdrawConfirmJustWithdraw()" class="flex-1 bg-transparent border border-white/20 text-gray-300 py-2.5 rounded-xl text-xs hover:bg-white/5 transition">
-    Just Withdraw
-  </button>
-</div>
-<div class="text-center mt-2">
-  <button onclick="withdrawConfirmMaybeLater()" class="text-gray-500 text-xs hover:text-gray-300 transition">
-    Maybe Later
-  </button>
-</div>
-    </div>
-  `;
-
-  document.getElementById('withdraw-confirm-modal').classList.remove('hidden');
-  document.getElementById('withdraw-confirm-modal').classList.add('flex');
-  return;  
-} else {
-    // Subsequent withdrawal – requires qualifying active plan
-    const activeInvs = (window.allInvestmentsLocal || []).filter(i => i.status === 'active');
-    const highestActiveAmount = activeInvs.length > 0 ? Math.max(...activeInvs.map(i => i.amount)) : 0;
-
-    if (highestActiveAmount < inv.amount) {
-      showToast(`You need an active plan of at least ₵${inv.amount} to unlock the remaining balance.`, 'error');
+      if (!await customConfirm(confirmMessage)) return;
+      await processWithdrawal(investmentId, amount);
       return;
     }
 
-    amount = maxWithdrawable;
-    confirmMessage = `
-      <div class="text-left text-sm space-y-2">
-        <p class="text-white font-semibold">Unlock Remaining Balance</p>
-        <p>You will receive: <span class="text-green-400 font-bold">₵${amount.toFixed(2)}</span></p>
-        <p class="text-xs text-gray-500">Proceed with withdrawal?</p>
+    // No qualifying active balance → 20% profit share modal
+    amount = Math.floor(profit * 0.2 * 100) / 100;
+    const locked = totalPayout - amount;
+    const encouragement = inv.amount >= 500
+      ? 'Most members immediately reinvest and double their returns within weeks.'
+      : 'Members who keep a plan active earn 3× more bonuses over time.';
+
+    window._pendingWithdrawalId = investmentId;
+    window._pendingWithdrawalAmount = amount;
+
+    document.getElementById('withdraw-confirm-content').innerHTML = `
+      <div class="text-left text-sm space-y-3">
+        <div class="text-center">
+          <p class="text-lg font-bold text-white">🎉 Your Money Has Grown</p>
+          <p class="text-xs text-gray-400 mt-1">Total value: <span class="text-gold-400 font-semibold">₵${totalPayout.toFixed(2)}</span></p>
+        </div>
+
+        <div class="bg-dark-950/60 rounded-xl p-4 text-center border border-gold-500/30">
+          <p class="text-xs text-gray-400 uppercase tracking-wider">Cash Out Instantly</p>
+          <p class="text-3xl font-black text-green-400 mt-1">₵${amount.toFixed(2)}</p>
+          <p class="text-xs text-green-400/70 mt-1">Sent to your wallet immediately</p>
+        </div>
+
+        <div class="text-center text-xs text-gray-400 mt-3">
+          <p>Your <strong class="text-white">₵${inv.amount.toFixed(2)}</strong> principal is held securely and ready to be reactivated.</p>
+          <p class="text-yellow-400 mt-1">Start a new plan of <strong>₵${inv.amount}</strong> to unlock the full <strong>₵${locked.toFixed(2)}</strong> balance.</p>
+        </div>
+
+        <div class="text-[10px] text-gray-500 text-center italic">${encouragement}</div>
+
+        <div class="flex gap-2 mt-2">
+          <button onclick="withdrawConfirmUnlock()" class="flex-1 gradient-gold text-dark-950 font-semibold py-2.5 rounded-xl text-xs hover:opacity-90 transition">
+            ⚡ Unlock & Grow
+          </button>
+          <button onclick="withdrawConfirmJustWithdraw()" class="flex-1 bg-transparent border border-white/20 text-gray-300 py-2.5 rounded-xl text-xs hover:bg-white/5 transition">
+            Just Withdraw
+          </button>
+        </div>
+        <div class="text-center mt-2">
+          <button onclick="withdrawConfirmMaybeLater()" class="text-gray-500 text-xs hover:text-gray-300 transition">
+            Maybe Later
+          </button>
+        </div>
       </div>
     `;
-  }
 
-  // Store current investment ID for the CTA buttons
-  window._pendingWithdrawalId = investmentId;
-  window._pendingWithdrawalAmount = amount;
-
-  if (!await customConfirm(confirmMessage)) {
-    window._pendingWithdrawalId = null;
+    document.getElementById('withdraw-confirm-modal').classList.remove('hidden');
+    document.getElementById('withdraw-confirm-modal').classList.add('flex');
     return;
   }
 
-  // If user clicked "Just Withdraw" (default OK), process normally
+  // ── SUBSEQUENT WITHDRAWAL ──
+  if (totalActiveAmount < inv.amount) {
+    showToast(`You need a total active balance of at least ₵${inv.amount} to unlock the remaining balance.`, 'error');
+    return;
+  }
+
+  amount = maxWithdrawable;
+  confirmMessage = `
+    <div class="text-left text-sm space-y-2">
+      <p class="text-white font-semibold">Unlock Remaining Balance</p>
+      <p>You will receive: <span class="text-green-400 font-bold">₵${amount.toFixed(2)}</span></p>
+      <p class="text-xs text-gray-500">Proceed with withdrawal?</p>
+    </div>
+  `;
+
+  if (!await customConfirm(confirmMessage)) return;
   await processWithdrawal(investmentId, amount);
 } 
 
@@ -2609,16 +2624,18 @@ function requestRemainingWithdrawal(investmentId) {
   const inv = window.allInvestmentsLocal.find(i => i.id === investmentId);
   if (!inv) return;
 
-  const activeInvs = (window.allInvestmentsLocal || []).filter(i => i.status === 'active');
-  const highestActiveAmount = activeInvs.length > 0 ? Math.max(...activeInvs.map(i => i.amount)) : 0;
+  // Total balance of all active plans
+  const totalActiveAmount = (window.allInvestmentsLocal || [])
+    .filter(i => i.status === 'active')
+    .reduce((sum, i) => sum + i.amount, 0);
 
-  if (highestActiveAmount >= inv.amount) {
+  if (totalActiveAmount >= inv.amount) {
     requestWithdrawal(investmentId);
   } else {
     const modal = document.getElementById('lock-info-modal');
     if (modal) {
       document.getElementById('lock-info-message').innerHTML =
-        `To unlock your remaining balance, you need an active plan of at least <strong>₵${inv.amount}</strong>.<br><br>Your original investment was ₵${inv.amount}. Start a new plan now to access your funds.`;
+        `To unlock your remaining balance, you need a total active balance of at least <strong>₵${inv.amount}</strong>.<br><br>Your current total active balance is <strong>₵${totalActiveAmount}</strong>. Start a new plan now to reach the requirement.`;
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     }
