@@ -2500,56 +2500,57 @@ async function requestWithdrawal(investmentId) {
 
   let amount, confirmMessage;
 
-  if (alreadyWithdrawn === 0) {
-    // First withdrawal – 20% profit share
-    amount = Math.floor(profit * 0.2 * 100) / 100;
-    const locked = totalPayout - amount;
+if (alreadyWithdrawn === 0) {
+  amount = Math.floor(profit * 0.2 * 100) / 100;
+  const locked = totalPayout - amount;
+  const encouragement = inv.amount >= 500
+    ? 'Most members immediately reinvest and double their returns within weeks.'
+    : 'Members who keep a plan active earn 3× more bonuses over time.';
 
-    // Dynamic encouragement based on plan size
-    const encouragement = inv.amount >= 500 
-      ? 'Most members immediately reinvest and double their returns within weeks.'
-      : 'Members who keep a plan active earn 3× more bonuses over time.';
+  // Store for button actions
+  window._pendingWithdrawalId = investmentId;
+  window._pendingWithdrawalAmount = amount;
 
-    confirmMessage = `
-      <div class="text-left text-sm space-y-3">
-        <!-- Celebration header -->
-        <div class="text-center">
-          <p class="text-lg font-bold text-white">🎉 Your Money Has Grown</p>
-          <p class="text-xs text-gray-400 mt-1">Total value: <span class="text-gold-400 font-semibold">₵${totalPayout.toFixed(2)}</span></p>
-        </div>
-
-        <!-- Instant cash – BIG and gold -->
-        <div class="bg-dark-950/60 rounded-xl p-4 text-center border border-gold-500/30">
-          <p class="text-xs text-gray-400 uppercase tracking-wider">Cash Out Instantly</p>
-          <p class="text-3xl font-black text-green-400 mt-1">₵${amount.toFixed(2)}</p>
-          <p class="text-xs text-green-400/70 mt-1">Sent to your wallet immediately</p>
-        </div>
-
-        <!-- Principal – framed as already working -->
-        <div class="text-center text-xs text-gray-400 mt-3">
-  <p>Your <strong class="text-white">₵${inv.amount.toFixed(2)}</strong> principal is held securely and ready to be reactivated.</p>
-  <p class="text-yellow-400 mt-1">Start a new plan of <strong>₵${inv.amount}</strong> to unlock the full <strong>₵${locked.toFixed(2)}</strong> balance.</p>
-</div>
-
-        <!-- Social proof + urgency -->
-        <div class="text-[10px] text-gray-500 text-center italic">
-          ${encouragement}
-        </div>
-
-        <!-- CTA row -->
-        <div class="flex gap-2 mt-2">
-          <button onclick="closeConfirmAndReinvest()" 
-           class="flex-1 gradient-gold text-dark-950 font-semibold py-2.5 rounded-xl text-xs hover:opacity-90 transition">
-            ⚡ Unlock & Grow
-          </button>
-          <button onclick="confirmCurrentWithdrawal(${investmentId})" 
-            class="flex-1 bg-transparent border border-white/20 text-gray-300 py-2.5 rounded-xl text-xs hover:bg-white/5 transition">
-            Just Withdraw
-          </button>
-        </div>
+  document.getElementById('withdraw-confirm-content').innerHTML = `
+    <div class="text-left text-sm space-y-3">
+      <div class="text-center">
+        <p class="text-lg font-bold text-white">🎉 Your Money Has Grown</p>
+        <p class="text-xs text-gray-400 mt-1">Total value: <span class="text-gold-400 font-semibold">₵${totalPayout.toFixed(2)}</span></p>
       </div>
-    `;
-  } else {
+
+      <div class="bg-dark-950/60 rounded-xl p-4 text-center border border-gold-500/30">
+        <p class="text-xs text-gray-400 uppercase tracking-wider">Cash Out Instantly</p>
+        <p class="text-3xl font-black text-green-400 mt-1">₵${amount.toFixed(2)}</p>
+        <p class="text-xs text-green-400/70 mt-1">Sent to your wallet immediately</p>
+      </div>
+
+      <div class="text-center text-xs text-gray-400 mt-3">
+        <p>Your <strong class="text-white">₵${inv.amount.toFixed(2)}</strong> principal is held securely and ready to be reactivated.</p>
+        <p class="text-yellow-400 mt-1">Start a new plan of <strong>₵${inv.amount}</strong> to unlock the full <strong>₵${locked.toFixed(2)}</strong> balance.</p>
+      </div>
+
+      <div class="text-[10px] text-gray-500 text-center italic">${encouragement}</div>
+
+<div class="flex gap-2 mt-2">
+  <button onclick="withdrawConfirmUnlock()" class="flex-1 gradient-gold text-dark-950 font-semibold py-2.5 rounded-xl text-xs hover:opacity-90 transition">
+    ⚡ Unlock & Grow
+  </button>
+  <button onclick="withdrawConfirmJustWithdraw()" class="flex-1 bg-transparent border border-white/20 text-gray-300 py-2.5 rounded-xl text-xs hover:bg-white/5 transition">
+    Just Withdraw
+  </button>
+</div>
+<div class="text-center mt-2">
+  <button onclick="withdrawConfirmMaybeLater()" class="text-gray-500 text-xs hover:text-gray-300 transition">
+    Maybe Later
+  </button>
+</div>
+    </div>
+  `;
+
+  document.getElementById('withdraw-confirm-modal').classList.remove('hidden');
+  document.getElementById('withdraw-confirm-modal').classList.add('flex');
+  return;  
+} else {
     // Subsequent withdrawal – requires qualifying active plan
     const activeInvs = (window.allInvestmentsLocal || []).filter(i => i.status === 'active');
     const highestActiveAmount = activeInvs.length > 0 ? Math.max(...activeInvs.map(i => i.amount)) : 0;
@@ -2580,32 +2581,7 @@ async function requestWithdrawal(investmentId) {
 
   // If user clicked "Just Withdraw" (default OK), process normally
   await processWithdrawal(investmentId, amount);
-}
-
-
-        function closeConfirmAndReinvest() {
-  document.getElementById('custom-confirm-cancel').click();
-  openDepositModal();
-}
-function confirmCurrentWithdrawal(investmentId) {
-  document.getElementById('custom-confirm-ok').click();
-}
-async function processWithdrawal(investmentId, amount) {
-  try {
-    const res = await fetch(`${API_BASE}/api/withdrawals`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-      body: JSON.stringify({ investment_id: investmentId })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      showToast(data.error || 'Withdrawal failed', 'error');
-      return;
-    }
-    showToast(data.message || 'Payout request submitted!', 'success');
-    updateDashboard();
-  } catch (e) { showToast('Connection error', 'error'); }
-}  
+} 
 
 function requestRemainingWithdrawal(investmentId) {
   const inv = window.allInvestmentsLocal.find(i => i.id === investmentId);
@@ -2673,6 +2649,42 @@ function requestRemainingWithdrawal(investmentId) {
         showToast('Referral withdrawal requested!', 'success');
         updateDashboard();
     } catch (e) { showToast('Connection error', 'error'); }
+}
+
+        function withdrawConfirmMaybeLater() {
+  document.getElementById('withdraw-confirm-modal').classList.add('hidden');
+  document.getElementById('withdraw-confirm-modal').classList.remove('flex');
+  window._pendingWithdrawalId = null;
+  window._pendingWithdrawalAmount = null;
+}
+
+        function withdrawConfirmUnlock() {
+  document.getElementById('withdraw-confirm-modal').classList.add('hidden');
+  document.getElementById('withdraw-confirm-modal').classList.remove('flex');
+  openDepositModal();
+}
+
+async function withdrawConfirmJustWithdraw() {
+  document.getElementById('withdraw-confirm-modal').classList.add('hidden');
+  document.getElementById('withdraw-confirm-modal').classList.remove('flex');
+
+  const investmentId = window._pendingWithdrawalId;
+  window._pendingWithdrawalId = null;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/withdrawals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ investment_id: investmentId })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.error || 'Withdrawal failed', 'error');
+      return;
+    }
+    showToast(data.message || 'Payout request submitted!', 'success');
+    updateDashboard();
+  } catch (e) { showToast('Connection error', 'error'); }
 }
 
        function getCurrentEarnings(inv) {
@@ -3485,6 +3497,14 @@ document.addEventListener('DOMContentLoaded', () => {
       <button id="custom-confirm-cancel" class="px-6 py-2 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
       <button id="custom-confirm-ok" class="px-6 py-2 rounded-full gradient-gold text-dark-950 font-semibold text-sm hover:opacity-90 transition">Confirm</button>
     </div>
+  </div>
+</div>
+
+    <!-- Withdrawal Confirm Modal (for first withdrawal) -->
+<div id="withdraw-confirm-modal" class="fixed inset-0 z-[310] hidden items-center justify-center p-4"
+     style="background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-sm p-6 text-center" id="withdraw-confirm-content">
+    <!-- populated by JavaScript -->
   </div>
 </div>
 
