@@ -983,6 +983,10 @@
           Notifications
           <span id="announcement-dot" class="w-2 h-2 rounded-full bg-yellow-400 hidden ml-auto"></span>
         </button>
+          <button onclick="openPlatformStrengthModal()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-300">
+  <i data-lucide="shield-check" class="w-4 h-4 text-gold-400"></i>
+  Why you're safe
+</button>
         <button onclick="updateDashboard(); toggleProfileDropdown()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-300">
           <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-400"></i>
           Refresh
@@ -1502,6 +1506,24 @@
 
     <!-- SCRIPTS -->
     <script>
+
+        function openPlatformStrengthModal() {
+  toggleProfileDropdown();   // close the profile dropdown
+  const modal = document.getElementById('platform-strength-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    lucide.createIcons();
+  }
+}
+
+function closePlatformStrengthModal() {
+  const modal = document.getElementById('platform-strength-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
 
         function toggleProfileDropdown() {
   const dropdown = document.getElementById('profile-dropdown');
@@ -3505,6 +3527,81 @@ document.addEventListener('DOMContentLoaded', () => {
      style="background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
   <div class="glass rounded-2xl w-full max-w-sm p-6 text-center" id="withdraw-confirm-content">
     <!-- populated by JavaScript -->
+  </div>
+</div>
+
+    <!-- Platform Strength Modal -->
+<div id="platform-strength-modal" class="fixed inset-0 z-[330] hidden items-center justify-center p-4"
+     style="background: rgba(0,0,0,0.92); backdrop-filter: blur(12px);">
+  <div class="glass rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6 text-sm text-gray-300 space-y-5">
+    
+    <div class="text-center">
+      <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-lg">
+        <i data-lucide="shield-check" class="w-7 h-7 text-dark-950"></i>
+      </div>
+      <h3 class="text-xl font-bold text-white">Why We’re Still Here</h3>
+      <p class="text-xs text-gray-400 mt-1">Most platforms disappear. We built ours to last — here’s how.</p>
+    </div>
+
+    <!-- Section 1: Sustainable Model -->
+    <div class="bg-dark-950/50 rounded-xl p-4 border border-gold-500/20">
+      <h4 class="text-gold-400 font-semibold flex items-center gap-2 mb-2">
+        <i data-lucide="refresh-cw" class="w-4 h-4"></i> The Reinvestment Cycle
+      </h4>
+      <p class="text-xs leading-relaxed">
+        When your plan matures, you take a portion of your profit as <strong class="text-green-400">instant cashback</strong>. 
+        Your principal stays in the system and keeps growing. This means we <strong class="text-white">never pay out more than we hold</strong>, 
+        and your money always has a job to do. Platforms that let everyone withdraw 100% at once always collapse. We don’t.
+      </p>
+    </div>
+
+    <!-- Section 2: Active Plan Policy -->
+    <div class="bg-dark-950/50 rounded-xl p-4 border border-gold-500/20">
+      <h4 class="text-gold-400 font-semibold flex items-center gap-2 mb-2">
+        <i data-lucide="lock" class="w-4 h-4"></i> Active Plan Protection
+      </h4>
+      <p class="text-xs leading-relaxed">
+        To withdraw your full balance, you need an <strong class="text-white">active investment plan</strong> of at least the same size as your original investment. 
+        This ensures that <strong class="text-white">large withdrawals are always backed by fresh capital</strong>. 
+        It’s the same principle banks use — and it’s why your funds are always available when you need them.
+      </p>
+    </div>
+
+    <!-- Section 3: Instant Cashback -->
+    <div class="bg-dark-950/50 rounded-xl p-4 border border-gold-500/20">
+      <h4 class="text-gold-400 font-semibold flex items-center gap-2 mb-2">
+        <i data-lucide="zap" class="w-4 h-4"></i> Instant Cashback Rewards
+      </h4>
+      <p class="text-xs leading-relaxed">
+        Every time your plan matures, you get <strong class="text-green-400">real cash instantly</strong> — not just numbers on a screen. 
+        Meanwhile, the rest of your funds are already working in your next plan. 
+        You earn, you withdraw, and your principal keeps building. It’s the smartest way to grow wealth without risking the platform.
+      </p>
+    </div>
+
+    <!-- Section 4: Referral & VIP -->
+    <div class="bg-dark-950/50 rounded-xl p-4 border border-gold-500/20">
+      <h4 class="text-gold-400 font-semibold flex items-center gap-2 mb-2">
+        <i data-lucide="users" class="w-4 h-4"></i> Community Power
+      </h4>
+      <p class="text-xs leading-relaxed">
+        Our members earn <strong class="text-green-400">₵15 per referral</strong>, and VIP members enjoy boosted bonuses, 
+        priority support, and exclusive perks. The more you share, the more you earn — 
+        and a growing community keeps the platform strong for everyone.
+      </p>
+    </div>
+
+    <!-- Section 5: The Bottom Line -->
+    <div class="bg-gradient-to-r from-gold-500/10 to-transparent rounded-xl p-4 border border-gold-500/30">
+      <p class="text-xs text-gold-400 font-semibold text-center">
+        This is why we’ve paid out millions and kept growing — while others shut down. 
+        Your money is safe, your rewards are real, and your future is bright.
+      </p>
+    </div>
+
+    <button onclick="closePlatformStrengthModal()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">
+      Got It
+    </button>
   </div>
 </div>
 
