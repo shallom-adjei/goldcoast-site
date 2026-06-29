@@ -2354,7 +2354,11 @@ if (investments.length === 0) {
   let remainingHtml = '';
   if (remaining > 0) {
     remainingHtml = `<div class="text-yellow-400 text-[10px] mt-1">₵${formatNumber(remaining)} available with next plan</div>`;
-    const hasActive = (window.allInvestmentsLocal || []).some(i => i.status === 'active');
+    const activeInvs = (window.allInvestmentsLocal || []).filter(i => i.status === 'active');
+const highestActiveAmount = activeInvs.length > 0
+  ? Math.max(...activeInvs.map(i => i.amount))
+  : 0;
+const hasQualifyingActive = highestActiveAmount >= inv.amount;
     if (hasActive) {
       remainingHtml += `<button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Withdraw</button>`;
     } else {
@@ -2429,7 +2433,11 @@ if (investments.length === 0) {
   let remainingHtml = '';
   if (remaining > 0) {
     remainingHtml = `<div class="text-yellow-400 text-[10px] mt-1">₵${formatNumber(remaining)} available with next plan</div>`;
-    const hasActive = (window.allInvestmentsLocal || []).some(i => i.status === 'active');
+    const activeInvs = (window.allInvestmentsLocal || []).filter(i => i.status === 'active');
+const highestActiveAmount = activeInvs.length > 0
+  ? Math.max(...activeInvs.map(i => i.amount))
+  : 0;
+const hasQualifyingActive = highestActiveAmount >= inv.amount;
     if (hasActive) {
       remainingHtml += `<button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Withdraw</button>`;
     } else {
@@ -2472,12 +2480,13 @@ document.getElementById('dashboard-loader').classList.add('hidden');
             window.allWithdrawalsLocal = withdrawals;
         }
 
-      async function requestWithdrawal(investmentId) {
+async function requestWithdrawal(investmentId) {
   const inv = window.allInvestmentsLocal.find(i => i.id === investmentId);
   if (!inv) return;
 
   const rate = returnRates[inv.plan] || 1;
   const totalPayout = inv.amount * (1 + rate);
+  const originalDeposit = inv.amount;
 
   const alreadyWithdrawn = (window.allWithdrawalsLocal || [])
     .filter(w => w.investment_id === investmentId && w.status !== 'rejected')
@@ -2489,9 +2498,22 @@ document.getElementById('dashboard-loader').classList.add('hidden');
     return;
   }
 
-  const hasActive = (window.allInvestmentsLocal || []).some(i => i.status === 'active');
-  const amount = hasActive ? maxWithdrawable : Math.floor(maxWithdrawable * 0.4 * 100) / 100;
+  // Find the highest active plan amount
+  const activeInvs = (window.allInvestmentsLocal || []).filter(i => i.status === 'active');
+  const highestActiveAmount = activeInvs.length > 0
+    ? Math.max(...activeInvs.map(i => i.amount))
+    : 0;
+
+  const hasQualifyingActive = highestActiveAmount >= originalDeposit;
+  const amount = hasQualifyingActive ? maxWithdrawable : Math.floor(maxWithdrawable * 0.4 * 100) / 100;
   const locked = maxWithdrawable - amount;
+
+  let note = '';
+  if (!hasQualifyingActive && highestActiveAmount > 0) {
+    note = `Your active plan (₵${highestActiveAmount}) is smaller than your original deposit (₵${originalDeposit}). Start a new plan of at least ₵${originalDeposit} to unlock the full amount.`;
+  } else if (!hasQualifyingActive) {
+    note = `Start a new plan of at least ₵${originalDeposit} to unlock the remaining ₵${locked.toFixed(2)}.`;
+  }
 
   const confirmMessage = `
     <div class="text-left text-sm space-y-2">
@@ -2499,8 +2521,8 @@ document.getElementById('dashboard-loader').classList.add('hidden');
       <p>Total payout: <span class="text-gold-400">₵${totalPayout.toFixed(2)}</span></p>
       ${alreadyWithdrawn > 0 ? `<p>Already withdrawn: <span class="text-gray-400">₵${alreadyWithdrawn.toFixed(2)}</span></p>` : ''}
       <p>You will receive now: <span class="text-green-400 font-bold">₵${amount.toFixed(2)}</span></p>
-      ${!hasActive ? `<p class="text-yellow-400">₵${locked.toFixed(2)} Kept until you start a new active plan (min ₵200).</p>` : ''}
-      <p class="text-xs text-gray-500 mt-2">${hasActive ? 'You have an active plan – 100% available.' : 'Start a new plan to unlock the remaining 60%.'}</p>
+      ${!hasQualifyingActive ? `<p class="text-yellow-400">₵${locked.toFixed(2)} locked until you start a new plan of at least ₵${originalDeposit}.</p>` : ''}
+      ${note ? `<p class="text-xs text-gray-400 mt-2">${note}</p>` : ''}
       <p class="text-xs text-gray-500">Proceed with withdrawal?</p>
     </div>
   `;
@@ -2523,17 +2545,29 @@ document.getElementById('dashboard-loader').classList.add('hidden');
   } catch (e) { showToast('Connection error', 'error'); }
 }
 
-        function requestRemainingWithdrawal(investmentId) {
-  const hasActive = (window.allInvestmentsLocal || []).some(i => i.status === 'active');
-  if (!hasActive) {
-    // Show lock explanation modal
+function requestRemainingWithdrawal(investmentId) {
+  const inv = window.allInvestmentsLocal.find(i => i.id === investmentId);
+  if (!inv) return;
+
+  const originalDeposit = inv.amount;
+  const activeInvs = (window.allInvestmentsLocal || []).filter(i => i.status === 'active');
+  const highestActiveAmount = activeInvs.length > 0
+    ? Math.max(...activeInvs.map(i => i.amount))
+    : 0;
+
+  if (highestActiveAmount >= originalDeposit) {
+    // Qualifying active plan – proceed with normal withdrawal
+    requestWithdrawal(investmentId);
+  } else {
+    // Show lock modal with required amount
     const modal = document.getElementById('lock-info-modal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    return;
+    if (modal) {
+      document.getElementById('lock-info-message').innerHTML =
+        `To unlock your remaining balance, you need an active plan of at least <strong>₵${originalDeposit}</strong>.<br><br>Your original investment was ₵${originalDeposit}. Start a new plan now to access your funds.`;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
   }
-  // If active, just proceed with normal withdrawal
-  requestWithdrawal(investmentId);
 }
 
     async function requestGameRewardWithdrawal() {
