@@ -2359,7 +2359,7 @@ const highestActiveAmount = activeInvs.length > 0
   ? Math.max(...activeInvs.map(i => i.amount))
   : 0;
 const hasQualifyingActive = highestActiveAmount >= inv.amount;
-    if (hasActive) {
+    if (hasQualifyingActive) {
       remainingHtml += `<button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Withdraw</button>`;
     } else {
       remainingHtml += `<button onclick="requestRemainingWithdrawal(${inv.id})" class="bg-purple-600/50 text-white/70 rounded-lg px-3 py-1 text-xs flex items-center gap-1 mt-1 cursor-pointer">
@@ -2438,7 +2438,7 @@ const highestActiveAmount = activeInvs.length > 0
   ? Math.max(...activeInvs.map(i => i.amount))
   : 0;
 const hasQualifyingActive = highestActiveAmount >= inv.amount;
-    if (hasActive) {
+    if (hasQualifyingActive) {
       remainingHtml += `<button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">Withdraw</button>`;
     } else {
       remainingHtml += `<button onclick="requestRemainingWithdrawal(${inv.id})" class="bg-purple-600/50 text-white/70 rounded-lg px-3 py-1 text-xs flex items-center gap-1 mt-1 cursor-pointer">
