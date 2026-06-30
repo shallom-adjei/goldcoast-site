@@ -3,37 +3,37 @@ const leadershipTeam = [
   {
     name: "Kwame Asare",
     role: "Investment Operations Director",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
+    img: "https://unsplash.com/photos/a-man-drinking-from-a-cup-bYvCRHzsLrk",
     bio: "Kwame oversees all investment operations, from deposit verification to payout processing. With over a decade in financial services, he ensures every transaction is handled with precision and transparency."
   },
   {
-    name: "Akosua Mensah",
+    name: "Freda Mensah",
     role: "Head of Member Support",
-    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face",
+    img: "https://unsplash.com/photos/a-woman-in-a-white-shirt-posing-for-a-picture-dQyfiYNJoHw",
     bio: "Akosua leads our 24/7 support team, making sure every question or concern is answered promptly and empathetically. Her team is the human face behind the platform."
   },
   {
     name: "Yaw Boateng",
     role: "Technology & Security Director",
-    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
+    img: "https://unsplash.com/photos/a-man-with-a-beard-wearing-a-green-shirt-GEIgcTeiaOI",
     bio: "Yaw is responsible for the platform's entire technical infrastructure and cybersecurity. With over 12 years in software engineering, your data and funds are protected by enterprise‑grade security."
   },
   {
-    name: "Efua Danso",
+    name: "Rebecca Danso",
     role: "Investment Strategy Advisor",
-    img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face",
+    img: "https://unsplash.com/photos/a-woman-standing-in-front-of-a-laptop-computer-D8Xxi_I77w4",
     bio: "Efua designs the strategic frameworks behind our investment plans, bonus structures, and reinvestment incentives. An MBA in Finance, she crafts policies that balance generous returns with long‑term stability."
   },
   {
     name: "Kofi Agyeman",
     role: "Community Manager",
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face",
+    img: "https://unsplash.com/photos/a-man-with-his-arms-crossed-wearing-a-white-robe-zZXtbRU_mc0",
     bio: "Kofi is the heartbeat of our Telegram community. He curates daily content, runs our Lucky Spin and Mystery Box events, and celebrates every member's milestones."
   },
   {
     name: "Richard Mensah",
     role: "Portfolio Risk Manager",
-    img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face",
+    img: "https://unsplash.com/photos/a-man-in-a-blue-suit-smiles-for-the-camera-7TI-3jUObYg",
     bio: "Richard monitors the platform's overall financial health, analyzing cash flow, exposure, and liquidity across all active plans. His vigilance keeps the platform balanced and your investments secure."
   },
   {
@@ -51,13 +51,13 @@ const leadershipTeam = [
   {
     name: "Sophia Anderson",
     role: "Client Relations Director",
-    img: "https://images.unsplash.com/photo-1489424731084-a5d8b403a541?w=200&h=200&fit=crop&crop=face",
+    img: "https://unsplash.com/photos/woman-with-dark-hair-wearing-a-black-turtleneck-and-necklace-OS8ax0WNzWc",
     bio: "Sophia oversees relationships with our most valued members. Her background in luxury hospitality and private banking brings a personal touch rarely seen in digital platforms."
   },
   {
     name: "Michael Osei",
     role: "Head of Product Development",
-    img: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=200&h=200&fit=crop&crop=face",
+    img: "https://unsplash.com/photos/derek-fisher-d0peGya6R5Y",
     bio: "Michael leads the team that designs and refines every feature on the platform. From the reinvestment modal to the live portfolio chart, he turns complex requirements into elegant, user‑friendly experiences."
   }
 ];
