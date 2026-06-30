@@ -48,7 +48,7 @@
 }
 .carousel-wrapper::before { left: 0; background: linear-gradient(to right, #0a0a12, transparent); }
 .carousel-wrapper::after { right: 0; background: linear-gradient(to left, #0a0a12, transparent); }
-@media (max-width: 640px) { .carousel-track { animation-duration: 40s; } }
+@media (max-width: 640px) { .carousel-track { animation-duration: 60s; } }
 
         .payout-popup-premium {
   position: fixed;
@@ -578,8 +578,8 @@
             </div>
         </nav>
 
-        <!-- Hero Section -->
-<section class="relative min-h-screen flex items-center overflow-hidden pt-24 sm:pt-28 pb-10">
+<!-- Hero Section -->
+<section class="relative min-h-screen flex flex-col items-center overflow-hidden pt-24 sm:pt-28 pb-10">
     <div class="absolute inset-0">
         <div class="absolute top-20 left-10 w-72 h-72 bg-gold-500/10 rounded-full blur-[100px] animate-float"></div>
         <div class="absolute bottom-20 right-10 w-96 h-96 bg-gold-600/5 rounded-full blur-[120px] animate-float-delay"></div>
@@ -587,6 +587,7 @@
     </div>
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Left column (text + buttons + mobile card) -->
             <div class="text-center lg:text-left">
     <div class="inline-flex items-center gap-2 glass-gold rounded-full px-4 py-2 mb-4">
         <div class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></div>
@@ -607,7 +608,7 @@
         </button>
     </div>
 
-    <!-- Mobile Portfolio Card (hidden on lg and up) -->
+    <!-- Mobile Portfolio Card (visible only on mobile) -->
     <div class="lg:hidden mt-8">
         <div class="glass rounded-3xl p-6 max-w-xs mx-auto animate-float">
             <div class="flex items-center justify-between mb-4">
@@ -632,6 +633,8 @@
         </div>
     </div>
 </div>
+
+            <!-- Right column (desktop portfolio card only) -->
             <div class="hidden lg:block">
                 <div class="relative">
                     <div class="glass rounded-3xl p-8 max-w-md mx-auto animate-float">
@@ -672,13 +675,14 @@
                     </div>
                 </div>
             </div>
-            <!-- Leadership Carousel -->
-<div class="mt-10 relative w-full max-w-full overflow-hidden" id="leadership-carousel-container">
-  <h4 class="text-center lg:text-left text-xs text-gray-500 uppercase tracking-widest mb-4">Our Leadership Team</h4>
-  <div class="carousel-wrapper relative">
-    <div class="carousel-track flex gap-5" id="leadershipTrack"></div>
-  </div>
-</div>
+        </div>
+
+        <!-- Leadership Carousel – full width below the grid -->
+        <div class="mt-12 relative w-full max-w-full overflow-hidden" id="leadership-carousel-container">
+            <h4 class="text-center text-xs text-gray-500 uppercase tracking-widest mb-4">Our Leadership Team</h4>
+            <div class="carousel-wrapper relative">
+                <div class="carousel-track flex gap-5" id="leadershipTrack"></div>
+            </div>
         </div>
     </div>
 </section>
