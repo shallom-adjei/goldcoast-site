@@ -24,6 +24,31 @@
     </script>
     <style>
 
+        .leadership-card {
+  width: 220px;          
+}
+@media (min-width: 640px) {
+  .leadership-card {
+    width: 260px;       
+  }
+}
+.leadership-card h5 {
+  font-size: 0.95rem;  
+}
+@media (min-width: 640px) {
+  .leadership-card h5 {
+    font-size: 1rem;
+  }
+}
+.leadership-card p {
+  font-size: 0.65rem;
+}
+@media (min-width: 640px) {
+  .leadership-card p {
+    font-size: 0.7rem;
+  }
+}
+
         .carousel-wrapper { overflow: hidden; position: relative; }
 .carousel-track {
   display: flex;
@@ -1551,7 +1576,7 @@
   if (!track || typeof leadershipTeam === 'undefined') return;
 
   const cardsHTML = leadershipTeam.map(member => `
-    <div class="glass-premium rounded-2xl p-5 text-center flex-shrink-0" style="width: 260px;">
+    <div class="leadership-card glass-premium rounded-2xl p-4 sm:p-5 text-center flex-shrink-0">
       <img src="${member.img}" alt="${member.name}" class="w-20 h-20 rounded-full mx-auto mb-3 object-cover border-2 border-gold-400/30">
       <h5 class="text-base font-bold text-white">${member.name}</h5>
       <p class="text-gold-400 text-xs font-semibold mb-2">${member.role}</p>
