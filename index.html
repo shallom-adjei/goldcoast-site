@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="team-data.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>" />
     <script>
@@ -22,6 +23,32 @@
         }
     </script>
     <style>
+
+        .carousel-wrapper { overflow: hidden; position: relative; }
+.carousel-track {
+  display: flex;
+  gap: 1.25rem;
+  width: max-content;
+  animation: scrollLeadership 60s linear infinite;
+}
+@keyframes scrollLeadership {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.carousel-wrapper:hover .carousel-track { animation-play-state: paused; }
+/* Fade edges */
+.carousel-wrapper::before,
+.carousel-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+.carousel-wrapper::before { left: 0; background: linear-gradient(to right, #0a0a12, transparent); }
+.carousel-wrapper::after { right: 0; background: linear-gradient(to left, #0a0a12, transparent); }
+@media (max-width: 640px) { .carousel-track { animation-duration: 40s; } }
 
         .payout-popup-premium {
   position: fixed;
@@ -645,6 +672,13 @@
                     </div>
                 </div>
             </div>
+            <!-- Leadership Carousel -->
+<div class="mt-10 relative w-full max-w-full overflow-hidden" id="leadership-carousel-container">
+  <h4 class="text-center lg:text-left text-xs text-gray-500 uppercase tracking-widest mb-4">Our Leadership Team</h4>
+  <div class="carousel-wrapper relative">
+    <div class="carousel-track flex gap-5" id="leadershipTrack"></div>
+  </div>
+</div>
         </div>
     </div>
 </section>
@@ -799,7 +833,6 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <p class="text-gray-500 text-sm">© 2026 Gold Coast Capital. All rights reserved.</p>
         <a href="terms.html" class="text-gray-500 text-xs hover:text-gray-400 hover:underline mt-2 inline-block">Terms of Service & Privacy Policy</a>
-        <a href="team.html" class="text-gray-500 text-xs hover:text-gray-400 hover:underline mt-2 inline-block">Our Team</a>
     </div>
 </footer>
         
@@ -1508,6 +1541,25 @@
 
     <!-- SCRIPTS -->
     <script>
+
+        function initLeadershipCarousel() {
+  const track = document.getElementById('leadershipTrack');
+  if (!track || typeof leadershipTeam === 'undefined') return;
+
+  const cardsHTML = leadershipTeam.map(member => `
+    <div class="glass-premium rounded-2xl p-5 text-center flex-shrink-0" style="width: 260px;">
+      <img src="${member.img}" alt="${member.name}" class="w-20 h-20 rounded-full mx-auto mb-3 object-cover border-2 border-gold-400/30">
+      <h5 class="text-base font-bold text-white">${member.name}</h5>
+      <p class="text-gold-400 text-xs font-semibold mb-2">${member.role}</p>
+      <p class="text-gray-400 text-[11px] leading-relaxed">${member.bio}</p>
+    </div>
+  `).join('');
+
+  // Duplicate for seamless loop
+  track.innerHTML = cardsHTML + cardsHTML;
+}
+
+document.addEventListener('DOMContentLoaded', initLeadershipCarousel);
 
         function openPlatformStrengthModal() {
   toggleProfileDropdown();   // close the profile dropdown
