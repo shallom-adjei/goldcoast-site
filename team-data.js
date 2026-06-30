@@ -10,7 +10,7 @@ const leadershipTeam = [
     name: "Freda Mensah",
     role: "Head of Member Support",
     img: "images/team/akosua.jpg",
-    bio: "Akosua leads our 24/7 support team, making sure every question or concern is answered promptly and empathetically. Her team is the human face behind the platform."
+    bio: "Freda leads our 24/7 support team, making sure every question or concern is answered promptly and empathetically. Her team is the human face behind the platform."
   },
   {
     name: "Yaw Boateng",
@@ -22,7 +22,7 @@ const leadershipTeam = [
     name: "Rebecca Danso",
     role: "Investment Strategy Advisor",
     img: "images/team/efua.jpg",
-    bio: "Efua designs the strategic frameworks behind our investment plans, bonus structures, and reinvestment incentives. An MBA in Finance, she crafts policies that balance generous returns with long‑term stability."
+    bio: "Rebecca designs the strategic frameworks behind our investment plans, bonus structures, and reinvestment incentives. An MBA in Finance, she crafts policies that balance generous returns with long‑term stability."
   },
   {
     name: "Kofi Agyeman",
