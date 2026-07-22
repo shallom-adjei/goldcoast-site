@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Gold Coast Capital - Smart Investments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="team-data.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {50:'#FFF9E6',100:'#FFF0B3',200:'#FFE680',300:'#FFDB4D',400:'#FFD11A',500:'#D4A017',600:'#B8860B',700:'#8B6914',800:'#5E4B1E',900:'#312A14'},
+                        dark: {50:'#f7f7f8',100:'#eeeef0',200:'#d9d9de',300:'#b8b8c1',400:'#92929e',500:'#747482',600:'#5d5d6b',700:'#4c4c58',800:'#1a1a2e',900:'#0f0f1a',950:'#0a0a12'}
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+
+        #investor-count-fixed {
+  animation: softPulse 3s ease-in-out infinite;
+}
+@keyframes softPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255,210,90,0.15); }
+  50% { box-shadow: 0 0 25px rgba(255,210,90,0.25); }
+}
+
+        #investor-count-fixed {
+  animation: softPulse 3s ease-in-out infinite;
+}
+@keyframes softPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255,210,90,0.15); }
+  50% { box-shadow: 0 0 25px rgba(255,210,90,0.25); }
+}
+
+        /* Badge glow pulse */
+.investor-badge {
+  animation: badgeGlow 2.5s ease-in-out infinite;
+}
+@keyframes badgeGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(255,210,90,0.1); }
+  50% { box-shadow: 0 0 30px rgba(255,210,90,0.3); }
+}
+
+/* Shimmer sweep */
+.badge-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,215,0,0.2), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 3s infinite;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* Icon spin on hover (or continuously) */
+.icon-spin-wrapper {
+  animation: iconPulse 3s ease-in-out infinite;
+}
+.icon-spin {
+  animation: iconSpin 4s linear infinite;
+}
+@keyframes iconSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* Count-up effect for the number */
+.count-number {
+  display: inline-block;
+}
+
+        @media (max-width: 640px) {
+  .stat-card {
+    padding: 0.75rem !important;       
+  }
+  .stat-card .text-xl {
+    font-size: 1.05rem !important;     
+    line-height: 1.2;
+  }
+  .stat-card .text-xs {
+    font-size: 0.65rem !important;     
+  }
+  .stat-card svg, .stat-card i {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .stat-card .pl-3 {
+    padding-left: 0.5rem !important;    /* less left padding after the accent bar */
+  }
+}
+
+        #promo-bubble {
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 18px rgba(255,215,0,0.4), 0 8px 24px rgba(0,0,0,0.5);
+}
+
+        .leadership-card {
+  width: 220px;          
+}
+@media (min-width: 640px) {
+  .leadership-card {
+    width: 260px;       
+  }
+}
+.leadership-card h5 {
+  font-size: 0.95rem;  
+}
+@media (min-width: 640px) {
+  .leadership-card h5 {
+    font-size: 1rem;
+  }
+}
+.leadership-card p {
+  font-size: 0.65rem;
+}
+@media (min-width: 640px) {
+  .leadership-card p {
+    font-size: 0.7rem;
+  }
+}
+
+        .carousel-wrapper { overflow: hidden; position: relative; }
+.carousel-track {
+  display: flex;
+  gap: 1.25rem;
+  width: max-content;
+  animation: scrollLeadership 60s linear infinite;
+}
+@keyframes scrollLeadership {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.carousel-wrapper:hover .carousel-track { animation-play-state: paused; }
+/* Fade edges */
+.carousel-wrapper::before,
+.carousel-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+.carousel-wrapper::before { left: 0; background: linear-gradient(to right, #0a0a12, transparent); }
+.carousel-wrapper::after { right: 0; background: linear-gradient(to left, #0a0a12, transparent); }
+@media (max-width: 640px) { .carousel-track { animation-duration: 100s; } }
+
+        .payout-popup-premium {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(10,10,18,0.98);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 20px;
+  padding: 14px 20px;
+  color: white;
+  z-index: 1000;
+  box-shadow: 0 0 40px rgba(255,215,0,0.15), 0 8px 32px rgba(0,0,0,0.4);
+  animation: payoutSlideUp 0.6s ease, payoutFadeOut 0.5s ease 4.5s forwards;
+  max-width: 95vw;
+}
+
+        html {
+  scroll-behavior: smooth;
+}
+#starter-limit-modal .glass {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+/* Promote heavy animated elements to the GPU */
+.logo-orbit,
+.logo-star,
+.anniversary-badge,
+.anniversary-shimmer::before,
+.chart-card-premium::after,
+.leaderboard-card .animate-\[luxurySweep_12s_linear_infinite\] {
+  will-change: transform, opacity;
+}
+
+/* Reduce blur strength on backdrop cards for better performance */
+.glass-premium,
+.leaderboard-card,
+.chart-card-premium {
+  backdrop-filter: blur(16px); /* was 20px–24px, still looks premium but lighter */
+}
+
+        .tier-badge.text-gold-400 { color: #fbbf24; }
+.tier-badge.border-gold-500\/30 { border-color: rgba(245,158,11,0.3); }
+.tier-badge.bg-gold-500\/10 { background: rgba(245,158,11,0.1); }
+
+.tier-badge.text-gray-300 { color: #d1d5db; }
+.tier-badge.border-gray-400\/30 { border-color: rgba(156,163,175,0.3); }
+.tier-badge.bg-gray-500\/10 { background: rgba(107,114,128,0.1); }
+
+.tier-badge.text-amber-400 { color: #f59e0b; }
+.tier-badge.border-amber-500\/30 { border-color: rgba(245,158,11,0.3); }
+.tier-badge.bg-amber-500\/10 { background: rgba(245,158,11,0.1); }
+
+.tier-badge.text-emerald-400 { color: #34d399; }
+.tier-badge.border-emerald-500\/30 { border-color: rgba(16,185,129,0.3); }
+.tier-badge.bg-emerald-500\/10 { background: rgba(16,185,129,0.1); }
+
+.tier-badge.text-gray-500 { color: #6b7280; }
+.tier-badge.border-gray-500\/30 { border-color: rgba(107,114,128,0.3); }
+.tier-badge.bg-gray-500\/5 { background: rgba(107,114,128,0.05); }
+
+        /* ── Luxury Logo Medallion ── */
+.logo-core {
+  /* styles already inline for gradient + shadow; keep as fallback */
+}
+
+@keyframes logoOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes logoSparkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ── Brand Name Engraved Gold ── */
+.brand-name {
+  background: linear-gradient(180deg, #fff8d8 0%, #ffd24a 40%, #c58d00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Moving gold reflection across the name */
+.brand-name::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -200%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
+  transform: skewX(-20deg);
+  animation: nameSweep 8s linear infinite;
+}
+
+@keyframes nameSweep {
+  from { left: -200%; }
+  to { left: 300%; }
+}
+
+/* Floating crown (anniversary) */
+@keyframes crownFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+        @media (max-width: 640px) {
+  .anniversary-badge {
+    animation: anniversaryPulse 3s ease-in-out infinite; /* drop float */
+  }
+}
+
+        /* ── Anniversary Badge Core ── */
+.anniversary-badge {
+  position: relative;
+  overflow: visible;          /* allow sparkles outside */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1.2rem;
+  border-radius: 9999px;
+
+  background: linear-gradient(135deg, #fff9df 0%, #ffe08a 25%, #ffc93c 50%, #d89a00 100%);
+  border: 1px solid rgba(255,240,180,.8);
+  box-shadow: 0 0 20px rgba(255,210,90,.25), 0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.75);
+
+  animation: anniversaryFloat 5s ease-in-out infinite,
+             anniversaryPulse 3s ease-in-out infinite;
+}
+
+/* Gentle float */
+@keyframes anniversaryFloat {
+  0%,100% { transform: translateY(0px); }
+  25% { transform: translateY(-3px); }
+  50% { transform: translateY(-6px); }
+  75% { transform: translateY(-2px); }
+}
+
+/* Glow pulse */
+@keyframes anniversaryPulse {
+  0%,100% { box-shadow: 0 0 20px rgba(255,210,90,.25), 0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.75); }
+  50% { box-shadow: 0 0 35px rgba(255,210,90,.55), 0 12px 30px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.9); }
+}
+        .ml-13 {
+  margin-left: 3.25rem; /* aligns text with the icon */
+}
+
+/* Moving shimmer overlay */
+.anniversary-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+.anniversary-shimmer::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -150%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  transform: rotate(25deg);
+  animation: anniversarySweep 4s linear infinite;
+}
+@keyframes anniversarySweep {
+  from { left: -150%; }
+  to { left: 250%; }
+}
+
+/* Tiny floating sparkles */
+.sparkle {
+  position: absolute;
+  color: #fff6b0;
+  font-size: 10px;
+  pointer-events: none;
+  text-shadow: 0 0 6px rgba(255,215,0,0.6);
+}
+.sparkle-1 {
+  top: -6px;
+  left: 15%;
+  animation: sparkleFloat 2s infinite;
+}
+.sparkle-2 {
+  top: -10px;
+  right: 20%;
+  animation: sparkleFloat 2.5s infinite 0.3s;
+}
+.sparkle-3 {
+  bottom: -6px;
+  right: 30%;
+  animation: sparkleFloat 3s infinite 0.7s;
+}
+@keyframes sparkleFloat {
+  0%,100% { opacity: 0.4; transform: translateY(0) scale(0.8); }
+  50% { opacity: 1; transform: translateY(-4px) scale(1.2); }
+}
+
+/* Chip for "1ST YEAR" */
+.anniversary-chip {
+  font-size: 10px;
+  font-weight: 900;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(0,0,0,0.1);
+  color: #5c3d00;
+  letter-spacing: 0.12em;
+}
+
+        /* Anniversary badge luxury style */
+.anniversary-badge {
+  background: linear-gradient(135deg, #fff9df 0%, #ffe08a 25%, #ffc93c 50%, #d89a00 100%);
+  border: 1px solid rgba(255,240,180,.8);
+  box-shadow: 0 0 20px rgba(255,210,90,.25), 0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.75);
+  animation: anniversaryPulse 3s ease-in-out infinite;
+}
+
+@keyframes anniversaryPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255,210,90,.25), 0 8px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.75);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(255,210,90,.55), 0 12px 30px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.9);
+  }
+}
+
+.anniversary-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.anniversary-shimmer::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -150%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  transform: rotate(25deg);
+  animation: anniversarySweep 4s linear infinite;
+}
+
+@keyframes anniversarySweep {
+  from { left: -150%; }
+  to { left: 250%; }
+}
+        
+
+         .chart-card-premium {
+    background: radial-gradient(circle at top left, rgba(255,215,120,0.12), transparent 50%),
+                linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,215,120,0.10);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06),
+                0 20px 50px rgba(0,0,0,0.4),
+                0 0 40px rgba(255,200,70,0.05);
+  }
+
+        /* Promote heavy layers to GPU */
+.leaderboard-card .animate-\[luxurySweep_8s_linear_infinite\],
+.chart-card-premium::after {
+  will-change: transform;
+}
+.glass-premium, .leaderboard-card, .chart-card-premium {
+  transform: translateZ(0);
+}
+  @keyframes sweep {
+    from { transform: translateX(-200%); }
+    to { transform: translateX(300%); }
+  }
+
+        .collapsible-content {
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  max-height: 2000px; /* large enough to show content */
+  opacity: 1;
+}
+.collapsible-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+        .glass-premium {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,215,120,0.10);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.05);
+  border-radius: 1.25rem;
+}
+
+        .animate-pulse-gold { animation: pulseGold 2s ease-in-out infinite; }
+@keyframes pulseGold { 0%,100% { box-shadow: 0 0 0 0 rgba(212,160,23,0.4); } 50% { box-shadow: 0 0 20px 10px rgba(212,160,23,0.1); } }
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+        @keyframes vip-shimmer {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(250%); }
+}
+/* Leaderboard Card Ambient Lighting */
+.leaderboard-card {
+  position: relative;
+  background:
+    radial-gradient(circle at top left, rgba(255,215,120,0.12), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,215,120,0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 20px 60px rgba(0,0,0,0.45),
+    0 0 60px rgba(255,200,70,0.08);
+}
+
+/* Moving gold reflection */
+@keyframes luxurySweep {
+  0% { transform: translateX(-200%); }
+  100% { transform: translateX(300%); }
+}
+
+/* Rank chips */
+.rank-chip {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+.rank-chip.gold {
+  background: linear-gradient(180deg, #fff3bf, #d8a423);
+  color: #1f1700;
+  box-shadow: 0 0 20px rgba(255,215,80,0.25);
+}
+.rank-chip.silver {
+  background: linear-gradient(180deg, #e0e0e0, #9e9e9e);
+  color: #1f1f1f;
+  box-shadow: 0 0 16px rgba(200,200,200,0.2);
+}
+.rank-chip.bronze {
+  background: linear-gradient(180deg, #f6c28b, #b87333);
+  color: #2d1800;
+  box-shadow: 0 0 14px rgba(184,115,51,0.2);
+}
+.rank-chip.default {
+  background: rgba(255,255,255,0.05);
+  color: #9ca3af;
+}
+
+/* Bonus pill */
+.bonus-pill {
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,215,100,0.16), rgba(255,180,0,0.08));
+  border: 1px solid rgba(255,215,100,0.2);
+  color: #ffd76a;
+  font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* Tier badges */
+.tier-badge {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255,215,100,0.1);
+  color: #ffd76a;
+  border: 1px solid rgba(255,215,100,0.2);
+}
+
+/* Champion row */
+.leaderboard-champion {
+  position: relative;
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255,223,120,0.18), rgba(255,170,0,0.08));
+  border: 1px solid rgba(255,223,120,0.28);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 0 40px rgba(255,215,80,0.12);
+}
+.champion-badge {
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  font-weight: 900;
+  color: #ffd86a;
+}
+@keyframes gentleBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.animate-bounce-gentle {
+  animation: gentleBounce 1.5s ease-in-out infinite;
+}        
+
+        body { font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        .glass-gold { background: rgba(212,160,23,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(212,160,23,0.2); }
+        .gradient-gold { background: linear-gradient(135deg, #D4A017, #FFD11A, #B8860B); }
+        .gradient-dark { background: linear-gradient(180deg, #0a0a12 0%, #1a1a2e 100%); }
+        .text-gradient {
+    background: linear-gradient(135deg, #FFD11A, #D4A017, #B8860B);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-float-delay { animation: float 6s ease-in-out 2s infinite; }
+        @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .page { display: none; }
+        .page.active { display: block; }
+        input:focus { outline: none; box-shadow: 0 0 0 2px rgba(212,160,23,0.5); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a12; }
+        ::-webkit-scrollbar-thumb { background: #D4A017; border-radius: 3px; }
+        .stat-card:hover { transform: translateY(-4px); }
+        .nav-link { position: relative; }
+        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, #D4A017, #FFD11A); transition: width 0.3s; }
+        .nav-link:hover::after { width: 100%; }
+        .toast { animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { transform: translateX(100%); opacity: 0; } }
+
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        .payout-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10,10,18,0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212,160,23,0.4);
+            border-radius: 16px;
+            padding: 12px 20px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(212,160,23,0.2);
+            animation: payoutSlideUp 0.6s ease, payoutFadeOut 0.5s ease 4.5s forwards;
+            max-width: 90vw;
+        }
+        button.glass-gold { background: rgba(212,160,23,0.08); border: 1px solid rgba(212,160,23,0.2); }
+        @keyframes payoutSlideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes payoutFadeOut { to { transform: translateY(100%); opacity: 0; } }
+        /* Telegram pulse animation */
+@keyframes telegramPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,136,204,0.7); }
+    50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0,136,204,0); }
+}
+.telegram-float {
+    animation: telegramPulse 2s infinite;
+}
+    </style>
+</head>
+<body class="bg-dark-950 text-white min-h-screen">
+    <!-- Telegram Support - shows on all pages -->
+<a href="https://t.me/+xxDIWBZBy4A0NmU0" target="_blank" 
+   class="fixed bottom-24 left-5 z-50 flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition-all hover:scale-110 telegram-float"
+   style="background: #0088cc;" title="Join our Telegram">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="22" height="22">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.93 1.23-5.46 3.62-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.24.37-.49 1.02-.74 3.98-1.73 6.64-2.87 7.98-3.42 3.8-1.58 4.59-1.85 5.1-1.86.11 0 .37.03.54.17.14.12.18.28.2.45.02.16.04.53.03.55z"/>
+    </svg>
+</a>
+   <div id="toast-container" class="fixed top-4 right-4 z-[300] flex flex-col gap-2"></div>
+
+    <!-- ========== LANDING PAGE ========== -->
+    <div id="page-landing" class="page active">
+        <nav class="fixed top-0 w-full z-50 transition-all duration-300" id="navbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16 sm:h-20">
+                    <div class="flex items-center gap-2">
+                       <!-- Logo Medallion -->
+<div class="logo-mark relative w-11 h-11 sm:w-12 sm:h-12">
+  <span class="logo-orbit absolute inset-[-4px] rounded-full border border-gold-400/30 animate-[logoOrbit_14s_linear_infinite]"></span>
+  <div class="logo-core absolute inset-0 flex items-center justify-center rounded-full
+              bg-gradient-to-br from-[#fff7d4] via-[#ffd24a] to-[#d89c00]
+              border border-[rgba(255,240,180,0.7)]
+              shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_0_25px_rgba(255,210,90,0.35),0_10px_20px_rgba(0,0,0,0.25)]">
+    <i data-lucide="landmark" class="w-5 h-5 sm:w-6 sm:h-6 text-dark-950 relative z-20"></i>
+  </div>
+  <span class="logo-star absolute -top-0.5 right-1 w-1.5 h-1.5 rounded-full bg-[#fff7c2] shadow-[0_0_12px_#fff7c2] animate-[logoSparkle_2.8s_ease-in-out_infinite]"></span>
+</div>
+
+<!-- Brand Name -->
+<span class="brand-name relative font-display text-base sm:text-lg md:text-xl font-extrabold tracking-[.03em] cursor-default">
+  <span class="brand-crown absolute -top-3 -left-2.5 text-xs animate-[crownFloat_3s_ease-in-out_infinite]">👑</span>
+  Gold Coast Capital
+</span>
+                    </div>
+                    <div class="hidden md:flex items-center gap-8">
+                        <a href="#features" class="nav-link text-gray-300 hover:text-gold-400 text-sm">Features</a>
+                        <a href="#how-it-works" class="nav-link text-gray-300 hover:text-gold-400 text-sm">How It Works</a>
+                        <a href="#plans" class="nav-link text-gray-300 hover:text-gold-400 text-sm">Plans</a>
+                        <a href="#faq" class="nav-link text-gray-300 hover:text-gold-400 text-sm">FAQ</a>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="navigateTo('login')" class="text-gray-300 hover:text-gold-400 text-sm font-medium px-3 py-2">Login</button>
+                        <button onclick="navigateTo('signup')" class="gradient-gold text-dark-950 font-semibold text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-full">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+<!-- Hero Section -->
+<section class="relative min-h-screen flex flex-col items-center overflow-hidden pt-24 sm:pt-28 pb-10">
+    <div class="absolute inset-0">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-gold-500/10 rounded-full blur-[100px] animate-float"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-gold-600/5 rounded-full blur-[120px] animate-float-delay"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold-500/5 rounded-full blur-[150px]"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Left column (text + buttons + mobile card) -->
+            <div class="text-center lg:text-left">
+    <div class="inline-flex items-center gap-2 glass-gold rounded-full px-4 py-2 mb-4">
+        <div class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></div>
+        <span class="text-gold-400 text-sm font-medium">A modern platform for tracking wealth and financial progress.</span>
+    </div>
+    <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-4">
+        Grow Your <span class="text-gradient">Wealth</span> with Confidence
+    </h1>
+    <p class="text-gray-400 text-base sm:text-lg max-w-xl mb-8 leading-relaxed">
+        Start from just <span class="text-gold-400 font-semibold">₵200</span> and receive <span class="text-gold-400 font-semibold">BONUS returns</span> from your capital. Gold Coast Capital makes it simple, transparent, and rewarding.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+        <button onclick="navigateTo('signup')" class="gradient-gold text-dark-950 font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity text-base flex items-center justify-center gap-2">
+            Start Now <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+        <button onclick="navigateTo('login')" class="glass text-white font-medium px-8 py-4 rounded-full hover:bg-white/10 transition-colors text-base">
+            Login to Dashboard
+        </button>
+    </div>
+
+    <!-- Mobile Portfolio Card (visible only on mobile) -->
+    <div class="lg:hidden mt-8">
+        <div class="glass rounded-3xl p-6 max-w-xs mx-auto animate-float">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-400 text-xs">Portfolio Value</span>
+                <span class="text-green-400 text-xs flex items-center gap-1"><i data-lucide="trending-up" class="w-3 h-3"></i> +100%</span>
+            </div>
+            <div class="text-3xl font-bold mb-4">₵<span class="hero-counter">0</span></div>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between glass rounded-lg px-3 py-2 text-xs">
+                    <span>Initial Deposit</span>
+                    <span class="font-medium">₵1,000</span>
+                </div>
+                <div class="flex items-center justify-between glass rounded-lg px-3 py-2 text-xs">
+                    <span>Earnings</span>
+                    <span class="font-medium text-green-400">₵1,000</span>
+                </div>
+                <div class="flex items-center justify-between glass rounded-lg px-3 py-2 text-xs">
+                    <span>Total Payout</span>
+                    <span class="font-medium text-gold-400">₵2,000</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- Right column (desktop portfolio card only) -->
+            <div class="hidden lg:block">
+                <div class="relative">
+                    <div class="glass rounded-3xl p-8 max-w-md mx-auto animate-float">
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-gray-400 text-sm">Portfolio Value</span>
+                            <span class="text-green-400 text-sm flex items-center gap-1"><i data-lucide="trending-up" class="w-4 h-4"></i> +100%</span>
+                        </div>
+                        <div class="text-4xl font-bold mb-6">₵<span class="hero-counter">0</span></div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between glass rounded-xl px-4 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-500/20 flex items-center justify-center"><i data-lucide="coins" class="w-4 h-4 text-gold-400"></i></div>
+                                    <span class="text-sm">Initial Deposit</span>
+                                </div>
+                                <span class="text-sm font-medium">₵1,000</span>
+                            </div>
+                            <div class="flex items-center justify-between glass rounded-xl px-4 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center"><i data-lucide="trending-up" class="w-4 h-4 text-green-400"></i></div>
+                                    <span class="text-sm">Earnings</span>
+                                </div>
+                                <span class="text-sm font-medium text-green-400">₵1,000</span>
+                            </div>
+                            <div class="flex items-center justify-between glass rounded-xl px-4 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><i data-lucide="wallet" class="w-4 h-4 text-blue-400"></i></div>
+                                    <span class="text-sm">Total Payout</span>
+                                </div>
+                                <span class="text-sm font-medium text-gold-400">₵2,000</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -top-4 -right-4 glass-gold rounded-2xl px-4 py-3 animate-pulse-gold">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-gold-400"></i>
+                            <span class="text-sm font-medium text-gold-400">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leadership Carousel – full width below the grid -->
+        <div class="mt-12 relative w-full max-w-full overflow-hidden" id="leadership-carousel-container">
+            <h4 class="text-center text-xs text-gray-500 uppercase tracking-widest mb-4">Our Leadership Team</h4>
+            <div class="carousel-wrapper relative">
+                <div class="carousel-track flex gap-5" id="leadershipTrack"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-gold-400 text-sm font-semibold uppercase tracking-widest">Why Choose Us</span>
+                    <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4">Built for <span class="text-gradient">Smart Investors</span></h2>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="shield-check" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">Secure & Transparent</h3>
+                        <p class="text-gray-400 text-sm">Your growth is tracked in real-time with full transparency on every transaction.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="percent" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">100% Returns</h3>
+                        <p class="text-gray-400 text-sm">Receive 100% earnings on top of your invested capital. Double your money with our premium plan.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="smartphone" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">MoMo & Crypto</h3>
+                        <p class="text-gray-400 text-sm">Deposit via MTN Mobile Money or popular cryptocurrencies. Flexible payment options.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="bar-chart-3" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">Live Dashboard</h3>
+                        <p class="text-gray-400 text-sm">Monitor your investment growth in real-time through your personalized dashboard.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="banknote" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">Low Minimum</h3>
+                        <p class="text-gray-400 text-sm">Start investing from just ₵200. Accessible to everyone in Ghana.</p>
+                    </div>
+                    <div class="glass rounded-2xl p-6 hover:border-gold-500/30 group">
+                        <div class="w-12 h-12 rounded-xl gradient-gold flex items-center justify-center mb-4 group-hover:scale-110"><i data-lucide="clock" class="w-6 h-6 text-dark-950"></i></div>
+                        <h3 class="text-lg font-semibold mb-2">Fast Payouts</h3>
+                        <p class="text-gray-400 text-sm">Withdraw your earnings quickly and hassle-free when your investment matures.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section id="how-it-works" class="py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-gold-400 text-sm font-semibold uppercase tracking-widest">Simple Process</span>
+                    <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4">How It <span class="text-gradient">Works</span></h2>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center"><div class="w-16 h-16 rounded-full gradient-gold flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-dark-950">1</div><h3 class="text-xl font-semibold mb-3">Create Account</h3><p class="text-gray-400">Sign up with your details.</p></div>
+                    <div class="text-center"><div class="w-16 h-16 rounded-full gradient-gold flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-dark-950">2</div><h3 class="text-xl font-semibold mb-3">Make Deposit</h3><p class="text-gray-400">Invest from ₵200 via MTN MoMo or Crypto. Your investment starts immediately.</p></div>
+                    <div class="text-center"><div class="w-16 h-16 rounded-full gradient-gold flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-dark-950">3</div><h3 class="text-xl font-semibold mb-3">Earn 100%</h3><p class="text-gray-400">Watch your investment grow and receive 100% returns plus your capital.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Plans -->
+        <section id="plans" class="py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-gold-400 text-sm font-semibold uppercase tracking-widest">Investment Plans</span>
+                    <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4">Choose Your <span class="text-gradient">Plan</span></h2>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass rounded-2xl p-8">
+                        <div class="text-gold-400 text-sm font-semibold mb-2">STARTER</div>
+                        <div class="text-3xl font-bold mb-1">₵200 <span class="text-base text-gray-400 font-normal">min</span></div>
+                        <div class="text-gray-400 text-sm mb-6">10 Days</div>
+                        <ul class="space-y-3 mb-8 text-sm">
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 50% Returns</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Real-time Dashboard</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> MoMo & Crypto Deposit</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Fast Payout</li>
+</ul>
+                        <button onclick="navigateTo('signup')" class="w-full py-3 rounded-full border border-gold-500/50 text-gold-400 font-semibold hover:bg-gold-500/10">Get Started</button>
+                    </div>
+                    <div class="glass-gold rounded-2xl p-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 gradient-gold text-dark-950 text-xs font-bold px-4 py-1 rounded-bl-xl">POPULAR</div>
+                        <div class="text-gold-400 text-sm font-semibold mb-2">GROWTH</div>
+                        <div class="text-3xl font-bold mb-1">₵300 <span class="text-base text-gray-400 font-normal">min</span></div>
+                        <div class="text-gray-400 text-sm mb-6">20 Days</div>
+                        <ul class="space-y-3 mb-8 text-sm">
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 70% Returns</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Real-time Dashboard</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Priority Support</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Instant Payout</li>
+</ul>
+                        <button onclick="navigateTo('signup')" class="w-full py-3 rounded-full gradient-gold text-dark-950 font-semibold hover:opacity-90">Get Started</button>
+                    </div>
+                    <div class="glass rounded-2xl p-8">
+                        <div class="text-gold-400 text-sm font-semibold mb-2">PREMIUM</div>
+                        <div class="text-3xl font-bold mb-1">₵500 <span class="text-base text-gray-400 font-normal">min</span></div>
+                        <div class="text-gray-400 text-sm mb-6">30 Days</div>
+                        <ul class="space-y-3 mb-8 text-sm">
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> 100% Returns</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> VIP Dashboard</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Dedicated Manager</li>
+    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-gold-400"></i> Instant Payout</li>
+</ul>
+                        <button onclick="navigateTo('signup')" class="w-full py-3 rounded-full border border-gold-500/50 text-gold-400 font-semibold hover:bg-gold-500/10">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="py-20 relative">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="text-gold-400 text-sm font-semibold uppercase tracking-widest">FAQ</span>
+                    <h2 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mt-4">Frequently <span class="text-gradient">Asked</span></h2>
+                </div>
+                <div class="space-y-4" id="faq-container">
+    <div class="glass rounded-xl overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left">
+            <span class="font-medium">What is the minimum investment amount?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
+        </button>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">The minimum investment is ₵200. You can invest any amount above this threshold.</div>
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left">
+            <span class="font-medium">How do I deposit money?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
+        </button>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">You can deposit via MTN Mobile Money or cryptocurrency (USDT, BTC, ETH). Simply choose your preferred method in the dashboard.</div>
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left">
+            <span class="font-medium">How do the returns work?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
+        </button>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">Returns vary by plan: Starter gives 50% earnings (e.g. invest ₵1,000 → get ₵1,500), Growth gives 70% earnings (e.g. invest ₵1,000 → get ₵1,700), and Premium gives 100% earnings (e.g. invest ₵1,000 → get ₵2,000). All payouts include your original capital.</div>
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left">
+            <span class="font-medium">How long until I receive my returns?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-gold-400 transition-transform"></i>
+        </button>
+        <div class="hidden px-5 pb-5 text-gray-400 text-sm">Returns depend on your chosen plan: Starter (10 days), Growth (20 days), or Premium (30 days). When your investment matures – a Withdraw button will appear.</div>
+    </div>
+</div>
+            </div>
+        </section>
+
+        <footer class="border-t border-white/5 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <p class="text-gray-500 text-sm">© 2026 Gold Coast Capital. All rights reserved.</p>
+        <a href="terms.html" class="text-gray-500 text-xs hover:text-gray-400 hover:underline mt-2 inline-block">Terms of Service & Privacy Policy</a>
+    </div>
+</footer>
+    </div>
+
+    <!-- SIGNUP PAGE -->
+    <div id="page-signup" class="page">
+        <div class="min-h-screen flex items-center justify-center px-4 py-12">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center gap-2 mb-6">
+                        <div class="w-10 h-10 rounded-full gradient-gold flex items-center justify-center"><i data-lucide="landmark" class="w-5 h-5 text-dark-950"></i></div>
+                        <span class="font-display text-xl font-bold text-gradient">Gold Coast Capital</span>
+                    </div>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold">Create Account</h2>
+                </div>
+                <form onsubmit="handleSignup(event)" class="glass rounded-2xl p-6 sm:p-8 space-y-4">
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Full Name</label><input type="text" id="signup-name" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Email</label><input type="email" id="signup-email" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Phone Number</label><input type="tel" id="signup-phone" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <div class="relative">
+  <label class="block text-sm font-medium mb-1.5 text-gray-300">Password</label>
+  <input type="password" id="signup-password" required minlength="6" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+  <button type="button" onclick="togglePasswordVisibility('signup-password', this)" class="absolute right-3 top-9 text-gray-400 hover:text-white">
+    <i data-lucide="eye" class="w-5 h-5"></i>
+  </button>
+</div>
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Referral Code (Optional)</label><input type="text" id="signup-referral" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <button type="submit" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">Create Account</button>
+                    <p class="text-center text-gray-400 text-sm">Already have an account? <button type="button" onclick="navigateTo('login')" class="text-gold-400 hover:underline">Login</button></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="page-login" class="page">
+        <div class="min-h-screen flex items-center justify-center px-4 py-12">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center gap-2 mb-6">
+                        <div class="w-10 h-10 rounded-full gradient-gold flex items-center justify-center"><i data-lucide="landmark" class="w-5 h-5 text-dark-950"></i></div>
+                        <span class="font-display text-xl font-bold text-gradient">Gold Coast Capital</span>
+                    </div>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold">Welcome Back</h2>
+                </div>
+                <form onsubmit="handleLogin(event)" class="glass rounded-2xl p-6 sm:p-8 space-y-4">
+                    <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Email</label><input type="email" id="login-email" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+                    <div class="relative">
+  <label class="block text-sm font-medium mb-1.5 text-gray-300">Password</label>
+  <input type="password" id="login-password" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+  <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-9 text-gray-400 hover:text-white">
+    <i data-lucide="eye" class="w-5 h-5"></i>
+  </button>
+</div>
+<div class="text-right">
+  <button type="button" onclick="navigateTo('forgot-password')" class="text-gold-400 text-sm hover:underline">Forgot Password?</button>
+</div>
+                    <button type="submit" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">Login</button>
+                    <p class="text-center text-gray-400 text-sm">Don't have an account? <button type="button" onclick="navigateTo('signup')" class="text-gold-400 hover:underline">Sign Up</button></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD PAGE -->
+<div id="page-forgot-password" class="page">
+  <div class="min-h-screen flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold">Forgot Password</h2>
+      </div>
+      <form onsubmit="handleForgotPassword(event)" class="glass rounded-2xl p-6 sm:p-8 space-y-4">
+        <div><label class="block text-sm font-medium mb-1.5 text-gray-300">Email</label><input type="email" id="forgot-email" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+        <button type="submit" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">Send Reset Link</button>
+        <p class="text-center text-gray-400 text-sm">Remembered? <button type="button" onclick="navigateTo('login')" class="text-gold-400 hover:underline">Login</button></p>
+      </form>
+      <div id="forgot-message" class="mt-4 text-center text-sm text-gray-400 hidden"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESET PASSWORD PAGE -->
+<div id="page-reset-password" class="page">
+  <div class="min-h-screen flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold">Reset Password</h2>
+      </div>
+      <form onsubmit="handleResetPassword(event)" class="glass rounded-2xl p-6 sm:p-8 space-y-4">
+        <div class="relative">
+          <label class="block text-sm font-medium mb-1.5 text-gray-300">New Password</label>
+          <input type="password" id="reset-password" required minlength="6" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+          <button type="button" onclick="togglePasswordVisibility('reset-password', this)" class="absolute right-3 top-9 text-gray-400 hover:text-white"><i data-lucide="eye" class="w-5 h-5"></i></button>
+        </div>
+        <input type="hidden" id="reset-token" value="">
+        <button type="submit" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">Set New Password</button>
+        <div id="reset-message" class="text-center text-sm text-gray-400 hidden"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page">
+        <div class="min-h-screen gradient-dark">
+            <nav class="border-b border-white/5 bg-dark-950/80 backdrop-blur-xl sticky top-0 z-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16 relative">
+  
+  <!-- LEFT: Logo + Name -->
+  <div class="flex items-center gap-2 z-10">
+    <div class="logo-mark relative w-8 h-8 sm:w-11 sm:h-11">
+      <span class="logo-orbit absolute inset-[-3px] sm:inset-[-4px] rounded-full border border-gold-400/30 animate-[logoOrbit_14s_linear_infinite]"></span>
+      <div class="logo-core absolute inset-0 flex items-center justify-center rounded-full
+                  bg-gradient-to-br from-[#fff7d4] via-[#ffd24a] to-[#d89c00]
+                  border border-[rgba(255,240,180,0.7)]
+                  shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_0_25px_rgba(255,210,90,0.35),0_10px_20px_rgba(0,0,0,0.25)]">
+        <i data-lucide="landmark" class="w-4 h-4 sm:w-5 sm:h-5 text-dark-950 relative z-20"></i>
+      </div>
+      <span class="logo-star absolute -top-0.5 right-0.5 sm:right-1 w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#fff7c2] shadow-[0_0_12px_#fff7c2] animate-[logoSparkle_2.8s_ease-in-out_infinite]"></span>
+    </div>
+   <span class="brand-name relative font-display text-base sm:text-lg md:text-xl font-extrabold tracking-[.03em] cursor-default">
+      <span class="brand-crown absolute -top-3 -left-2.5 text-xs hidden sm:inline animate-[crownFloat_3s_ease-in-out_infinite]"></span>
+      G.C.C
+    </span>
+  </div>
+
+  <!-- CENTER: Anniversary Badge (absolutely centered) -->
+  <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
+    <!-- Desktop -->
+    <div class="anniversary-badge hidden sm:flex relative">
+      <span class="anniversary-shimmer"></span>
+      <span class="sparkle sparkle-1">✦</span>
+      <span class="sparkle sparkle-2">✦</span>
+      <span class="sparkle sparkle-3">✦</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-950 relative z-10" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/></svg>
+      <span class="relative z-10 text-[12px] font-black uppercase tracking-[0.22em] text-amber-950">10 YEARS ANNIVERSARY
+</span>
+      <span class="anniversary-chip relative z-10">CELEBRATING 10 YEARS 🏛️</span>
+    </div>
+    <!-- Mobile -->
+    <div class="anniversary-badge flex sm:hidden relative">
+      <span class="anniversary-shimmer"></span>
+      <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.18em] text-amber-950">10 YEARS 🏛️</span>
+    </div>
+  </div>
+
+  <!-- RIGHT: VIP + Profile -->
+ <div class="flex items-center gap-1.5 z-10">
+    <!-- VIP Badge -->
+    <span id="partner-badge" class="hidden relative inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-[0.22em] text-amber-950 bg-gradient-to-r from-[#FFF6D6] via-[#FFD45E] to-[#C88A00] border border-[#FFE9A3] shadow-[0_0_18px_rgba(255,210,90,0.35),0_4px_12px_rgba(0,0,0,0.2)] overflow-hidden">
+      <span class="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+        <span class="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent" style="animation: vip-shimmer 3.5s infinite ease-in-out; transform: translateX(-150%);"></span>
+      </span>
+      <!-- Crown -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-950 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/>
+  </svg>
+  </span>
+
+    <!-- Profile Dropdown -->
+    <div class="relative">
+      <button onclick="toggleProfileDropdown()" class="flex items-center gap-2 cursor-pointer glass rounded-full pl-2 pr-3 py-1.5 hover:bg-white/10 transition">
+        <div class="w-8 h-8 rounded-full gradient-gold flex items-center justify-center text-dark-950 font-bold text-sm" id="dash-avatar">U</div>
+        <span class="text-sm font-medium hidden sm:block" id="dash-username">User</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transition-transform duration-200" id="profile-chevron"></i>
+      </button>
+      <div id="profile-dropdown" class="absolute right-0 top-full mt-2 w-48 bg-dark-800/95 backdrop-blur-md border border-white/10 rounded-xl p-1.5 hidden z-50 shadow-2xl">
+        <button onclick="openAnnouncementsModal(); toggleProfileDropdown()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-300">
+          <i data-lucide="bell" class="w-4 h-4 text-gray-400"></i>
+          Notifications
+          <span id="announcement-dot" class="w-2 h-2 rounded-full bg-yellow-400 hidden ml-auto"></span>
+        </button>
+          <button onclick="openPlatformStrengthModal()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-300">
+  <i data-lucide="shield-check" class="w-4 h-4 text-gold-400"></i>
+  Why you're safe
+</button>
+        <button onclick="updateDashboard(); toggleProfileDropdown()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-300">
+          <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-400"></i>
+          Refresh
+        </button>
+        <button onclick="handleLogout()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-500/10 text-sm text-red-400">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+            </nav>
+
+            <!-- Fixed investor count badge (inside dashboard, always visible while on this page) -->
+<div id="investor-count-fixed" class="fixed bottom-6 right-4 z-30 glass-gold rounded-2xl px-4 py-2.5 flex items-center gap-2 shadow-lg"
+     style="border: 1px solid rgba(255,215,0,0.3); box-shadow: 0 0 15px rgba(255,210,90,0.15); animation: softPulse 3s ease-in-out infinite;">
+  <i data-lucide="users" class="w-4 h-4 text-gold-400"></i>
+  <span class="text-sm font-medium text-white whitespace-nowrap">
+    <span id="investor-count-number">—</span>+ Active Investments
+  </span>
+</div>
+
+            <!-- Dashboard Loader -->
+<div id="dashboard-loader" class="fixed inset-0 z-40 flex items-center justify-center bg-dark-950/90 backdrop-blur-sm">
+  <div class="flex flex-col items-center gap-4">
+    <div class="w-12 h-12 rounded-full gradient-gold flex items-center justify-center animate-bounce-gentle">
+      <i data-lucide="landmark" class="w-6 h-6 text-dark-950"></i>
+    </div>
+    <p class="text-gold-400 text-sm font-medium animate-pulse">Loading your wealth…</p>
+  </div>
+</div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                <div class="mb-8"><h1 class="font-display text-2xl sm:text-3xl font-bold">Welcome back, <span class="text-gradient" id="dash-name">User</span></h1></div>
+
+   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+  <div class="glass-premium p-4 stat-card relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-1 h-full bg-gold-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2"><i data-lucide="wallet" class="w-4 h-4 text-gold-400"></i><span class="text-gray-400 text-xs">Total Invested</span></div>
+      <div class="text-xl font-bold" id="stat-invested">₵0</div>
+    </div>
+  </div>
+       <div class="glass-premium p-4 stat-card relative overflow-hidden">
+  <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500/60"></div>
+  <div class="pl-3">
+    <div class="flex items-center gap-2 mb-2">
+      <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+      <span class="text-gray-400 text-xs">Active Investments</span>
+    </div>
+    <div class="text-xl font-bold text-emerald-400" id="stat-active-total">₵0</div>
+  </div>
+</div>
+  <div class="glass-premium p-4 stat-card relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-1 h-full bg-green-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2"><i data-lucide="trending-up" class="w-4 h-4 text-green-400"></i><span class="text-gray-400 text-xs">Earnings</span></div>
+      <div class="text-xl font-bold text-green-400" id="stat-earnings">₵0</div>
+    </div>
+  </div>
+  <div class="glass-premium p-4 stat-card relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2"><i data-lucide="target" class="w-4 h-4 text-blue-400"></i><span class="text-gray-400 text-xs">Expected Total</span></div>
+      <div class="text-xl font-bold text-blue-400" id="stat-expected">₵0</div>
+    </div>
+  </div>
+  <div class="glass-premium p-4 stat-card relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-1 h-full bg-orange-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2"><i data-lucide="download" class="w-4 h-4 text-orange-400"></i><span class="text-gray-400 text-xs">Total Withdrawn</span></div>
+      <div class="text-xl font-bold text-orange-400" id="stat-withdrawn">₵0</div>
+    </div>
+  </div>
+  <div class="glass-premium p-4 stat-card relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-1 h-full bg-purple-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2"><i data-lucide="clock" class="w-4 h-4 text-purple-400"></i><span class="text-gray-400 text-xs">Days Left</span></div>
+      <div class="text-xl font-bold text-purple-400" id="stat-days">0</div>
+    </div>
+  </div>
+</div>
+
+                <!-- Deposit CTA -->
+<div class="glass-premium p-5 sm:p-6 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+  <div>
+    <h3 class="font-display text-lg font-bold">Start a New Investment</h3>
+    <p class="text-sm text-gray-400 mt-1">Deposit from ₵200 via MoMo or crypto.</p>
+  </div>
+ <button onclick="openDepositModal()" class="relative overflow-hidden text-dark-950 font-semibold px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg transition-opacity whitespace-nowrap"
+  style="background: linear-gradient(135deg, #FFF6D6, #FFD45E, #C88A00); border: 1px solid #FFE9A3; box-shadow: 0 0 18px rgba(255,210,90,0.35), 0 4px 12px rgba(0,0,0,0.2);">
+  <span class="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
+    <span class="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent" style="animation: vip-shimmer 3.5s infinite ease-in-out; transform: translateX(-150%);"></span>
+  </span>
+  <i data-lucide="plus-circle" class="w-5 h-5 relative z-10"></i>
+  <span class="relative z-10">Make a Deposit</span>
+</button>
+</div>
+</div>
+
+               <!-- Referral Card -->
+<div class="glass-premium p-5 sm:p-6 mb-6">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-3">
+      <div>
+        <p class="text-xs text-gray-400 uppercase tracking-wider">Your Referral Code</p>
+        <p class="text-2xl font-bold mt-0.5" id="dash-referral-code">----</p>
+      </div>
+      <div class="hidden sm:block w-px h-10 bg-white/10"></div>
+      <div>
+        <p class="text-xs text-gray-400 uppercase tracking-wider">Referral Bonus</p>
+        <p class="text-2xl font-bold text-green-400 mt-0.5" id="dash-bonus">₵0</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <button id="withdraw-bonus-btn" onclick="requestReferralWithdrawal()"
+        class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2.5 px-5 rounded-xl text-sm whitespace-nowrap transition">
+        Withdraw Bonus
+      </button>
+      <button onclick="copyReferralLink()"
+        class="glass px-4 py-2 rounded-xl text-xs text-gray-300 hover:text-white flex items-center gap-1.5 transition">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i>Copy🔗
+      </button>
+     <button onclick="shareReferral('whatsapp')"
+  class="glass px-4 py-2 rounded-xl text-xs text-gray-300 hover:text-white flex items-center gap-1.5 transition">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#25D366" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  <span class="hidden sm:inline">Share</span>
+</button>
+     <button onclick="shareReferral('telegram')"
+  class="glass px-4 py-2 rounded-xl text-xs text-gray-300 hover:text-white flex items-center gap-1.5 transition">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0088cc" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.93 1.23-5.46 3.62-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.24.37-.49 1.02-.74 3.98-1.73 6.64-2.87 7.98-3.42 3.8-1.58 4.59-1.85 5.1-1.86.11 0 .37.03.54.17.14.12.18.28.2.45.02.16.04.53.03.55z"/></svg>
+  <span class="hidden sm:inline">Share</span>
+</button>
+    </div>
+  </div>
+</div>
+
+ <!-- Prizes & Rewards Card -->
+<div class="glass-premium p-5 sm:p-6 mb-6">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div>
+      <p class="text-xs text-gray-400 uppercase tracking-wider">🏆 Prizes & Rewards</p>
+      <p class="text-2xl font-bold text-purple-400" id="dash-game-balance">₵0</p>
+    </div>
+    <button id="withdraw-game-btn" onclick="requestGameRewardWithdrawal()" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-4 rounded-xl text-sm whitespace-nowrap">Withdraw Prizes</button>
+  </div>
+</div>
+                
+<!-- ──────── REFERRAL ELITE LEADERBOARD ──────── -->
+<div class="leaderboard-card relative overflow-hidden rounded-3xl p-5 sm:p-7 mb-6">
+  <!-- Background ambient layers -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute -top-20 -left-20 w-64 h-64 bg-gold-500/5 rounded-full blur-[80px]"></div>
+    <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-gold-500/5 rounded-full blur-[80px]"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="relative z-10 flex items-center justify-between mb-6">
+    <h3 class="leaderboard-title text-lg font-black uppercase tracking-[0.15em]"
+        style="background: linear-gradient(180deg, #fff7d6, #e5c86b, #a97d18); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      Referral Race
+    </h3>
+    <div class="relative">
+      <select id="leaderboard-period" onchange="loadLeaderboard()"
+        class="appearance-none bg-white/5 border border-gold-500/30 rounded-lg pl-3 pr-8 py-1.5 text-xs text-gold-400 focus:outline-none focus:border-gold-500 cursor-pointer transition">
+        <option value="all">All Time</option>
+        <option value="monthly">This Month</option>
+      </select>
+      <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gold-400 pointer-events-none"></i>
+    </div>
+  </div>
+
+  <!-- Leaderboard content -->
+  <div id="leaderboard-list" class="relative z-10">
+    <div class="text-gray-500 text-center py-4 text-sm">Loading...</div>
+  </div>
+
+  <!-- Subtle bottom gradient line -->
+  <div class="relative z-10 mt-5 h-px bg-gradient-to-r from-transparent via-gold-500/30 to-transparent"></div>
+</div>
+
+   <!-- Premium Wealth Performance Chart -->
+<div class="chart-card-premium relative overflow-hidden rounded-3xl p-6 sm:p-7 mb-6">
+  <!-- Background glow -->
+  <div class="chart-glow absolute -bottom-40 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-[radial-gradient(ellipse,rgba(255,215,80,.18),transparent_70%)] pointer-events-none"></div>
+
+  <!-- Top right status pill -->
+  <div class="absolute top-5 right-5 z-10">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="text-xs font-semibold text-emerald-300">Live Projection</span>
+    </div>
+  </div>
+
+  <!-- Wealth summary header -->
+  <div class="mb-6 relative z-10">
+    <div class="text-xs uppercase tracking-[0.25em] text-gold-500/70">Portfolio Performance</div>
+    <div id="portfolio-total" class="text-4xl font-black tracking-tight text-white mt-1">₵0</div>
+    <div class="flex items-center gap-2 mt-1">
+      <span id="portfolio-growth-pct" class="text-emerald-400 text-sm font-semibold">+0%</span>
+      <span class="text-gray-500 text-xs">projected growth</span>
+    </div>
+  </div>
+
+  <!-- Chart canvas -->
+  <div class="relative z-10" style="position: relative; width: 100%; height: 220px;">
+  <canvas id="growth-chart"></canvas>
+</div>
+</div>
+
+             <div class="glass-premium p-5 sm:p-6 mb-6">
+  <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCollapse(this)">
+    <h3 class="font-semibold text-lg">My Investments</h3>
+    <div class="flex items-center gap-3">
+      <button onclick="event.stopPropagation(); openDepositModal()" class="text-gold-400 text-sm font-medium hover:underline flex items-center gap-1">
+        <i data-lucide="plus" class="w-4 h-4"></i> New Investment
+      </button>
+      <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+    </div>
+  </div>
+  <div class="collapsible-content mt-4">
+    <div id="investments-cards" class="sm:hidden space-y-3"></div>
+    <div class="overflow-x-auto hidden sm:block">
+      <table class="w-full text-sm">
+        <thead><tr class="text-gray-400 border-b border-white/5"><th class="text-left pb-3">Amount</th><th class="text-left pb-3 hidden sm:table-cell">Plan</th><th class="text-left pb-3">Earnings</th><th class="text-left pb-3">Progress</th><th class="text-left pb-3">Status</th><th class="text-left pb-3">Action</th></tr></thead>
+        <tbody id="investments-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="glass-premium p-5 sm:p-6 mb-6">
+  <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCollapse(this)">
+    <h3 class="font-semibold text-lg">Recent Activity</h3>
+    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+  </div>
+  <div class="collapsible-content mt-4">
+    <div id="recent-activity" class="space-y-3">
+      <div class="text-gray-500 text-sm text-center py-4">Loading...</div>
+    </div>
+  </div>
+</div>
+            <div class="my-2"></div>
+                
+                <!-- Transaction History -->
+<div class="glass-premium p-5 sm:p-6 mt-6">
+  <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCollapse(this)">
+    <h3 class="font-semibold text-lg">Transaction History</h3>
+    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+  </div>
+  <div class="collapsible-content mt-4">
+    <div id="transaction-cards" class="sm:hidden space-y-3"></div>
+    <div class="overflow-x-auto hidden sm:block">
+      <table class="w-full text-sm">
+        <thead><tr class="text-gray-400 border-b border-white/5"><th class="text-left pb-3">Type</th><th class="text-left pb-3">Description</th><th class="text-left pb-3">Amount</th><th class="text-left pb-3">Status</th><th class="text-left pb-3">Date</th></tr></thead>
+        <tbody id="transaction-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+            </div>
+        </div>
+        <div id="announcements-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold">Announcements</h3>
+      <button onclick="closeAnnouncementsModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div id="announcements-list" class="space-y-2 text-sm">
+      <div class="text-gray-500 text-center py-2">Loading...</div>
+    </div>
+    <div class="mt-4 text-right">
+      <button onclick="clearAllAnnouncements()" class="bg-red-600 hover:bg-red-500 text-white text-xs px-4 py-2 rounded-lg">Clear All</button>
+    </div>
+  </div>
+</div>
+    </div>
+
+    <!-- DEPOSIT MODAL -->
+    <div id="deposit-modal" class="fixed inset-0 z-[90] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+        <div class="glass rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div class="p-6 sm:p-8">
+                <div class="flex items-center justify-between mb-6"><h2 class="font-display text-xl sm:text-2xl font-bold">Make a Deposit</h2><button onclick="closeDepositModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+
+<div id="deposit-step1">
+  <!-- Premium Header -->
+  <div class="text-center mb-6">
+    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-br from-gold-400/20 to-gold-600/20 border border-gold-400/30 flex items-center justify-center">
+      <i data-lucide="wallet" class="w-6 h-6 text-gold-400"></i>
+    </div>
+    <h3 class="text-lg font-bold text-white">Build Your Investment Position</h3>
+    <p class="text-xs text-gray-400 mt-1">Select the plan that best matches your investment horizon.</p>
+  </div>
+
+    <!-- Progress indicator -->
+<div class="flex items-center justify-center gap-2 mb-4">
+  <div class="w-8 h-1.5 rounded-full bg-gold-400"></div>
+  <div class="w-8 h-1.5 rounded-full bg-white/10"></div>
+</div>
+<p class="text-center text-xs text-gray-500 mb-6">Step 1 of 2 · Select Plan &amp; Amount</p>
+
+  <label class="block text-xs font-medium mb-3 text-gray-300 uppercase tracking-wider">Plan</label>
+  <div class="grid grid-cols-3 gap-3 mb-6">
+    <button onclick="selectPlan('starter')" id="plan-starter" class="glass rounded-xl p-4 text-center hover:border-gold-500/50 transition">
+      <div class="text-gold-400 font-bold text-sm">Starter</div>
+      <div class="text-gray-500 text-xs mt-1">10 Days</div>
+    </button>
+    <button onclick="selectPlan('growth')" id="plan-growth" class="glass-gold rounded-xl p-4 text-center hover:border-gold-400 transition relative">
+  <div class="absolute -top-2 left-1/2 -translate-x-1/2">
+    <span class="bg-gold-500 text-dark-950 text-[10px] px-2 py-1 rounded-full font-bold whitespace-nowrap">
+      MOST POPULAR
+    </span>
+  </div>
+  <div class="text-gold-400 font-bold text-sm">Growth</div>
+  <div class="text-gray-500 text-xs mt-1">20 Days</div>
+</button>
+    <button onclick="selectPlan('premium')" id="plan-premium" class="glass rounded-xl p-4 text-center hover:border-gold-500/50 transition">
+      <div class="text-gold-400 font-bold text-sm">Premium</div>
+      <div class="text-gray-500 text-xs mt-1">30 Days</div>
+    </button>
+  </div>
+  <input type="hidden" id="deposit-plan" value="growth">
+
+  <label class="block text-xs font-medium mb-2 text-gray-300 uppercase tracking-wider">Amount (GHS)</label>
+  <div class="relative">
+    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gold-400 font-bold">₵</span>
+    <input type="number" id="deposit-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-8 text-white text-lg font-semibold">
+  </div>
+  <p class="text-xs text-gray-500 mt-1 mb-5" id="deposit-min-note">Minimum deposit is ₵300</p>
+
+  <!-- Calculator -->
+  <div class="glass-gold rounded-xl p-4 mb-5">
+    <div class="flex items-center gap-2 mb-3">
+      <i data-lucide="calculator" class="w-4 h-4 text-gold-400"></i>
+      <span class="text-sm font-medium text-gold-400">Estimated Returns</span>
+    </div>
+    <div class="space-y-2 text-sm">
+      <div class="flex justify-between"><span class="text-gray-400">You Invest</span><span id="calc-invest" class="font-medium text-white">₵0</span></div>
+      <div class="flex justify-between"><span class="text-gray-400">Returns (<span id="calc-rate-label">70</span>%)</span><span id="calc-earn" class="font-medium text-green-400">₵0</span></div>
+      <div class="flex justify-between border-t border-white/10 pt-2"><span class="text-gray-400">Total Payout</span><span id="calc-total" class="font-bold text-gold-400">₵0</span></div>
+    </div>
+
+      <div class="flex items-center gap-2 text-xs text-green-400 mt-2 mb-4">
+  <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+  Deposits are typically reviewed within 5–15 minutes.
+</div>  
+  </div>
+    
+<div class="glass rounded-xl p-4 mb-4">
+  <div class="flex items-start gap-3">
+    <i data-lucide="shield-check" class="w-5 h-5 text-green-400 mt-0.5"></i>
+    <div>
+      <p class="text-sm font-medium text-white">Secure &amp; Verified Process</p>
+      <p class="text-xs text-gray-400">
+        Every deposit is matched against a unique reference code and reviewed before activation.
+      </p>
+    </div>
+  </div>
+</div>
+    
+  <button onclick="goToStep2()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg hover:opacity-90 transition">
+    Continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
+  </button>
+
+  <!-- Trust badge -->
+  <div class="flex items-center justify-center gap-2 mt-4 text-xs text-gray-500">
+    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-gold-400"></i>
+    <span>Secured by Gold Coast Capital</span>
+  </div>
+</div>
+
+<div id="deposit-step2" class="hidden">
+  <button onclick="goToStep1()" class="flex items-center gap-1 text-gray-400 hover:text-white text-sm mb-4">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+  </button>
+
+    <div class="flex items-center justify-center gap-2 mb-4">
+  <div class="w-8 h-1.5 rounded-full bg-gold-400"></div>
+  <div class="w-8 h-1.5 rounded-full bg-gold-400"></div>
+</div>
+<p class="text-center text-xs text-gray-500 mb-6">Step 2 of 2 · Complete Payment</p>
+
+    <div class="glass-gold rounded-xl p-4 mb-5 text-sm">
+  <div class="flex justify-between">
+    <span class="text-gray-400">Plan</span>
+    <span class="text-white font-medium" id="summary-plan">Growth</span>
+  </div>
+  <div class="flex justify-between mt-2">
+    <span class="text-gray-400">Amount</span>
+    <span class="text-white font-medium" id="summary-amount">₵0</span>
+  </div>
+  <div class="flex justify-between mt-2">
+    <span class="text-gray-400">Expected Return</span>
+    <span class="text-gold-400 font-semibold" id="summary-payout">₵0</span>
+  </div>
+</div>
+
+  <!-- Premium Payment Card -->
+  <div class="glass-premium rounded-2xl p-6 mb-5 text-center relative overflow-hidden">
+    <div class="absolute -top-10 -right-10 w-40 h-40 bg-gold-500/10 rounded-full blur-[60px] pointer-events-none"></div>
+    <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-gold-500/5 rounded-full blur-[60px] pointer-events-none"></div>
+
+    <div class="relative z-10">
+      <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-gold-400/20 to-gold-600/20 border border-gold-400/30 flex items-center justify-center">
+        <i data-lucide="shield-check" class="w-7 h-7 text-gold-400"></i>
+      </div>
+      <h3 class="text-lg font-bold text-white">Private Transfer</h3>
+      <p class="text-sm text-gray-400 mt-1">Send exactly the amount shown to complete your deposit</p>
+
+      <!-- Security reassurance -->
+      <div class="flex items-center justify-center gap-2 mt-3 mb-5 text-xs text-gray-500">
+        <i data-lucide="lock" class="w-3 h-3 text-gold-400"></i>
+        <span>End-to-end encrypted · Verified merchant</span>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Amount -->
+        <div class="bg-dark-950/60 rounded-xl p-4 border border-white/5">
+          <p class="text-xs text-gray-400 uppercase tracking-wider">Amount to Send</p>
+          <p class="text-2xl font-bold text-white mt-1" id="pay-amount-display">₵0</p>
+        </div>
+
+        <!-- MoMo Number -->
+        <div class="bg-dark-950/60 rounded-xl p-4 border border-white/5">
+          <p class="text-xs text-gray-400 uppercase tracking-wider">MTN MoMo Number</p>
+          <div class="flex items-center justify-center gap-3 mt-2">
+            <p class="text-xl font-bold text-gradient tracking-wider" id="pay-momo-number">••••••••••</p>
+            <button onclick="copyAddress(document.getElementById('pay-momo-number').textContent)" class="text-gold-400 hover:text-gold-300 transition">
+              <i data-lucide="copy" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <p class="text-xs text-gray-400 mt-1" id="pay-momo-name"></p>
+        </div>
+
+        <!-- Reference Code -->
+        <div class="bg-dark-950/60 rounded-xl p-4 border border-white/5">
+        <p class="text-xs text-gray-400 uppercase tracking-wider">Your Reference Code</p>
+        <div class="flex items-center justify-center gap-3 mt-1">
+        <p class="text-2xl font-bold text-gold-400 tracking-widest" id="pay-reference-code">------</p>
+        <button onclick="copyAddress(document.getElementById('pay-reference-code').textContent)" class="text-gold-400 hover:text-gold-300 transition">
+        <i data-lucide="copy" class="w-5 h-5"></i>
+        </button>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">Please include this code in the MoMo note if possible</p>
+        <p class="text-[10px] text-gray-500 mt-1" id="pay-reference-expiry"></p>
+        </div>
+
+        <!-- Steps -->
+        <div class="text-left text-sm text-gray-300 space-y-3 mt-4 bg-dark-950/40 rounded-xl p-4 border border-white/5">
+          <h4 class="text-xs text-gray-400 uppercase tracking-wider mb-3">How to Send</h4>
+          <div class="flex items-start gap-2">
+            <span class="text-gold-400 font-bold mt-0.5">1.</span>
+            <span>Open your MTN MoMo menu and choose <strong>Send Money</strong>.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="text-gold-400 font-bold mt-0.5">2.</span>
+            <span>Enter the number above and the exact amount shown.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="text-gold-400 font-bold mt-0.5">3.</span>
+            <span>If there's a note field, add your <strong>Reference Code</strong>.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="text-gold-400 font-bold mt-0.5">4.</span>
+            <span>After sending, copy the <strong>Transaction ID</strong> from your MoMo SMS and paste it below.</span>
+          </div>
+        </div>
+
+        <!-- Transaction ID Input -->
+        <div>
+          <label class="block text-sm text-gray-300 text-left mb-2">MoMo Transaction ID</label>
+          <input type="text" id="deposit-txid" placeholder="e.g., 1234567890" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white">
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- What happens next -->
+<div class="glass rounded-xl p-4 mt-4">
+  <h4 class="text-sm font-semibold text-white mb-3">What Happens Next?</h4>
+  <div class="space-y-2 text-xs text-gray-400">
+    <div class="flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+      Payment submitted for verification
+    </div>
+    <div class="flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+      Deposit confirmed by our team
+    </div>
+    <div class="flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+      Funds activated in your dashboard
+    </div>
+    <div class="flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+      Earnings begin tracking immediately
+    </div>
+  </div>
+</div>
+
+    <div class="flex justify-center items-center gap-2 text-xs text-gray-400 mt-4">
+  <i data-lucide="headphones" class="w-3.5 h-3.5"></i>
+  Need help? Support is always available.
+</div>
+
+  <button onclick="submitDeposit()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2 mt-4 shadow-lg">
+    <i data-lucide="check-circle" class="w-5 h-5"></i> Confirm Deposit
+  </button>
+
+    <div class="grid grid-cols-3 gap-3 mt-5 text-center text-xs text-gray-500">
+  <div class="flex flex-col items-center gap-1">
+    <i data-lucide="shield" class="w-4 h-4 text-gold-400"></i>
+    <span>Secure</span>
+  </div>
+  <div class="flex flex-col items-center gap-1">
+    <i data-lucide="clock" class="w-4 h-4 text-gold-400"></i>
+    <span>Fast Review</span>
+  </div>
+  <div class="flex flex-col items-center gap-1">
+    <i data-lucide="badge-check" class="w-4 h-4 text-gold-400"></i>
+    <span>Verified</span>
+  </div>
+</div>
+    
+</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal -->
+<div id="custom-confirm-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl p-6 w-full max-w-sm text-center">
+    <i data-lucide="help-circle" class="w-10 h-10 text-yellow-400 mx-auto mb-3"></i>
+    <p id="custom-confirm-message" class="text-white text-sm mb-6">Are you sure?</p>
+    <div class="flex justify-center gap-4">
+      <button id="custom-confirm-cancel" class="px-6 py-2 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+      <button id="custom-confirm-ok" class="px-6 py-2 rounded-full gradient-gold text-dark-950 font-semibold text-sm hover:opacity-90 transition">Confirm</button>
+    </div>
+  </div>
+</div>
+
+    <!-- Promo Modal -->
+<div id="promo-modal" class="fixed inset-0 z-[300] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-sm p-6 text-center">
+    <span class="text-3xl">🎁</span>
+    <h3 class="text-lg font-bold text-white mt-2" id="promo-modal-message">Limited‑time deposit bonus!</h3>
+    <p class="text-xs text-gray-400 mt-1">
+      Deposit <strong id="promo-modal-min">₵500</strong>+ and get <strong id="promo-modal-bonus">10%</strong> extra in Prizes &amp; Rewards.
+    </p>
+    <p class="text-xs text-gray-500 mt-2">
+      Ends in <span id="promo-modal-countdown" class="text-gold-400 font-bold">--:--:--</span>
+    </p>
+    <div class="mt-4 space-y-2">
+      <button onclick="openDepositModalFromPromo()" class="w-full gradient-gold text-dark-950 font-semibold py-2.5 rounded-xl text-sm">
+        Start Investing
+      </button>
+      <button onclick="minimizePromo()" class="w-full bg-transparent border border-white/20 text-gray-300 py-2.5 rounded-xl text-sm hover:bg-white/5 transition">
+        Maybe Later
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Promo Bubble (minimised, shows countdown) -->
+<div id="promo-bubble" class="hidden fixed bottom-32 right-5 z-40 flex items-center gap-2 px-4 py-2 rounded-full bg-dark-800 border border-gold-400/50 shadow-2xl cursor-pointer animate-bounce-gentle" onclick="expandPromo()" title="Active promo!">
+  <span class="text-lg">🎁</span>
+  <span id="promo-bubble-countdown" class="text-xs text-gold-400 font-bold">--:--:--</span>
+</div>
+
+    <!-- Withdrawal Confirm Modal (for first withdrawal) -->
+<div id="withdraw-confirm-modal" class="fixed inset-0 z-[310] hidden items-center justify-center p-4"
+     style="background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-sm p-6 text-center" id="withdraw-confirm-content">
+    <!-- populated by JavaScript -->
+  </div>
+</div>
+
+    <!-- Platform Strength Modal -->
+<div id="platform-strength-modal" class="fixed inset-0 z-[330] hidden items-center justify-center p-4"
+     style="background: rgba(0,0,0,0.92); backdrop-filter: blur(12px);">
+  <div class="glass rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6 text-sm text-gray-300 space-y-5">
+    
+    <div class="text-center">
+      <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-lg">
+        <i data-lucide="shield-check" class="w-7 h-7 text-dark-950"></i>
+      </div>
+      <h3 class="text-xl font-bold text-white">Why We’re Still Here</h3>
+      <p class="text-xs text-gray-400 mt-1">Most platforms disappear. We built ours to last — here’s how.</p>
+    </div>
+
+    <!-- Section 1: Sustainable Model -->
+    <div class="bg-dark-950/50 rounded-xl p-4 border border-gold-500/20">
+      <h4 class="text-gold-400 font-semibold flex items-center gap-2 mb-2">
+        <i data-lucide="refresh-cw" class="w-4 h-4"></i> The Reinvestment Cycle
+      </h4>
+      <p class="text-xs leading-relaxed">
+        When your plan matures, you take a portion of your profit as <strong class="text-green-400">instant cashback</strong>. 
+        Your principal stays in the system and keeps growing. This means we <strong class="text-white">never pay out more than we hold</strong>, 
+        and your money always has a job to do. Platforms that let everyone withdraw 100% at once always collapse. We don’t.
+      </p>
+    </div>
+
+    <!-- Section 2: Active Plan Policy -->
+    <div class="bg-dark-950/50 rounded-xl p-4 border border-gold-500/20">
+      <h4 class="text-gold-400 font-semibold flex items-center gap-2 mb-2">
+        <i data-lucide="lock" class="w-4 h-4"></i> Active Plan Protection
+      </h4>
+      <p class="text-xs leading-relaxed">
+        To withdraw your full balance, you need an <strong class="text-white">active investment plan</strong> of at least the same size as your original investment. 
+        This ensures that <strong class="text-white">large withdrawals are always backed by fresh capital</strong>. 
+        It’s the same principle banks use — and it’s why your funds are always available when you need them.
+      </p>
+    </div>
+
+    <!-- Section 3: Instant Cashback -->
+    <div class="bg-dark-950/50 rounded-xl p-4 border border-gold-500/20">
+      <h4 class="text-gold-400 font-semibold flex items-center gap-2 mb-2">
+        <i data-lucide="zap" class="w-4 h-4"></i> Instant Cashback Rewards
+      </h4>
+      <p class="text-xs leading-relaxed">
+        Every time your plan matures, you get <strong class="text-green-400">real cash instantly</strong> — not just numbers on a screen. 
+        Meanwhile, the rest of your funds are already working in your next plan. 
+        You earn, you withdraw, and your principal keeps building. It’s the smartest way to grow wealth without risking the platform.
+      </p>
+    </div>
+
+    <!-- Section 4: Referral & VIP -->
+    <div class="bg-dark-950/50 rounded-xl p-4 border border-gold-500/20">
+      <h4 class="text-gold-400 font-semibold flex items-center gap-2 mb-2">
+        <i data-lucide="users" class="w-4 h-4"></i> Community Power
+      </h4>
+      <p class="text-xs leading-relaxed">
+        Our members earn <strong class="text-green-400">₵15 per referral</strong>, and VIP members enjoy boosted bonuses, 
+        priority support, and exclusive perks. The more you share, the more you earn — 
+        and a growing community keeps the platform strong for everyone.
+      </p>
+    </div>
+
+    <!-- Section 5: The Bottom Line -->
+    <div class="bg-gradient-to-r from-gold-500/10 to-transparent rounded-xl p-4 border border-gold-500/30">
+      <p class="text-xs text-gold-400 font-semibold text-center">
+        This is why we’ve paid out millions and kept growing — while others shut down. 
+        Your money is safe, your rewards are real, and your future is bright.
+      </p>
+    </div>
+
+    <button onclick="closePlatformStrengthModal()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl">
+      Got It
+    </button>
+  </div>
+</div>
+
+<!-- Membership Agreement Modal (one‑time) -->
+<div id="terms-modal" class="fixed inset-0 z-[300] hidden items-center justify-center p-4"
+     style="background: rgba(0,0,0,0.92); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6 text-sm text-gray-300 space-y-4">
+
+    <h3 class="text-lg font-bold text-white">Gold Coast Capital – Membership Agreement</h3>
+<p class="text-xs text-gray-500">Last updated: 29 June 2026</p>
+
+<p>Welcome to the Gold Coast Capital community! By creating an account or using our platform, you agree to this Membership Agreement. It explains how the platform works and what you can expect as a valued member.</p>
+
+<h4 class="text-white font-semibold">1. About Gold Coast Capital</h4>
+<p>Gold Coast Capital is a digital wealth‑building platform that helps you invest consistently and earn generous bonuses on your investments. Our mission is to make investing rewarding, transparent, and accessible.</p>
+
+<h4 class="text-white font-semibold">2. Investment Plans</h4>
+<ul class="list-disc pl-5 space-y-1">
+  <li><strong>Starter</strong> – Minimum ₵200, 10‑day duration, 50% bonus</li>
+  <li><strong>Growth</strong> – Minimum ₵300, 20‑day duration, 70% bonus</li>
+  <li><strong>Premium</strong> – Minimum ₵500, 30‑day duration, 100% bonus</li>
+</ul>
+<p>The bonus is paid at maturity together with your original deposit. You can have multiple active plans at once.</p>
+
+<h4 class="text-white font-semibold">3. Instant Cashback (Profit Share)</h4>
+<p>When your plan matures, you can immediately withdraw <strong>20% of your profit</strong> as instant cashback — sent directly to your wallet. Your original deposit and the remaining profit stay in your account and can be unlocked by starting a new investment plan of at least the same deposit amount.</p>
+
+<h4 class="text-white font-semibold">4. Withdrawal Policy</h4>
+<p>To withdraw the full balance of a matured plan, you need an <strong>active investment plan</strong> with a deposit amount at least equal to the original investment. This ensures the platform remains sustainable and rewards consistent investors.</p>
+
+<h4 class="text-white font-semibold">5. Referral Rewards</h4>
+<p>Every member receives a unique referral code. When a new user signs up with your code and activates their first investment plan, you receive a cash bonus. There is no limit on referrals.</p>
+
+<h4 class="text-white font-semibold">6. Prizes &amp; Rewards</h4>
+<p>Our Telegram group runs regular events like the Daily Lucky Spin and Mystery Box. Winnings go to your Prizes &amp; Rewards balance and can be withdrawn once you meet the minimum amount and have an active investment plan.</p>
+
+<h4 class="text-white font-semibold">7. Reinvest &amp; Earn</h4>
+<p>You can reinvest your matured payout into a new plan and receive an immediate bonus. Choose the same plan (Tier 1) or switch to a different plan with an extra deposit (Tier 2) for an even larger bonus.</p>
+
+<h4 class="text-white font-semibold">8. Platform Sustainability</h4>
+<p>Our policies are designed to keep the platform stable and growing. By requiring active plans for large withdrawals and rewarding consistent investments, we’ve built a system that can serve members for years — unlike platforms that collapse when too many users withdraw at once.</p>
+
+<h4 class="text-white font-semibold">9. General Provisions</h4>
+<p>This Agreement may be updated from time to time. Continued use of the Platform after changes means you accept the new terms. If you have questions, our support team is always available.</p>
+
+<p class="text-xs text-gray-500 mt-4">By clicking “I Agree”, you confirm that you have read, understood, and agree to this Membership Agreement.</p>
+
+    <button onclick="acceptTerms()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl mt-4">
+      I Agree
+    </button>
+  </div>
+</div>
+
+    <!-- Lock Info Modal -->
+<div id="lock-info-modal" class="fixed inset-0 z-[310] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-sm p-6 text-center">
+    <i data-lucide="lock" class="w-10 h-10 text-yellow-400 mx-auto mb-3"></i>
+    <h3 class="text-lg font-bold text-white mb-2">Remaining Balance Kept</h3>
+    <p class="text-sm text-gray-300 mb-4" id="lock-info-message">
+      You have a balance available, but it requires an active investment plan to unlock. Start a new plan (min ₵200) to access your remaining funds.
+    </p>
+    <button onclick="startNewPlanAndClose()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl mb-2">
+      Start New Plan
+    </button>
+    <button onclick="closeLockModal()" class="text-gray-400 text-xs hover:text-white">Maybe Later</button>
+  </div>
+</div>
+
+    <!-- Starter Loyalty Modal -->
+<div id="starter-limit-modal" class="fixed inset-0 z-[320] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.90); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-sm p-6 text-center">
+    <i data-lucide="award" class="w-10 h-10 text-gold-400 mx-auto mb-3"></i>
+    <h3 class="text-lg font-bold text-white mb-2">You've Reached Starter Elite!</h3>
+    <p class="text-sm text-gray-300 mb-4">
+      You've successfully completed 3 Starter plans. As a reward for your loyalty, your next Starter plan requires a <strong class="text-gold-400">minimum of ₵400</strong>.
+    </p>
+    <p class="text-xs text-gray-400 mb-4">
+      You can also upgrade to <strong class="text-white">Growth</strong> from just <strong class="text-white">₵300</strong> (70% returns) or <strong class="text-white">Premium</strong> from <strong class="text-white">₵500</strong> (100% returns).
+    </p>
+    <div class="space-y-2 mb-3">
+      <button onclick="selectPlanFromModal('growth')" class="w-full glass-gold rounded-xl py-3 font-semibold text-gold-400 hover:border-gold-400 transition">
+        Switch to Growth (₵300)
+      </button>
+      <button onclick="selectPlanFromModal('premium')" class="w-full glass-gold rounded-xl py-3 font-semibold text-gold-400 hover:border-gold-400 transition">
+        Switch to Premium (₵500)
+      </button>
+    </div>
+    <button onclick="closeStarterLimitModal()" class="text-gray-400 text-xs hover:text-white">Maybe Later</button>
+  </div>
+</div>
+
+<!-- Reinvest Bonus Modal -->
+<div id="reinvest-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-md max-h-[90vh] flex flex-col">
+    <div class="flex items-center justify-between p-6 pb-2">
+      <h2 class="font-display text-xl font-bold">Reinvest & Earn Bonus</h2>
+      <button onclick="closeReinvestModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+    </div>
+
+    <div class="overflow-y-auto px-6 pb-6 flex-1">
+      <input type="hidden" id="reinvest-investment-id">
+      <div class="mb-4">
+        <p class="text-sm text-gray-300">Your payout: <span id="reinvest-payout" class="font-bold text-white">₵0</span></p>
+        <p class="text-xs text-gray-500">Original plan: <span id="reinvest-original-plan"></span></p>
+      </div>
+
+      <!-- Tier 1 -->
+      <div id="reinvest-tier1" onclick="selectTier1()" class="w-full text-left glass-gold rounded-xl p-5 mb-4 cursor-pointer hover:border-gold-400 transition relative overflow-hidden group">
+        <div class="absolute inset-0 bg-gold-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center">
+            <i data-lucide="refresh-cw" class="w-5 h-5 text-gold-400"></i>
+          </div>
+          <h3 class="font-semibold text-gold-400">Tier 1 – Same Plan</h3>
+        </div>
+        <p class="text-sm text-gray-300 ml-13">Reinvest full payout into <strong>the same plan</strong> – no new deposit needed.</p>
+        <p class="text-sm text-green-400 mt-1 ml-13">Bonus: <strong>₵5</strong> added to Prizes & Rewards</p>
+      </div>
+
+      <!-- Tier 2 -->
+      <div id="reinvest-tier2-wrapper" class="mb-4">
+        <div onclick="selectTier2()" class="w-full text-left glass rounded-xl p-5 cursor-pointer hover:border-gold-400 transition relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gold-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center shrink-0">
+              <i data-lucide="arrow-up-circle" class="w-5 h-5 text-gold-400"></i>
+            </div>
+            <h3 class="font-semibold text-gold-400">Tier 2 – Upgrade & Boost</h3>
+          </div>
+          <p class="text-sm text-gray-300 ml-13">Switch to a <strong>different plan</strong> + add new deposit for a <strong>7% bonus</strong>.</p>
+        </div>
+        <div id="reinvest-tier2-options" class="hidden mt-3 pl-14 pr-2">
+          <label class="block text-sm mb-1">Choose New Plan</label>
+          <select id="reinvest-new-plan" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-2">
+            <option value="starter">Starter (min ₵200)</option>
+            <option value="growth">Growth (min ₵300)</option>
+            <option value="premium">Premium (min ₵500)</option>
+          </select>
+          <p class="text-xs text-gray-400 mt-2">Minimum new deposit: <strong id="fresh-amount">₵200</strong></p>
+          <div class="mt-2">
+            <label class="block text-sm mb-1">Your New Deposit (GHS)</label>
+            <input type="number" id="reinvest-extra-amount" min="200" placeholder="Min ₵200" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2" oninput="updateTier2Bonus()">
+          </div>
+          <p class="text-xs text-gray-400">Your payout will be reinvested into this plan together with your new deposit.</p>
+          <div id="reinvest-payment-section" class="mt-3">
+            <p class="text-xs text-gray-400 mb-3">Send exactly <strong id="fresh-amount-display">₵0</strong> to the number below, then paste your MoMo Transaction ID.</p>
+            <div class="glass-gold rounded-xl p-3 mb-4 text-sm">
+              <div class="flex justify-between"><span class="text-gray-400">Plan</span><span class="text-white font-medium" id="tier2-summary-plan">Premium</span></div>
+              <div class="flex justify-between mt-1"><span class="text-gray-400">Fresh Deposit</span><span class="text-white font-medium" id="tier2-summary-amount">₵0</span></div>
+              <div class="flex justify-between mt-1"><span class="text-gray-400">Total Investment</span><span class="text-gold-400 font-semibold" id="tier2-summary-total">₵0</span></div>
+            </div>
+            <div class="bg-dark-950/50 rounded-xl p-4 mb-3 border border-white/5 text-center">
+              <p class="text-xs text-gray-400 uppercase tracking-wider">MTN MoMo Number</p>
+              <div class="flex items-center justify-center gap-3 mt-2">
+                <p class="text-xl font-bold text-gradient tracking-wider" id="reinvest-momo-number">••••••••••</p>
+                <button onclick="copyAddress(document.getElementById('reinvest-momo-number').textContent)" class="text-gold-400 hover:text-gold-300"><i data-lucide="copy" class="w-5 h-5"></i></button>
+              </div>
+              <p class="text-xs text-gray-400 mt-1" id="reinvest-momo-name"></p>
+            </div>
+            <label class="block text-sm text-gray-300 text-left mb-2">MoMo Transaction ID</label>
+            <input type="text" id="reinvest-txid" placeholder="e.g., 1234567890" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
+          </div>
+          <p class="text-sm text-green-400 mt-1">Bonus: <strong id="reinvest-tier2-bonus">7% of new deposit</strong></p>
+          <div class="grid grid-cols-3 gap-2 mt-3 text-center text-[10px] text-gray-500">
+            <div class="flex flex-col items-center gap-1"><i data-lucide="shield" class="w-3 h-3 text-gold-400"></i><span>Secure</span></div>
+            <div class="flex flex-col items-center gap-1"><i data-lucide="clock" class="w-3 h-3 text-gold-400"></i><span>Fast Review</span></div>
+            <div class="flex flex-col items-center gap-1"><i data-lucide="badge-check" class="w-3 h-3 text-gold-400"></i><span>Verified</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBMIT BUTTON – always visible -->
+      <button onclick="submitReinvest()" class="w-full gradient-gold text-dark-950 font-semibold py-3 rounded-xl flex items-center justify-center gap-2 mt-4">
+        <i data-lucide="check-circle" class="w-5 h-5"></i> Claim Bonus & Reinvest
+      </button>
+    </div>
+  </div>
+</div>
+<script>
+  let promoInterval=null;let promoEndTime=null;async function loadInvestorCount(){const span=document.getElementById('investor-count-number');if(!span)return;let target=500;try{const res=await fetch(`${API_BASE}/api/settings/investor_count`);if(res.ok){const data=await res.json();target=data.count||500}}catch(e){}
+span.textContent='0';const duration=1500;const start=performance.now();const startValue=0;function update(now){const elapsed=now-start;const progress=Math.min(elapsed/duration,1);const eased=1-Math.pow(1-progress,3);span.textContent=Math.floor(startValue+(target-startValue)*eased);if(progress<1){requestAnimationFrame(update)}else{span.textContent=target}}
+requestAnimationFrame(update)}
+async function loadPromoBanner(){try{const res=await fetch(`${API_BASE}/api/admin/promo-status`);const data=await res.json();const modal=document.getElementById('promo-modal');const bubble=document.getElementById('promo-bubble');if(!modal||!bubble)return;if(!data.active){modal.classList.add('hidden');bubble.classList.add('hidden');if(promoInterval)clearInterval(promoInterval);return}
+document.getElementById('promo-modal-message').textContent=data.message||'Limited‑time deposit bonus!';document.getElementById('promo-modal-min').textContent='₵'+data.min_deposit;document.getElementById('promo-modal-bonus').textContent=data.bonus+'%';promoEndTime=new Date(data.end_time).getTime();if(!window._promoMinimised){modal.classList.remove('hidden');modal.classList.add('flex');bubble.classList.add('hidden')}else{modal.classList.add('hidden');bubble.classList.remove('hidden')}
+updatePromoCountdown();if(promoInterval)clearInterval(promoInterval);promoInterval=setInterval(updatePromoCountdown,1000)}catch(e){}}
+function updatePromoCountdown(){if(!promoEndTime)return;const diff=promoEndTime-Date.now();const expired=diff<=0;const text=expired?'Expired':formatCountdown(diff);document.getElementById('promo-modal-countdown').textContent=text;document.getElementById('promo-bubble-countdown').textContent=text;if(expired){clearInterval(promoInterval);document.getElementById('promo-modal').classList.add('hidden');document.getElementById('promo-bubble').classList.add('hidden')}}
+function formatCountdown(ms){const h=Math.floor(ms/3600000);const m=Math.floor((ms%3600000)/60000);const s=Math.floor((ms%60000)/1000);return `${h}h ${m}m ${s}s`}
+function minimizePromo(){const modal=document.getElementById('promo-modal');const bubble=document.getElementById('promo-bubble');modal.classList.add('hidden');modal.classList.remove('flex');bubble.classList.remove('hidden');window._promoMinimised=!0}
+function expandPromo(){const modal=document.getElementById('promo-modal');const bubble=document.getElementById('promo-bubble');bubble.classList.add('hidden');modal.classList.remove('hidden');modal.classList.add('flex');window._promoMinimised=!1}
+function openDepositModalFromPromo(){minimizePromo();openDepositModal()}
+function initLeadershipCarousel(){const track=document.getElementById('leadershipTrack');if(!track||typeof leadershipTeam==='undefined')return;const cardsHTML=leadershipTeam.map(member=>`
+    <div class="leadership-card glass-premium rounded-2xl p-4 sm:p-5 text-center flex-shrink-0">
+      <img src="${member.img}" alt="${member.name}" class="w-20 h-20 rounded-full mx-auto mb-3 object-cover border-2 border-gold-400/30">
+      <h5 class="text-base font-bold text-white">${member.name}</h5>
+      <p class="text-gold-400 text-xs font-semibold mb-2">${member.role}</p>
+      <p class="text-gray-400 text-[11px] leading-relaxed">${member.bio}</p>
+    </div>
+  `).join('');track.innerHTML=cardsHTML+cardsHTML}
+document.addEventListener('DOMContentLoaded',initLeadershipCarousel);function openPlatformStrengthModal(){toggleProfileDropdown();const modal=document.getElementById('platform-strength-modal');if(modal){modal.classList.remove('hidden');modal.classList.add('flex');lucide.createIcons()}}
+function closePlatformStrengthModal(){const modal=document.getElementById('platform-strength-modal');if(modal){modal.classList.add('hidden');modal.classList.remove('flex')}}
+function toggleProfileDropdown(){const dropdown=document.getElementById('profile-dropdown');const chevron=document.getElementById('profile-chevron');dropdown.classList.toggle('hidden');if(chevron){chevron.style.transform=dropdown.classList.contains('hidden')?'rotate(0deg)':'rotate(180deg)'}}
+document.addEventListener('click',function(e){const dropdown=document.getElementById('profile-dropdown');const trigger=e.target.closest('[onclick="toggleProfileDropdown()"]');if(!trigger&&dropdown&&!dropdown.classList.contains('hidden')){dropdown.classList.add('hidden');const chevron=document.getElementById('profile-chevron');if(chevron)chevron.style.transform='rotate(0deg)'}});function toggleCollapse(headerEl){const content=headerEl.nextElementSibling;const icon=headerEl.querySelector('[data-lucide]');content.classList.toggle('collapsed');if(icon){icon.style.transform=content.classList.contains('collapsed')?'rotate(-90deg)':'rotate(0deg)'}}
+let currentReinvestTier=1;let reinvestPayout=0;let reinvestOriginalPlan='';function openReinvestModal(investmentId){const inv=allInvestmentsLocal.find(i=>i.id===investmentId);if(!inv)return;const rate={starter:0.5,growth:0.7,premium:1.0}[inv.plan]||1.0;const payout=inv.amount*(1+rate);reinvestPayout=payout;reinvestOriginalPlan=inv.plan;document.getElementById('reinvest-payout').textContent='₵'+payout.toFixed(2);document.getElementById('reinvest-original-plan').textContent=inv.plan;document.getElementById('reinvest-investment-id').value=inv.id;currentReinvestTier=1;document.getElementById('reinvest-tier1').classList.add('glass-gold');document.getElementById('reinvest-tier2-wrapper').classList.remove('glass-gold');document.getElementById('reinvest-tier2-options').classList.add('hidden');document.getElementById('reinvest-new-plan').value=inv.plan;document.getElementById('reinvest-modal').classList.remove('hidden');document.getElementById('reinvest-modal').classList.add('flex');lucide.createIcons()}
+function closeReinvestModal(){document.getElementById('reinvest-modal').classList.add('hidden');document.getElementById('reinvest-modal').classList.remove('flex')}
+function acceptTerms(){localStorage.setItem('gcc_terms_accepted','true');const modal=document.getElementById('terms-modal');if(modal){modal.classList.add('hidden');modal.classList.remove('flex')}}
+function closeLockModal(){document.getElementById('lock-info-modal').classList.add('hidden');document.getElementById('lock-info-modal').classList.remove('flex')}
+function startNewPlanAndClose(){closeLockModal();closeReinvestModal();openDepositModal()}
+function selectTier1(){currentReinvestTier=1;const tier1=document.getElementById('reinvest-tier1');const wrapper=document.getElementById('reinvest-tier2-wrapper');const options=document.getElementById('reinvest-tier2-options');if(tier1)tier1.classList.add('glass-gold');if(wrapper)wrapper.classList.remove('glass-gold');if(options)options.classList.add('hidden');}
+function selectTier2(){currentReinvestTier=2;const tier1=document.getElementById('reinvest-tier1');const wrapper=document.getElementById('reinvest-tier2-wrapper');const options=document.getElementById('reinvest-tier2-options');if(tier1)tier1.classList.remove('glass-gold');if(wrapper)wrapper.classList.add('glass-gold');if(options)options.classList.remove('hidden');updateTier2Info();const momoNum=document.getElementById('reinvest-momo-number');const momoName=document.getElementById('reinvest-momo-name');if(momoNum)momoNum.textContent=paymentSettings.momo_number||'••••••••••';if(momoName)momoName.textContent=paymentSettings.momo_name||''}
+function updateTier2Info(){const planSelect=document.getElementById('reinvest-new-plan');const freshEl=document.getElementById('fresh-amount');const extraInput=document.getElementById('reinvest-extra-amount');const bonusEl=document.getElementById('reinvest-tier2-bonus');if(!planSelect||!freshEl||!bonusEl)return;const minAmounts={starter:200,growth:300,premium:500};const requiredMin=minAmounts[planSelect.value]||200;freshEl.textContent='₵'+requiredMin;extraInput.min=requiredMin;extraInput.placeholder=`Min ₵${requiredMin}`;updateTier2Bonus();updateReinvestPaymentDetails()}
+function updateTier2Bonus(){const extraInput=document.getElementById('reinvest-extra-amount');const bonusEl=document.getElementById('reinvest-tier2-bonus');if(!extraInput||!bonusEl)return;const amount=parseFloat(extraInput.value)||0;const bonus=Math.min(Math.floor(0.07*amount),30);bonusEl.textContent=`₵${bonus} (7% of ₵${amount})`;const freshDisplay=document.getElementById('fresh-amount-display');if(freshDisplay){freshDisplay.textContent=`₵${amount.toFixed(2)}`;document.getElementById('tier2-summary-plan').textContent=document.getElementById('reinvest-new-plan').options[document.getElementById('reinvest-new-plan').selectedIndex].text;document.getElementById('tier2-summary-amount').textContent='₵'+amount.toFixed(2);const total=reinvestPayout+amount;document.getElementById('tier2-summary-total').textContent='₵'+total.toFixed(2)}}
+function updateReinvestPaymentDetails(){const container=document.getElementById('reinvest-payment-credentials');const extraAmount=parseFloat(document.getElementById('reinvest-extra-amount').value)||0;if(!container)return;const momoNumber=paymentSettings.momo_number||'••••••••••';const momoName=paymentSettings.momo_name||'';container.innerHTML=`
+    <div class="bg-dark-950/50 rounded-xl p-4 mb-3 border border-white/5 text-center">
+      <p class="text-xs text-gray-400 uppercase tracking-wider">MTN MoMo Number</p>
+      <div class="flex items-center justify-center gap-3 mt-2">
+        <p class="text-xl font-bold text-gradient tracking-wider">${momoNumber}</p>
+        <button onclick="copyAddress('${momoNumber}')" class="text-gold-400 hover:text-gold-300">
+          <i data-lucide="copy" class="w-5 h-5"></i>
+        </button>
+      </div>
+      ${momoName ? `<p class="text-xs text-gray-400 mt-1">${momoName}</p>` : ''}
+    </div>
+    <label class="block text-sm text-gray-300 text-left mb-2">MoMo Transaction ID</label>
+    <input type="text" id="reinvest-txid" placeholder="e.g., 1234567890" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-2">
+  `;lucide.createIcons()}
+async function processWithdrawal(investmentId,amount){try{const res=await fetch(`${API_BASE}/api/withdrawals`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${authToken}`},body:JSON.stringify({investment_id:investmentId})});const data=await res.json();if(!res.ok){showToast(data.error||'Withdrawal failed','error');return}
+showToast(data.message||'Payout request submitted!','success');updateDashboard()}catch(e){showToast('Connection error','error')}}
+async function submitReinvest(){const invId=document.getElementById('reinvest-investment-id').value;const plan=document.getElementById('reinvest-new-plan').value;const extraInput=document.getElementById('reinvest-extra-amount');const extraAmount=parseFloat(extraInput.value)||0;const minAmounts={starter:200,growth:300,premium:500};const requiredMin=minAmounts[plan];if(currentReinvestTier===2){if(extraAmount<requiredMin){showToast(`Minimum fresh deposit for ${plan} is ₵${requiredMin}`,'error');return}}
+if(currentReinvestTier===2){const txid=document.getElementById('reinvest-txid').value.trim();if(!txid){showToast('Please enter your MoMo Transaction ID','error');return}}
+const body={original_investment_id:invId,new_plan:plan,extra_amount:currentReinvestTier===2?extraAmount:0,method:currentReinvestTier===2?'momo':undefined,transaction_id:currentReinvestTier===2?document.getElementById('reinvest-txid').value:undefined};if(currentReinvestTier===2&&(!body.transaction_id||!body.method)){showToast('Please enter transaction ID and payment method','error');return}
+try{const res=await fetch(`${API_BASE}/api/reinvest`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${authToken}`},body:JSON.stringify(body)});const data=await res.json();if(!res.ok){showToast(data.error||'Reinvest failed','error');return}
+closeReinvestModal();showToast(`Reinvest successful! ₵${data.bonus} bonus added to Prizes & Rewards.`,'success');updateDashboard()}catch(e){showToast('Connection error','error')}}
+function copyReferralLink(){const code=document.getElementById('dash-referral-code').textContent.trim();const refLink=`https://goldcoastcapital.org?ref=${encodeURIComponent(code)}`;navigator.clipboard.writeText(refLink).then(()=>{showToast('Referral link copied!','success')}).catch(()=>{showToast('Failed to copy','error')})}
+function shareReferral(platform){const code=document.getElementById('dash-referral-code').textContent.trim();const refLink=`https://goldcoastcapital.org?ref=${encodeURIComponent(code)}`;const message=`Join Gold Coast Capital and start investing with just ₵200! Sign up with my referral link: ${refLink}`;if(platform==='whatsapp'){window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank')}else if(platform==='telegram'){window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent('Join Gold Coast Capital today!')}`,'_blank')}}
+function getDismissedIds(){try{return JSON.parse(localStorage.getItem('dismissed_announcements')||'[]')}catch(e){return[]}}
+function addDismissedId(id){const ids=getDismissedIds();ids.push(id);localStorage.setItem('dismissed_announcements',JSON.stringify(ids))}
+async function openAnnouncementsModal(){const modal=document.getElementById('announcements-modal');modal.classList.remove('hidden');modal.classList.add('flex');const list=document.getElementById('announcements-list');list.innerHTML='<div class="text-gray-500 text-center py-2">Loading...</div>';try{const res=await fetch(`${API_BASE}/api/admin/announcements?limit=10`);if(!res.ok)throw new Error('Failed');const{announcements}=await res.json();if(!announcements||announcements.length===0){list.innerHTML='<div class="text-gray-500 text-center py-4">No announcements.</div>';return}
+const dismissedIds=getDismissedIds();const visible=announcements.filter(a=>!dismissedIds.includes(a.id));if(visible.length===0){list.innerHTML='<div class="text-gray-500 text-center py-4">No new announcements.</div>';return}
+list.innerHTML=visible.map(a=>`
+      <div class="flex items-start justify-between border-b border-white/5 pb-2">
+        <div>
+          <p class="text-white">${a.message}</p>
+          <span class="text-xs text-gray-500">${new Date(a.created_at).toLocaleString()}</span>
+        </div>
+        <button onclick="dismissSingleAnnouncement(${a.id})" class="text-gray-400 hover:text-red-400 ml-2 shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+    `).join('');lucide.createIcons()}catch(e){list.innerHTML='<div class="text-gray-500 text-center py-4">Failed to load announcements.</div>'}}
+function closeAnnouncementsModal(){document.getElementById('announcements-modal').classList.add('hidden');document.getElementById('announcements-modal').classList.remove('flex')}
+function dismissSingleAnnouncement(id){addDismissedId(id);openAnnouncementsModal()}
+async function clearAllAnnouncements(){if(!await customConfirm('Dismiss all announcements?'))return;try{const res=await fetch(`${API_BASE}/api/admin/announcements?limit=100`);if(res.ok){const{announcements}=await res.json();const ids=getDismissedIds();announcements.forEach(a=>{if(!ids.includes(a.id))ids.push(a.id);});localStorage.setItem('dismissed_announcements',JSON.stringify(ids))}}catch(e){}
+closeAnnouncementsModal();const dot=document.getElementById('announcement-dot');if(dot)dot.classList.add('hidden');}
+let currentAnnouncementId=null;async function loadAnnouncement(){try{const res=await fetch(`${API_BASE}/api/admin/announcements`);if(!res.ok)return;const{announcements}=await res.json();const announcement=announcements&&announcements.length>0?announcements[0]:null;const dot=document.getElementById('announcement-dot');if(!announcement){if(dot)dot.classList.add('hidden');return}
+const dismissedIds=getDismissedIds();if(dismissedIds.includes(announcement.id)){if(dot)dot.classList.add('hidden');return}
+if(dot)dot.classList.remove('hidden');currentAnnouncementId=announcement.id}catch(e){}}
+async function loadTransactionHistory(){const tableBody=document.getElementById('transaction-table-body');const cardsContainer=document.getElementById('transaction-cards');try{const res=await fetch(`${API_BASE}/api/transactions`,{headers:{'Authorization':`Bearer ${authToken}`}});if(!res.ok)throw new Error('Failed');const{transactions}=await res.json();if(tableBody){tableBody.innerHTML=transactions.length===0?'<tr><td colspan="5" class="py-8 text-center text-gray-500">No transactions yet.</td></tr>':transactions.map(tx=>`
+          <tr class="border-b border-white/5">
+            <td class="py-3 capitalize">${tx.type}</td>
+            <td class="py-3">${tx.description}</td>
+            <td class="py-3 ${tx.type === 'withdrawal' || tx.type === 'referral_bonus' ? 'text-red-400' : 'text-green-400'}">₵${formatNumber(tx.amount)}</td>
+            <td class="py-3"><span class="status-${tx.status}">${tx.status}</span></td>
+            <td class="py-3 text-gray-400">${new Date(tx.date).toLocaleString()}</td>
+          </tr>
+        `).join('')}
+if(cardsContainer){cardsContainer.innerHTML=transactions.length===0?'<div class="text-gray-500 text-center py-4">No transactions yet.</div>':transactions.map(tx=>`
+          <div class="glass rounded-lg p-3 mb-2 flex justify-between items-start">
+            <div>
+              <div class="font-semibold capitalize">${tx.type}</div>
+              <div class="text-sm text-gray-300">${tx.description}</div>
+              <div class="text-xs text-gray-500">${new Date(tx.date).toLocaleString()}</div>
+            </div>
+            <div class="text-right">
+              <div class="${tx.type === 'withdrawal' || tx.type === 'referral_bonus' ? 'text-red-400' : 'text-green-400'} font-semibold">₵${formatNumber(tx.amount)}</div>
+              <span class="status-${tx.status} text-xs">${tx.status}</span>
+            </div>
+          </div>
+        `).join('')}}catch(e){if(tableBody)tableBody.innerHTML='<tr><td colspan="5" class="py-8 text-center text-gray-500">Failed to load transactions.</td></tr>';if(cardsContainer)cardsContainer.innerHTML='<div class="text-gray-500 text-center py-4">Failed to load transactions.</div>'}}
+async function handleForgotPassword(e){e.preventDefault();const email=document.getElementById('forgot-email').value;const msgDiv=document.getElementById('forgot-message');try{const res=await fetch(`${API_BASE}/api/auth/forgot-password`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});const data=await res.json();msgDiv.textContent=data.message;msgDiv.classList.remove('hidden');if(res.ok){showToast('Reset link sent! Check your email.','success')}}catch(err){msgDiv.textContent='Connection error.';msgDiv.classList.remove('hidden')}}
+async function handleResetPassword(e){e.preventDefault();const token=document.getElementById('reset-token').value;const newPassword=document.getElementById('reset-password').value;const msgDiv=document.getElementById('reset-message');try{const res=await fetch(`${API_BASE}/api/auth/reset-password`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,newPassword})});const data=await res.json();msgDiv.textContent=data.message||data.error;msgDiv.classList.remove('hidden');if(res.ok){showToast('Password reset successfully! Please login.','success');setTimeout(()=>navigateTo('login'),2000)}}catch(err){msgDiv.textContent='Connection error.';msgDiv.classList.remove('hidden')}}
+function togglePasswordVisibility(inputId,btn){const input=document.getElementById(inputId);const icon=btn.querySelector('[data-lucide]');if(input.type==='password'){input.type='text';icon.setAttribute('data-lucide','eye-off')}else{input.type='password';icon.setAttribute('data-lucide','eye')}
+lucide.createIcons()}
+function safe(str){return String(str).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
+function customConfirm(message){return new Promise((resolve)=>{document.getElementById('custom-confirm-message').innerHTML=message;document.getElementById('custom-confirm-modal').classList.remove('hidden');document.getElementById('custom-confirm-modal').classList.add('flex');function cleanup(){document.getElementById('custom-confirm-modal').classList.add('hidden');document.getElementById('custom-confirm-modal').classList.remove('flex');document.getElementById('custom-confirm-ok').removeEventListener('click',onOk);document.getElementById('custom-confirm-cancel').removeEventListener('click',onCancel)}
+function onOk(){cleanup();resolve(!0)}
+function onCancel(){cleanup();resolve(!1)}
+document.getElementById('custom-confirm-ok').addEventListener('click',onOk);document.getElementById('custom-confirm-cancel').addEventListener('click',onCancel)})}
+const API_BASE='https://goldcoast-api.onrender.com';let currentUser=null;let authToken=localStorage.getItem('gcc_token');let selectedPlan='growth';let selectedPayment='momo';const returnRates={starter:0.5,growth:0.7,premium:1.0};function getMomoDetailsHtml(amountText){const note=paymentSettings.payment_note||'Send exactly the amount shown.';const momoNumber=paymentSettings.momo_number;const momoName=paymentSettings.momo_name;if(!momoNumber){return `<div class="text-gray-500 text-sm text-center py-4">⚠️ MoMo payment details not configured yet.</div>`}
+return `
+        <div class="flex items-center gap-2 mb-4"><i data-lucide="smartphone" class="w-5 h-5 text-gold-400"></i><span class="font-medium">Send to MTN Mobile Money</span></div>
+                <div class="bg-dark-950/50 rounded-lg p-4 mb-4 text-center">
+            <p class="text-gray-400 text-xs mb-1">MTN MoMo Number</p>
+            <div class="flex items-center justify-center gap-2">
+                <p class="text-2xl font-bold text-gradient tracking-wider">${momoNumber}</p>
+                <button onclick="copyAddress('${momoNumber}')" class="text-gold-400 hover:text-gold-300 transition-colors" title="Copy number">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                </button>
+            </div>
+            ${momoName ? `<p class="text-gray-400 text-xs mt-1">${momoName}</p>` : ''}
+        </div>
+        <div class="space-y-2 text-sm text-gray-400">
+            <div class="flex items-start gap-2"><i data-lucide="info" class="w-4 h-4 mt-0.5 text-gold-400 shrink-0"></i> ${note} <span class="text-white font-medium mx-1">${amountText}</span></div>
+        </div>
+    `}
+function getCryptoDetailsHtml(amountText){const usdt=paymentSettings.usdt_address;const btc=paymentSettings.btc_address;const eth=paymentSettings.eth_address;if(!usdt&&!btc&&!eth){return `<div class="text-gray-500 text-sm text-center py-4">⚠️ Crypto payment details not configured yet.</div>`}
+return `
+        <div class="flex items-center gap-2 mb-4"><i data-lucide="bitcoin" class="w-5 h-5 text-orange-400"></i><span class="font-medium">Send Cryptocurrency</span></div>
+        <div class="space-y-4">
+            ${usdt ? `<div class="bg-dark-950/50 rounded-lg p-4"><div class="flex items-center justify-between mb-1"><span class="text-xs text-gray-400">USDT(TRC20)</span><button onclick="copyAddress('${usdt}')" class="text-gold-400 text-xs hover:underline"><i data-lucide="copy" class="w-3 h-3"></i>Copy</button></div><p class="text-sm font-mono break-all text-gray-300">${usdt}</p></div>` : ''}
+            ${btc ? `<div class="bg-dark-950/50 rounded-lg p-4"><div class="flex items-center justify-between mb-1"><span class="text-xs text-gray-400">Bitcoin(BTC)</span><button onclick="copyAddress('${btc}')" class="text-gold-400 text-xs hover:underline"><i data-lucide="copy" class="w-3 h-3"></i>Copy</button></div><p class="text-sm font-mono break-all text-gray-300">${btc}</p></div>` : ''}
+            ${eth ? `<div class="bg-dark-950/50 rounded-lg p-4"><div class="flex items-center justify-between mb-1"><span class="text-xs text-gray-400">Ethereum(ETH)</span><button onclick="copyAddress('${eth}')" class="text-gold-400 text-xs hover:underline"><i data-lucide="copy" class="w-3 h-3"></i>Copy</button></div><p class="text-sm font-mono break-all text-gray-300">${eth}</p></div>` : ''}
+        </div>
+        <div class="mt-4 space-y-2 text-sm text-gray-400">
+            <div class="flex items-start gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 text-orange-400 shrink-0"></i> Send equivalent of <span class="text-white font-medium mx-1">${amountText}</span></div>
+        </div>
+    `}
+let paymentSettings={momo_number:'',usdt_address:'',btc_address:'',eth_address:'',payment_note:''};async function loadPaymentSettings(){if(!authToken)return;try{const res=await fetch(`${API_BASE}/api/settings`,{headers:{'Authorization':`Bearer ${authToken}`}});if(res.ok){const data=await res.json();if(data.settings)paymentSettings=data.settings}}catch(e){}}
+let growthChart=null;let countdownTimer=null;function navigateTo(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(`page-${page}`).classList.add('active');if(page==='signup'){const storedRef=localStorage.getItem('gcc_ref_code');if(storedRef){const refInput=document.getElementById('signup-referral');if(refInput)refInput.value=storedRef}}
+if(page==='dashboard')updateDashboard();window.scrollTo(0,0)}
+async function handleSignup(e){e.preventDefault();const payload={name:document.getElementById('signup-name').value,email:document.getElementById('signup-email').value,phone:document.getElementById('signup-phone').value,password:document.getElementById('signup-password').value,referral:document.getElementById('signup-referral').value};try{const res=await fetch(`${API_BASE}/api/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await res.json();if(!res.ok)return showToast(data.error||'Registration failed','error');authToken=data.token;currentUser=data.user;localStorage.setItem('gcc_token',authToken);localStorage.setItem('gcc_user',JSON.stringify(data.user));loadPaymentSettings();showToast('Account created!','success');navigateTo('dashboard')}catch(err){showToast('Connection error','error')}}
+async function handleLogin(e){e.preventDefault();const payload={email:document.getElementById('login-email').value,password:document.getElementById('login-password').value};try{const res=await fetch(`${API_BASE}/api/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await res.json();if(!res.ok)return showToast(data.error||'Login failed','error');authToken=data.token;currentUser=data.user;localStorage.setItem('gcc_token',authToken);localStorage.setItem('gcc_user',JSON.stringify(data.user));loadPaymentSettings();showToast('Welcome back!','success');navigateTo('dashboard')}catch(err){showToast('Connection error','error')}}
+function handleLogout(){if(countdownTimer)clearInterval(countdownTimer);localStorage.removeItem('gcc_token');localStorage.removeItem('gcc_user');authToken=null;currentUser=null;navigateTo('landing');const badge=document.getElementById('investor-count-fixed');if(badge)badge.style.display='none'}
+async function updateDashboard(){if(!authToken)return handleLogout();if(!currentUser){const res=await fetch(`${API_BASE}/api/auth/me`,{headers:{'Authorization':`Bearer ${authToken}`}});if(!res.ok){handleLogout();return}
+const data=await res.json();currentUser=data.user;document.getElementById('dashboard-loader').classList.remove('hidden')}
+document.getElementById('dash-name').textContent=safe(currentUser.name.split(' ')[0]);document.getElementById('dash-username').textContent=safe(currentUser.name.split(' ')[0]);document.getElementById('dash-avatar').textContent=currentUser.name[0].toUpperCase();const badge=document.getElementById('partner-badge');if(badge){if(currentUser.is_partner){badge.classList.remove('hidden')}else{badge.classList.add('hidden')}}
+document.getElementById('dash-referral-code').textContent=currentUser.referral_code||currentUser.id;document.getElementById('dash-bonus').textContent=`₵${formatNumber(currentUser.bonus || 0)}`;document.getElementById('dash-game-balance').textContent=`₵${formatNumber(currentUser.game_balance || 0)}`;loadLeaderboard();loadAnnouncement();const btn=document.getElementById('withdraw-bonus-btn');if(btn){const b=parseFloat((currentUser.bonus||0).toString());btn.disabled=b<50;btn.style.opacity=b<50?'0.5':'1'}
+const gameBtn=document.getElementById('withdraw-game-btn');if(gameBtn){const gb=parseFloat((currentUser.game_balance||0).toString());gameBtn.disabled=gb<30;gameBtn.style.opacity=gb<30?'0.5':'1'}
+const[invRes,wdrRes]=await Promise.all([fetch(`${API_BASE}/api/investments`,{headers:{'Authorization':`Bearer ${authToken}`}}),fetch(`${API_BASE}/api/withdrawals`,{headers:{'Authorization':`Bearer ${authToken}`}})]);const{investments}=await invRes.json();const{withdrawals}=await wdrRes.json();window.allInvestmentsLocal=investments;window.allWithdrawalsLocal=withdrawals;const withdrawalMap={};withdrawals.forEach(w=>{withdrawalMap[w.investment_id]=w});const totalInvested=investments.reduce((s,i)=>(i.status!=='rejected'&&i.status!=='reinvested')?s+i.amount:s,0);const totalActive=investments.filter(i=>i.status==='active').reduce((s,i)=>s+i.amount,0);document.getElementById('stat-active-total').textContent='₵'+formatNumber(totalActive);const totalEarnings=investments.reduce((s,i)=>{if(i.status!=='active')return s;const rate=returnRates[i.plan]||1;const progress=getProgress(i)/100;return s+(i.amount*rate*progress)},0);const totalExpected=investments.reduce((s,i)=>{if(i.status==='pending')return s+i.amount;if(i.status==='rejected'||i.status==='matured'||i.status==='reinvested')return s;return s+i.amount*(1+(returnRates[i.plan]||1))},0);const activityEl=document.getElementById('recent-activity');if(activityEl){if(investments.length===0){activityEl.innerHTML='<div class="text-gray-500 text-sm text-center py-4">No activity yet</div>'}else{activityEl.innerHTML=investments.slice(-3).reverse().map(inv=>`
+      <div class="flex items-center justify-between glass rounded-lg p-2.5">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full ${inv.method==='momo'?'bg-yellow-500/20':'bg-orange-500/20'} flex items-center justify-center"><span class="text-xs">${inv.method==='momo'?'M':'₿'}</span></div>
+          <div><div class="text-xs font-medium">₵${formatNumber(inv.amount)}</div><div class="text-[10px] text-gray-500">${inv.plan}</div></div>
+        </div>
+        <span class="text-[10px] text-gray-500">${timeAgo(inv.date)}</span>
+      </div>
+    `).join('')}}
+const activeInvs=investments.filter(i=>i.status!=='pending'&&i.status!=='rejected'&&i.status!=='matured'&&i.status!=='reinvested');if(countdownTimer)clearInterval(countdownTimer);let nextMaturity=null;if(activeInvs.length>0){const now=Date.now();const planDays={starter:10,growth:20,premium:30};for(const inv of activeInvs){const effectiveDays=inv.duration_days||planDays[inv.plan]||14;const matureTime=new Date(inv.date).getTime()+effectiveDays*86400000;if(matureTime>now&&(nextMaturity===null||matureTime<nextMaturity)){nextMaturity=matureTime}}}
+if(nextMaturity){const updateCountdown=()=>{const distance=nextMaturity-Date.now();if(distance<=0){document.getElementById('stat-days').textContent='Matured';clearInterval(countdownTimer);return}
+const days=Math.floor(distance/(1000*60*60*24));const hours=Math.floor((distance%(1000*60*60*24))/(1000*60*60));const minutes=Math.floor((distance%(1000*60*60))/(1000*60));const seconds=Math.floor((distance%(1000*60))/1000);document.getElementById('stat-days').textContent=`${days}d ${hours}h ${minutes}m ${seconds}s`};countdownTimer=setInterval(updateCountdown,1000);updateCountdown()}else{document.getElementById('stat-days').textContent=activeInvs.length>0?'Matured':'0'}
+document.getElementById('stat-invested').textContent=`₵${formatNumber(totalInvested)}`;document.getElementById('stat-earnings').textContent=`₵${formatNumber(totalEarnings)}`;document.getElementById('stat-expected').textContent=`₵${formatNumber(totalExpected)}`;const totalWithdrawn=withdrawals.filter(w=>w.status==='paid').reduce((s,w)=>s+w.amount,0);document.getElementById('stat-withdrawn').textContent=`₵${formatNumber(totalWithdrawn)}`;const tbody=document.getElementById('investments-table');const cardContainer=document.getElementById('investments-cards');if(investments.length===0){tbody.innerHTML='<tr><td colspan="6" class="py-8 text-center text-gray-500">No investments yet.</td></tr>';if(cardContainer)cardContainer.innerHTML='<div class="text-gray-500 text-center py-4">No investments yet.</div>'}else{tbody.innerHTML=investments.map(inv=>{const wd=withdrawalMap[inv.id];const status=inv.status;const isPending=status==='pending';const isMatured=status==='matured';const earnings=getCurrentEarnings(inv);const progress=getProgress(inv);const daysLeft=getDaysLeft(inv);let statusBadge='';if(isPending)statusBadge='<span class="bg-yellow-500/20 text-yellow-400 rounded-full px-2 py-1 text-xs">Pending ⏳</span>';else if(status==='rejected')statusBadge='<span class="bg-red-500/20 text-red-400 rounded-full px-2 py-1 text-xs">Rejected ❌</span>';else if(isMatured)statusBadge='<span class="bg-green-500/20 text-green-400 rounded-full px-2 py-1 text-xs">Matured ✅</span>';else if(status==='reinvested')statusBadge='<span class="bg-blue-500/20 text-blue-400 rounded-full px-2 py-1 text-xs">Reinvested 🔄</span>';else statusBadge=`<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;let actionHtml='';if(isMatured&&!wd&&inv.status!=='reinvested'){actionHtml=`<button onclick="openReinvestModal(${inv.id})" class="gradient-gold text-dark-950 font-semibold py-1.5 px-2 rounded-lg text-xs mr-1" style="animation: gentleBounce 1.5s ease-in-out infinite;">⚡ Reinvest & Earn</button>
+              <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500">Withdraw</button>`}else if(inv.status==='reinvested'){actionHtml='<span class="text-green-400 text-xs">Reinvested ✅</span>'}else if(wd){const totalPayout=inv.amount*(1+(returnRates[inv.plan]||1));const allWithdrawals=withdrawals.filter(w=>w.investment_id===inv.id&&w.status!=='rejected').sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));const alreadyPaid=allWithdrawals.filter(w=>w.status==='paid').reduce((s,w)=>s+w.amount,0);const remaining=totalPayout-alreadyPaid;let timelineHtml='';allWithdrawals.forEach(w=>{let statusText='';let colorClass='';if(w.status==='pending'){statusText='Pending';colorClass='text-yellow-400'}else if(w.status==='approved'){statusText='Approved';colorClass='text-green-400'}else if(w.status==='paid'){statusText='Paid';colorClass='text-green-400'}else{statusText='';colorClass='text-gray-400'}
+timelineHtml+=`<div class="flex items-center gap-1 ${colorClass} text-xs">
+      <span>₵${formatNumber(w.amount)} ${statusText}</span>
+    </div>`});let remainingHtml='';if(remaining>0){const hasActiveRequest=allWithdrawals.some(w=>w.status==='pending'||w.status==='approved');if(hasActiveRequest){remainingHtml=`<div class="text-blue-400 text-xs mt-1">Withdrawal in progress ⏳</div>`}else{remainingHtml=`<div class="text-yellow-400 text-[10px] mt-1">₵${formatNumber(remaining)} available with next plan</div>`;const availableActive=getAvailableActiveForFullUnlock();const hasQualifyingActive=availableActive>=inv.amount;if(hasQualifyingActive){remainingHtml+=`<button onclick="requestWithdrawal(${inv.id})"
+                class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">
+                Withdraw
+            </button>`}else{remainingHtml+=`<button onclick="requestRemainingWithdrawal(${inv.id})"
+                class="bg-purple-600/50 text-white/70 rounded-lg px-3 py-1 text-xs flex items-center gap-1 mt-1 cursor-pointer">
+                <i data-lucide="lock" class="w-3 h-3"></i> Withdraw
+            </button>`}}}else{const allPaid=allWithdrawals.length>0&&allWithdrawals.every(w=>w.status==='paid');if(allPaid){remainingHtml=`<div class="text-green-400 text-xs mt-1">All paid ⚡️</div>`}else{remainingHtml=`<div class="text-blue-400 text-xs mt-1">Withdrawal being processed ⏳</div>`}}
+actionHtml=`<div class="text-xs">${timelineHtml}${remainingHtml}</div>`}
+return `<tr class="border-b border-white/5">
+      <td class="py-4 font-medium">₵${formatNumber(inv.amount)}</td>
+      <td class="py-4 hidden sm:table-cell"><span class="glass-gold rounded-full px-2 py-1 text-xs">${inv.plan}</span></td>
+      <td class="py-4 text-green-400">₵${formatNumber(earnings)}</td>
+      <td class="py-4"><div class="flex items-center gap-2"><div class="w-20 h-2 bg-white/5 rounded-full"><div class="h-full gradient-gold rounded-full" style="width:${Math.min(100, progress)}%"></div></div><span class="text-xs">${Math.round(progress)}%</span></div></td>
+      <td class="py-4">${statusBadge}</td>
+      <td class="py-4">${actionHtml}</td>
+    </tr>`}).join('');lucide.createIcons();if(cardContainer){cardContainer.innerHTML=investments.map(inv=>{const wd=withdrawalMap[inv.id];const status=inv.status;const isPending=status==='pending';const isMatured=status==='matured';const earnings=getCurrentEarnings(inv);const progress=getProgress(inv);const daysLeft=getDaysLeft(inv);let statusBadge='';if(isPending)statusBadge='<span class="bg-yellow-500/20 text-yellow-400 rounded-full px-2 py-1 text-xs">Pending ⏳</span>';else if(status==='rejected')statusBadge='<span class="bg-red-500/20 text-red-400 rounded-full px-2 py-1 text-xs">Rejected ❌</span>';else if(isMatured)statusBadge='<span class="bg-green-500/20 text-green-400 rounded-full px-2 py-1 text-xs">Matured ✅</span>';else if(status==='reinvested')statusBadge='<span class="bg-blue-500/20 text-blue-400 rounded-full px-2 py-1 text-xs">Reinvested 🔄</span>';else statusBadge=`<span class="bg-gold-500/20 text-gold-400 rounded-full px-2 py-1 text-xs">Active (${daysLeft}d)</span>`;let actionHtml='';if(isMatured&&!wd&&inv.status!=='reinvested'){actionHtml=`<button onclick="openReinvestModal(${inv.id})" class="gradient-gold text-dark-950 font-semibold py-1.5 px-2 rounded-lg text-xs mr-1" style="animation: gentleBounce 1.5s ease-in-out infinite;">Reinvest</button>
+              <button onclick="requestWithdrawal(${inv.id})" class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500">Withdraw</button>`}else if(inv.status==='reinvested'){actionHtml='<span class="text-green-400 text-xs">Reinvested ✅</span>'}else if(wd){const totalPayout=inv.amount*(1+(returnRates[inv.plan]||1));const allWithdrawals=withdrawals.filter(w=>w.investment_id===inv.id&&w.status!=='rejected').sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));const alreadyPaid=allWithdrawals.filter(w=>w.status==='paid').reduce((s,w)=>s+w.amount,0);const remaining=totalPayout-alreadyPaid;let timelineHtml='';allWithdrawals.forEach(w=>{let statusText='';let colorClass='';if(w.status==='pending'){statusText='Pending';colorClass='text-yellow-400'}else if(w.status==='approved'){statusText='Approved';colorClass='text-green-400'}else if(w.status==='paid'){statusText='Paid';colorClass='text-green-400'}else{statusText='';colorClass='text-gray-400'}
+timelineHtml+=`<div class="flex items-center gap-1 ${colorClass} text-xs">
+      <span>₵${formatNumber(w.amount)} ${statusText}</span>
+    </div>`});let remainingHtml='';if(remaining>0){const hasActiveRequest=allWithdrawals.some(w=>w.status==='pending'||w.status==='approved');if(hasActiveRequest){remainingHtml=`<div class="text-blue-400 text-xs mt-1">Withdrawal in progress ⏳</div>`}else{remainingHtml=`<div class="text-yellow-400 text-[10px] mt-1">₵${formatNumber(remaining)} available with next plan</div>`;const availableActive=getAvailableActiveForFullUnlock();const hasQualifyingActive=availableActive>=inv.amount;if(hasQualifyingActive){remainingHtml+=`<button onclick="requestWithdrawal(${inv.id})"
+                class="bg-purple-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-purple-500 mt-1">
+                Withdraw
+            </button>`}else{remainingHtml+=`<button onclick="requestRemainingWithdrawal(${inv.id})"
+                class="bg-purple-600/50 text-white/70 rounded-lg px-3 py-1 text-xs flex items-center gap-1 mt-1 cursor-pointer">
+                <i data-lucide="lock" class="w-3 h-3"></i> Withdraw
+            </button>`}}}else{const allPaid=allWithdrawals.length>0&&allWithdrawals.every(w=>w.status==='paid');if(allPaid){remainingHtml=`<div class="text-green-400 text-xs mt-1">All paid ⚡️</div>`}else{remainingHtml=`<div class="text-blue-400 text-xs mt-1">Withdrawal being processed ⏳</div>`}}
+actionHtml=`<div class="text-xs">${timelineHtml}${remainingHtml}</div>`}
+return `<div class="glass rounded-lg p-3 mb-2">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="font-semibold">₵${formatNumber(inv.amount)} <span class="text-xs text-gray-400 capitalize">${inv.plan}</span></div>
+            <div class="text-sm text-green-400">Earnings: ₵${formatNumber(earnings)}</div>
+            <div class="flex items-center gap-2 mt-1">
+              <div class="w-16 h-1.5 bg-white/5 rounded-full"><div class="h-full gradient-gold rounded-full" style="width:${Math.min(100, progress)}%"></div></div>
+              <span class="text-xs text-gray-400">${Math.round(progress)}%</span>
+            </div>
+            <div class="mt-1">${statusBadge}</div>
+          </div>
+          <div class="flex flex-col items-end gap-2">
+            ${actionHtml}
+          </div>
+        </div>
+      </div>`}).join('')}}
+lucide.createIcons();drawChart(investments);loadTransactionHistory();document.getElementById('dashboard-loader').classList.add('hidden');loadInvestorCount();loadPromoBanner()}
+async function requestWithdrawal(investmentId){const inv=window.allInvestmentsLocal.find(i=>i.id===investmentId);if(!inv)return;const rate=returnRates[inv.plan]||1;const totalPayout=inv.amount*(1+rate);const profit=totalPayout-inv.amount;const alreadyWithdrawn=(window.allWithdrawalsLocal||[]).filter(w=>w.investment_id===investmentId&&w.status!=='rejected').reduce((s,w)=>s+w.amount,0);const maxWithdrawable=totalPayout-alreadyWithdrawn;if(maxWithdrawable<=0){showToast('Full payout already withdrawn.','error');return}
+const totalActiveAmount=(window.allInvestmentsLocal||[]).filter(i=>i.status==='active').reduce((sum,i)=>sum+i.amount,0);const availableActive=getAvailableActiveForFullUnlock();const hasQualifyingActive=availableActive>=inv.amount;let amount,confirmMessage;if(alreadyWithdrawn===0){if(hasQualifyingActive){amount=maxWithdrawable;confirmMessage=`
+        <div class="text-left text-sm space-y-2">
+          <p class="text-white font-semibold">Full Withdrawal Available</p>
+          <p>Total payout: <span class="text-gold-400">₵${totalPayout.toFixed(2)}</span></p>
+          <p>You will receive now: <span class="text-green-400 font-bold">₵${amount.toFixed(2)}</span></p>
+          <p class="text-xs text-gray-400">Your total active balance (₵${totalActiveAmount}) qualifies you for instant full access.</p>
+          <p class="text-xs text-gray-500">Proceed with withdrawal?</p>
+        </div>
+      `;if(!await customConfirm(confirmMessage))return;await processWithdrawal(investmentId,amount);return}
+amount=Math.floor(profit*0.2*100)/100;const locked=totalPayout-amount;const encouragement=inv.amount>=500?'Most members immediately reinvest and double their returns within weeks.':'Members who keep a plan active earn 3× more bonuses over time.';window._pendingWithdrawalId=investmentId;window._pendingWithdrawalAmount=amount;document.getElementById('withdraw-confirm-content').innerHTML=`
+      <div class="text-left text-sm space-y-3">
+        <div class="text-center">
+          <p class="text-lg font-bold text-white">🎉 Your Money Has Grown</p>
+          <p class="text-xs text-gray-400 mt-1">Total value: <span class="text-gold-400 font-semibold">₵${totalPayout.toFixed(2)}</span></p>
+        </div>
+
+        <div class="bg-dark-950/60 rounded-xl p-4 text-center border border-gold-500/30">
+          <p class="text-xs text-gray-400 uppercase tracking-wider">Cash Out Instantly</p>
+          <p class="text-3xl font-black text-green-400 mt-1">₵${amount.toFixed(2)}</p>
+          <p class="text-xs text-green-400/70 mt-1">Sent to your wallet immediately</p>
+        </div>
+
+        <div class="text-center text-xs text-gray-400 mt-3">
+          <p>Your <strong class="text-white">₵${inv.amount.toFixed(2)}</strong> principal is held securely and ready to be reactivated.</p>
+          <p class="text-yellow-400 mt-1">Start a new plan of <strong>₵${inv.amount}</strong> to unlock the full <strong>₵${locked.toFixed(2)}</strong> balance.</p>
+        </div>
+
+        <div class="text-[10px] text-gray-500 text-center italic">${encouragement}</div>
+
+        <div class="flex gap-2 mt-2">
+          <button onclick="withdrawConfirmUnlock()" class="flex-1 gradient-gold text-dark-950 font-semibold py-2.5 rounded-xl text-xs hover:opacity-90 transition">
+            ⚡ Unlock & Grow
+          </button>
+          <button onclick="withdrawConfirmJustWithdraw()" class="flex-1 bg-transparent border border-white/20 text-gray-300 py-2.5 rounded-xl text-xs hover:bg-white/5 transition">
+            Just Withdraw
+          </button>
+        </div>
+        <div class="text-center mt-2">
+          <button onclick="withdrawConfirmMaybeLater()" class="text-gray-500 text-xs hover:text-gray-300 transition">
+            Maybe Later
+          </button>
+        </div>
+      </div>
+    `;document.getElementById('withdraw-confirm-modal').classList.remove('hidden');document.getElementById('withdraw-confirm-modal').classList.add('flex');return}
+if(totalActiveAmount<inv.amount){showToast(`You need a total active balance of at least ₵${inv.amount} to unlock the remaining balance.`,'error');return}
+amount=maxWithdrawable;confirmMessage=`
+    <div class="text-left text-sm space-y-2">
+      <p class="text-white font-semibold">Unlock Remaining Balance</p>
+      <p>You will receive: <span class="text-green-400 font-bold">₵${amount.toFixed(2)}</span></p>
+      <p class="text-xs text-gray-500">Proceed with withdrawal?</p>
+    </div>
+  `;if(!await customConfirm(confirmMessage))return;await processWithdrawal(investmentId,amount)}
+function requestRemainingWithdrawal(investmentId){const inv=window.allInvestmentsLocal.find(i=>i.id===investmentId);if(!inv)return;const totalActive=(window.allInvestmentsLocal||[]).filter(i=>i.status==='active').reduce((sum,i)=>sum+i.amount,0);const availableActive=getAvailableActiveForFullUnlock();const shortfall=Math.max(0,inv.amount-availableActive);const modal=document.getElementById('lock-info-modal');if(!modal)return;let message='';if(totalActive===0){message=`
+      <div style="font-family: 'Inter', sans-serif; color: #e0e0e0; line-height: 1.5;">
+        <h3 style="color:#FFD700; font-weight:600; margin-bottom:8px;">Payout Secured</h3>
+        <p style="margin-bottom:8px;">Your funds are held safely and will be released in full once an active investment of <strong>₵${inv.amount}</strong> is established.</p>
+        <p style="margin-bottom:8px;">This requirement protects the integrity of your capital and the stability of the platform.</p>
+        <p style="margin-bottom:16px;">Start a new plan to activate your withdrawal immediately.</p>
+      </div>`}else if(availableActive===0){message=`
+      <div style="font-family: 'Inter', sans-serif; color: #e0e0e0; line-height: 1.5;">
+        <h3 style="color:#FFD700; font-weight:600; margin-bottom:8px;">Active Capital Fully Allocated</h3>
+        <p style="margin-bottom:8px;">Your current active investment of <strong>₵${totalActive}</strong> has already been allocated to a previous payout unlock.</p>
+        <p style="margin-bottom:8px;">To release this payout, a new active investment of at least <strong>₵${inv.amount}</strong> is required.</p>
+        <p style="margin-bottom:16px;">This allocation policy ensures that every withdrawal remains fully backed, protecting the platform and its longevity.</p>
+      </div>`}else{message=`
+      <div style="font-family: 'Inter', sans-serif; color: #e0e0e0; line-height: 1.5;">
+        <h3 style="color:#FFD700; font-weight:600; margin-bottom:8px;">Additional Active Capital Required</h3>
+        <p style="margin-bottom:8px;">Your available active balance is <strong>₵${availableActive}</strong>. To release this payout, a total of <strong>₵${inv.amount}</strong> is needed.</p>
+        <p style="margin-bottom:8px;">A new investment of <strong>₵${shortfall}</strong> will meet this threshold and make your full balance accessible.</p>
+        <p style="margin-bottom:16px;">This policy exists to safeguard all members and ensure long‑term platform health.</p>
+      </div>`}
+document.getElementById('lock-info-message').innerHTML=message;modal.classList.remove('hidden');modal.classList.add('flex')}
+async function requestGameRewardWithdrawal(){const balanceText=document.getElementById('dash-game-balance').textContent.replace('₵','').replace(/,/g,'');const balance=parseFloat(balanceText)||0;if(balance<30){showToast('Minimum withdrawal is ₵30','error');return}
+if(!await customConfirm(`Withdraw your game rewards of ₵${balance}?`))return;try{const res=await fetch(`${API_BASE}/api/game-reward-withdrawal`,{method:'POST',headers:{'Authorization':`Bearer ${authToken}`}});const data=await res.json();if(!res.ok){if(data.error&&data.error.includes('active investment')){showToast('You need an active investment to withdraw Prizes & Rewards. Start one from just ₵200!','error')}else{showToast(data.error||'Withdrawal failed','error')}
+return}
+showToast('Game reward withdrawal requested!','success');updateDashboard()}catch(e){showToast('Connection error','error')}}
+async function requestReferralWithdrawal(){const bonusText=document.getElementById('dash-bonus').textContent.replace('₵','').replace(/,/g,'');const bonus=parseFloat(bonusText)||0;if(bonus<50){showToast('Minimum referral withdrawal is ₵50','error');return}
+if(!await customConfirm(`Withdraw your referral bonus of ₵${bonus}?`))return;try{const res=await fetch(`${API_BASE}/api/referral-withdrawal`,{method:'POST',headers:{'Authorization':`Bearer ${authToken}`}});const data=await res.json();if(!res.ok)return showToast(data.error,'error');showToast('Referral withdrawal requested!','success');updateDashboard()}catch(e){showToast('Connection error','error')}}
+function withdrawConfirmMaybeLater(){document.getElementById('withdraw-confirm-modal').classList.add('hidden');document.getElementById('withdraw-confirm-modal').classList.remove('flex');window._pendingWithdrawalId=null;window._pendingWithdrawalAmount=null}
+function withdrawConfirmUnlock(){document.getElementById('withdraw-confirm-modal').classList.add('hidden');document.getElementById('withdraw-confirm-modal').classList.remove('flex');openDepositModal()}
+async function withdrawConfirmJustWithdraw(){document.getElementById('withdraw-confirm-modal').classList.add('hidden');document.getElementById('withdraw-confirm-modal').classList.remove('flex');const investmentId=window._pendingWithdrawalId;window._pendingWithdrawalId=null;try{const res=await fetch(`${API_BASE}/api/withdrawals`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${authToken}`},body:JSON.stringify({investment_id:investmentId})});const data=await res.json();if(!res.ok){showToast(data.error||'Withdrawal failed','error');return}
+showToast(data.message||'Payout request submitted!','success');updateDashboard()}catch(e){showToast('Connection error','error')}}
+function getCurrentEarnings(inv){if(inv.status==='pending')return 0;if(inv.status==='rejected')return 0;if(inv.status==='matured'||inv.status==='reinvested'){const rate=returnRates[inv.plan]||1;return inv.amount*rate}
+const progress=getProgress(inv)/100;const rate=returnRates[inv.plan]||1;return inv.amount*rate*progress}
+function getAvailableActiveForFullUnlock(){const investments=window.allInvestmentsLocal||[];const withdrawals=window.allWithdrawalsLocal||[];const rateMap={starter:0.5,growth:0.7,premium:1.0};const totalActive=investments.filter(i=>i.status==='active').reduce((sum,i)=>sum+i.amount,0);const activeStartDates=investments.filter(i=>i.status==='active').map(i=>new Date(i.date).getTime());const oldestActiveStart=activeStartDates.length>0?Math.min(...activeStartDates):Date.now();let consumed=0;for(const inv of investments){if(inv.status!=='matured')continue;const rate=rateMap[inv.plan]||1.0;const totalPayout=inv.amount*(1+rate);const planWithdrawals=withdrawals.filter(w=>w.investment_id===inv.id&&w.status!=='rejected');const totalWithdrawn=planWithdrawals.reduce((s,w)=>s+w.amount,0);if(totalWithdrawn>=totalPayout){const lastWithdrawalDate=planWithdrawals.length>0?Math.max(...planWithdrawals.map(w=>new Date(w.created_at).getTime())):null;if(lastWithdrawalDate&&lastWithdrawalDate>=oldestActiveStart){consumed+=inv.amount}}}
+return totalActive-consumed}
+function getProgress(inv){if(inv.status==='pending')return 0;if(inv.status==='rejected')return 0;if(inv.status==='matured'||inv.status==='reinvested')return 100;const planDays={starter:10,growth:20,premium:30};const totalDays=inv.duration_days||planDays[inv.plan]||14;const start=new Date(inv.date);const now=new Date();const elapsed=(now-start)/(1000*60*60*24);return Math.min(100,(elapsed/totalDays)*100)}
+function getDaysLeft(inv){if(inv.status==='matured'||inv.status==='reinvested')return'Completed';const planDays={starter:10,growth:20,premium:30};const totalDays=inv.duration_days||planDays[inv.plan]||14;const start=new Date(inv.date);const now=new Date();const elapsed=(now-start)/(1000*60*60*24);return Math.ceil(Math.max(0,totalDays-elapsed))}
+function drawChart(investments){const canvas=document.getElementById('growth-chart');if(!canvas)return;const ctx=canvas.getContext('2d');if(growthChart)growthChart.destroy();const activeInvs=investments.filter(i=>i.status!=='pending'&&i.status!=='rejected'&&i.status!=='reinvested');const totalInvested=activeInvs.reduce((s,i)=>s+i.amount,0);let currentValue=0;activeInvs.forEach(inv=>{const planDays={starter:10,growth:20,premium:30};const durDays=inv.duration_days||planDays[inv.plan]||14;const start=new Date(inv.date);const now=new Date();const elapsed=(now-start)/(1000*60*60*24);const progress=Math.min(1,Math.max(0,elapsed/durDays));const rate=returnRates[inv.plan]||1;currentValue+=inv.amount+(inv.amount*rate*progress)});const growthPct=totalInvested>0?((currentValue-totalInvested)/totalInvested*100):0;document.getElementById('portfolio-total').textContent='₵'+formatNumber(currentValue);document.getElementById('portfolio-growth-pct').textContent=(growthPct>=0?'+':'')+growthPct.toFixed(1)+'%';if(activeInvs.length===0){growthChart=new Chart(ctx,{type:'line',data:{labels:[],datasets:[]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1}},scales:{x:{display:!1},y:{display:!1}}}});return}
+const planDays={starter:10,growth:20,premium:30};const earliest=Math.min(...activeInvs.map(i=>new Date(i.date).getTime()));const latest=Math.max(...activeInvs.map(i=>{const d=new Date(i.date);d.setDate(d.getDate()+(i.duration_days||planDays[i.plan]||14));return d.getTime()}));const totalDays=Math.ceil((latest-earliest)/(1000*60*60*24));let labels=[],dataPoints=[];for(let day=0;day<=totalDays;day++){const dayTime=earliest+day*24*60*60*1000;let value=0;activeInvs.forEach(inv=>{const start=new Date(inv.date).getTime();const durDays=inv.duration_days||planDays[inv.plan]||14;const end=start+durDays*24*60*60*1000;if(dayTime>=start){const progress=Math.min(1,(dayTime-start)/(end-start));const rate=returnRates[inv.plan]||1;value+=inv.amount+(inv.amount*rate*progress)}});labels.push(`Day ${day}`);dataPoints.push(value)}
+const nowTime=Date.now();let todayIndex=0;for(let i=0;i<=totalDays;i++){const dayTime=earliest+i*24*60*60*1000;if(dayTime>nowTime){todayIndex=i;break}
+todayIndex=i}
+const realizedData=dataPoints.slice(0,todayIndex+1);const projectedData=dataPoints.slice(todayIndex);const glowLinePlugin={id:'glowLine',beforeDatasetsDraw(chart){const{ctx}=chart;ctx.save();ctx.shadowColor='#FFD86A';ctx.shadowBlur=18;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0},afterDatasetsDraw(chart){chart.ctx.restore()}};const gradient=ctx.createLinearGradient(0,0,0,280);gradient.addColorStop(0,'rgba(255, 215, 0, 0.35)');gradient.addColorStop(0.5,'rgba(212, 160, 23, 0.12)');gradient.addColorStop(1,'rgba(212, 160, 23, 0)');growthChart=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Realized',data:realizedData,borderColor:'#FFD700',backgroundColor:gradient,borderWidth:2.8,tension:0.4,pointRadius:0,pointHoverRadius:9,pointHoverBackgroundColor:'#FFD700',pointHoverBorderColor:'#fff',pointHoverBorderWidth:3,fill:!0,order:2},{label:'Projected',data:projectedData,borderColor:'rgba(255, 215, 128, 0.6)',backgroundColor:'transparent',borderWidth:2.5,borderDash:[8,6],tension:0.4,pointRadius:0,pointHoverRadius:0,fill:!1,order:1}]},options:{responsive:!0,maintainAspectRatio:!1,animation:{duration:1500,easing:'easeOutQuart'},plugins:{legend:{display:!1},tooltip:{backgroundColor:'rgba(5,5,10,0.97)',titleColor:'#FFD86A',bodyColor:'#fff',borderColor:'rgba(255,215,80,0.18)',borderWidth:1,cornerRadius:16,padding:14,titleFont:{weight:'700'},displayColors:!1,callbacks:{label:(ctx)=>' ₵'+ctx.raw.toLocaleString()}}},scales:{x:{grid:{display:!1},ticks:{color:'rgba(255,255,255,0.4)',font:{family:'Inter',size:10},maxTicksLimit:6}},y:{grid:{display:!1},ticks:{color:'rgba(255,255,255,0.4)',font:{family:'Inter',size:10},callback:(value)=>'₵'+value.toLocaleString(),maxTicksLimit:5}}}},plugins:[glowLinePlugin]})}
+function openDepositModal(){document.getElementById('deposit-modal').classList.remove('hidden');document.getElementById('deposit-modal').classList.add('flex');document.getElementById('deposit-step1').classList.remove('hidden');document.getElementById('deposit-step2').classList.add('hidden');document.getElementById('deposit-amount').value='';updateCalculator();document.getElementById('deposit-min-note').textContent='Minimum deposit is ₵300';document.getElementById('deposit-amount').placeholder='Min ₵300'}
+function closeDepositModal(){document.getElementById('deposit-modal').classList.add('hidden');document.getElementById('deposit-modal').classList.remove('flex');sessionStorage.removeItem('gcc_deposit')}
+function selectPlan(plan){const check=canSelectPlan(plan);if(!check.allowed){if(check.message){showToast(check.message,'error')}
+return}
+selectedPlan=plan;document.getElementById('deposit-plan').value=plan;['starter','growth','premium'].forEach(p=>{const el=document.getElementById(`plan-${p}`);el.className=p===plan?'glass-gold rounded-xl p-3 text-center':'glass rounded-xl p-3 text-center'});updateCalculator();const minAmounts={starter:200,growth:300,premium:500};document.getElementById('deposit-min-note').textContent=`Minimum deposit is ₵${minAmounts[plan]}`;document.getElementById('deposit-amount').placeholder=`Min ₵${minAmounts[plan]}`}
+function canSelectPlan(plan){const investments=window.allInvestmentsLocal||[];const now=Date.now();if(plan==='starter'){const activeStarter=investments.some(i=>i.status==='active'&&i.plan==='starter');if(activeStarter){return{allowed:!1,message:'You already have an active Starter plan. Please choose Growth or Premium to diversify your investment! 🌱'}}
+const planDays={starter:10,growth:20,premium:30};const nearMaturity=investments.some(i=>{if(i.status!=='active')return!1;const totalDays=i.duration_days||planDays[i.plan]||14;const matureTime=new Date(i.date).getTime()+totalDays*86400000;return(matureTime-now)<=10*86400000&&matureTime>now});if(nearMaturity){return{allowed:!1,message:'You have an investment maturing within 10 days. Please choose Growth or Premium instead, or wait until your current plan completes! ⏳'}}
+const starterMaturedCount=investments.filter(i=>i.plan==='starter'&&i.status==='matured').length;if(starterMaturedCount>=3){setTimeout(()=>showStarterLimitModal(),50);return{allowed:!1,message:null}}}
+return{allowed:!0}}
+function showStarterLimitModal(){const modal=document.getElementById('starter-limit-modal');if(modal){modal.classList.remove('hidden');modal.classList.add('flex')}}
+function closeStarterLimitModal(){const modal=document.getElementById('starter-limit-modal');if(modal){modal.classList.add('hidden');modal.classList.remove('flex')}}
+function selectPlanFromModal(plan){closeStarterLimitModal();selectPlan(plan)}
+function selectPayment(method){selectedPayment=method;document.getElementById('deposit-payment').value=method;document.getElementById('pay-momo').className=method==='momo'?'glass-gold rounded-xl p-4 text-center':'glass rounded-xl p-4 text-center';document.getElementById('pay-crypto').className=method==='crypto'?'glass-gold rounded-xl p-4 text-center':'glass rounded-xl p-4 text-center';const amount=document.getElementById('deposit-amount').value;const amountText=amount?`₵${formatNumber(parseFloat(amount))}`:'₵0';if(method==='momo'){document.getElementById('momo-details').innerHTML=getMomoDetailsHtml(amountText);document.getElementById('momo-details').classList.remove('hidden');document.getElementById('crypto-details').classList.add('hidden')}else{document.getElementById('crypto-details').innerHTML=getCryptoDetailsHtml(amountText);document.getElementById('crypto-details').classList.remove('hidden');document.getElementById('momo-details').classList.add('hidden')}}
+async function goToStep2(){const amount=parseFloat(document.getElementById('deposit-amount').value);if(!amount){showToast('Please enter an amount','error');return}
+const minAmounts={starter:200,growth:300,premium:500};if(amount<minAmounts[selectedPlan]){showToast(`Minimum deposit for ${selectedPlan} is ₵${minAmounts[selectedPlan]}`,'error');return}
+const btn=document.querySelector('#deposit-step1 button[onclick="goToStep2()"]');const originalHTML=btn.innerHTML;btn.disabled=!0;btn.innerHTML=`<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Loading…`;lucide.createIcons();try{const res=await fetch(`${API_BASE}/api/generate-reference`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${authToken}`},body:JSON.stringify({amount,plan:selectedPlan})});const data=await res.json();document.getElementById('pay-reference-code').textContent=data.reference;document.getElementById('pay-reference-expiry').textContent=`Expires in 30 minutes`}catch(e){showToast('Failed to generate reference code','error');btn.disabled=!1;btn.innerHTML=originalHTML;lucide.createIcons();return}
+document.getElementById('pay-momo-number').textContent=paymentSettings.momo_number||'••••••••••';document.getElementById('pay-momo-name').textContent=paymentSettings.momo_name||'';document.getElementById('pay-amount-display').textContent='₵'+formatNumber(amount);document.getElementById('summary-plan').textContent=selectedPlan.charAt(0).toUpperCase()+selectedPlan.slice(1);document.getElementById('summary-amount').textContent='₵'+formatNumber(amount);const rate=returnRates[selectedPlan]||1;document.getElementById('summary-payout').textContent='₵'+formatNumber(amount*(1+rate));document.getElementById('deposit-step1').classList.add('hidden');document.getElementById('deposit-step2').classList.remove('hidden');lucide.createIcons();sessionStorage.setItem('gcc_deposit',JSON.stringify({step:2,plan:selectedPlan,amount:amount,reference:document.getElementById('pay-reference-code').textContent,expires:Date.now()+30*60*1000}));btn.disabled=!1;btn.innerHTML=originalHTML;lucide.createIcons()}
+function goToStep1(){document.getElementById('deposit-step1').classList.remove('hidden');document.getElementById('deposit-step2').classList.add('hidden');sessionStorage.removeItem('gcc_deposit')}
+async function submitDeposit(){const amount=parseFloat(document.getElementById('deposit-amount').value);const plan=document.getElementById('deposit-plan').value;const txid=document.getElementById('deposit-txid').value.trim();if(!amount||!plan){showToast('Please select a plan and enter an amount','error');return}
+const minAmounts={starter:200,growth:300,premium:500};if(amount<minAmounts[plan]){showToast(`Minimum deposit for ${plan} is ₵${minAmounts[plan]}`,'error');return}
+if(!txid){showToast('Please enter your MoMo Transaction ID','error');return}
+if(!authToken||!currentUser){showToast('You must be logged in','error');return}
+const reference=document.getElementById('pay-reference-code').textContent;const payload={amount:amount,plan:plan,method:'momo',transaction_id:txid,reference:reference};try{const res=await fetch(`${API_BASE}/api/investments`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${authToken}`},body:JSON.stringify(payload)});const data=await res.json();if(!res.ok){showToast(data.error||'Deposit failed','error');return}
+sessionStorage.removeItem('gcc_deposit');closeDepositModal();showToast('Deposit submitted! Pending admin approval.','success');updateDashboard()}catch(e){showToast('Connection error','error')}}
+document.addEventListener('input',function(e){if(e.target.id==='deposit-amount')updateCalculator();});function updateCalculator(){const amount=parseFloat(document.getElementById('deposit-amount').value)||0;const rate=returnRates[selectedPlan]||1;document.getElementById('calc-invest').textContent=`₵${formatNumber(amount)}`;document.getElementById('calc-earn').textContent=`₵${formatNumber(amount * rate)}`;document.getElementById('calc-total').textContent=`₵${formatNumber(amount * (1 + rate))}`;const rateLabel=document.getElementById('calc-rate-label');if(rateLabel)rateLabel.textContent=Math.round(rate*100);}
+function formatNumber(n){return Number(n).toLocaleString('en-GH',{minimumFractionDigits:0,maximumFractionDigits:2})}
+function timeAgo(dateStr){const diff=(Date.now()-new Date(dateStr).getTime())/1000;if(diff<60)return'Just now';if(diff<3600)return `${Math.floor(diff/60)}m ago`;if(diff<86400)return `${Math.floor(diff/3600)}h ago`;return `${Math.floor(diff/86400)}d ago`}
+function showToast(message,type='success'){const container=document.getElementById('toast-container');const toast=document.createElement('div');const colors=type==='success'?'bg-green-500/20 border-green-500/50 text-green-400':'bg-red-500/20 border-red-500/50 text-red-400';const icon=type==='success'?'check-circle':'alert-circle';toast.className=`toast glass ${colors} border rounded-xl px-4 py-3 flex items-center gap-3 min-w-[280px] max-w-sm`;toast.innerHTML=`<i data-lucide="${icon}" class="w-5 h-5 shrink-0"></i><span class="text-sm">${message}</span>`;container.appendChild(toast);lucide.createIcons();const duration=type==='error'?8000:4000;setTimeout(()=>toast.remove(),duration)}
+function copyAddress(addr){navigator.clipboard.writeText(addr).then(()=>showToast('Copied!','success'))}
+function toggleFaq(btn){const content=btn.nextElementSibling;const icon=btn.querySelector('[data-lucide]');content.classList.toggle('hidden');icon.style.transform=content.classList.contains('hidden')?'rotate(0deg)':'rotate(180deg)'}
+async function loadLeaderboard(){const list=document.getElementById('leaderboard-list');if(!list)return;const period=document.getElementById('leaderboard-period')?.value||'all';try{const res=await fetch(`${API_BASE}/api/referral-leaderboard?period=${period}`);const data=await res.json();if(!data.leaderboard||data.leaderboard.length===0){list.innerHTML='<div class="text-gray-500 text-center py-4 text-sm">No referrals yet this period.</div>';return}
+const top=data.leaderboard.slice(0,6);const getTier=(count)=>{if(count>=100)return{name:'Diamond',class:'text-gold-400 border-gold-500/30 bg-gold-500/10'};if(count>=50)return{name:'Platinum',class:'text-gray-300 border-gray-400/30 bg-gray-500/10'};if(count>=20)return{name:'Gold',class:'text-amber-400 border-amber-500/30 bg-amber-500/10'};if(count>=1)return{name:'Elite',class:'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'};return{name:'Newbie',class:'text-gray-500 border-gray-500/30 bg-gray-500/5'}};let html='';if(top.length>=1){const champ=top[0];const champTier=getTier(champ.total_referrals);html+=`
+  <div class="leaderboard-champion mb-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="rank-chip gold">01</div>
+        <div>
+          <div class="champion-badge">TOP REFERRER</div>
+          <div class="text-base font-bold text-white mt-0.5">
+            ${safe(champ.name)}
+            ${champ.is_partner ? '<span class="ml-1.5 inline-block align-middle" title="VIP Partner"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/></svg></span>' : ''}
+          </div>
+          <div class="text-xs text-gold-400 mt-0.5">
+            <span class="tier-badge ${champTier.class}">${champTier.name}</span>
+            <span class="ml-2">${champ.total_referrals} referrals</span>
+          </div>
+        </div>
+      </div>
+      <div class="bonus-pill">₵${formatNumber(champ.bonus)}</div>
+    </div>
+  </div>`}
+if(top.length>=2||top.length>=3){html+='<div class="grid grid-cols-2 gap-3 mb-3">';for(let i=1;i<=2&&i<top.length;i++){const entry=top[i];const tier=getTier(entry.total_referrals);const chipClass=i===1?'silver':'bronze';html+=`
+    <div class="glass rounded-xl p-4 hover:bg-white/5 transition-all">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="rank-chip ${chipClass}">0${i+1}</div>
+        <span class="tier-badge ${tier.class}">${tier.name}</span>
+      </div>
+      <div class="text-sm font-semibold text-white truncate">
+        ${safe(entry.name)}
+        ${entry.is_partner ? '<span class="ml-1 inline-block align-middle" title="VIP Partner"><svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/></svg></span>' : ''}
+      </div>
+      <div class="flex justify-between items-center mt-3">
+        <span class="text-xs text-gray-400">${entry.total_referrals} ref</span>
+        <span class="bonus-pill text-xs">₵${formatNumber(entry.bonus)}</span>
+      </div>
+    </div>`}
+html+='</div>'}
+if(top.length>3){html+='<div class="space-y-2">';for(let i=3;i<top.length;i++){const entry=top[i];const tier=getTier(entry.total_referrals);html+=`
+    <div class="flex items-center justify-between glass rounded-lg px-4 py-2 hover:bg-white/5 transition-all">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-bold text-gray-400 w-4">${i+1}</span>
+        <span class="text-sm font-medium text-gray-200 truncate max-w-[120px]">
+          ${safe(entry.name)}
+          ${entry.is_partner ? '<span class="ml-1 inline-block align-middle" title="VIP Partner"><svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/></svg></span>' : ''}
+        </span>
+        <span class="tier-badge ${tier.class}">${tier.name}</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs text-gray-400">${entry.total_referrals} ref</span>
+        <span class="bonus-pill text-xs">₵${formatNumber(entry.bonus)}</span>
+      </div>
+    </div>`}
+html+='</div>'}
+list.innerHTML=html}catch(e){list.innerHTML='<div class="text-gray-500 text-center py-4 text-sm">Failed to load leaderboard.</div>'}}
+function animateCounter(){const els=document.querySelectorAll('.hero-counter');if(els.length===0)return;let current=0;const target=2000;const step=target/60;const interval=setInterval(()=>{current+=step;if(current>=target){current=target;clearInterval(interval)}
+els.forEach(el=>{el.textContent=formatNumber(current)})},30)}
+window.addEventListener('scroll',()=>{const nav=document.getElementById('navbar');if(nav){nav.style.background=window.scrollY>50?'rgba(10,10,18,0.9)':'transparent';nav.style.backdropFilter=window.scrollY>50?'blur(20px)':'none'}});setInterval(()=>{if(document.getElementById('page-dashboard').classList.contains('active')&&authToken){updateDashboard()}},60000);let recentPayouts=[];let currentPayoutIndex=0;let payoutPopupInterval=null;async function fetchRecentPayouts(){try{const res=await fetch(`${API_BASE}/api/recent-payouts`);if(res.ok){const data=await res.json();recentPayouts=data.payouts;currentPayoutIndex=0}}catch(e){}}
+function showNextPayoutPopup(){if(recentPayouts.length===0)return;const payout=recentPayouts[currentPayoutIndex];currentPayoutIndex=(currentPayoutIndex+1)%recentPayouts.length;const displayName=formatDisplayName(payout.name);const timeAgoStr=timeAgo(payout.created_at);const popup=document.createElement('div');popup.className='payout-popup-premium';popup.innerHTML=`
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-lg">
+        <i data-lucide="check" class="w-5 h-5 text-dark-950"></i>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-gold-400">${displayName}</p>
+        <p class="text-xs text-gray-300">
+          just received <span class="text-white font-bold">₵${formatNumber(payout.amount)}</span> from their <span class="text-white">${payout.plan || 'investment'}</span> plan
+        </p>
+        <p class="text-[10px] text-gray-500 mt-0.5">${timeAgoStr}</p>
+      </div>
+    </div>
+  `;document.body.appendChild(popup);setTimeout(()=>{if(popup.parentNode)popup.parentNode.removeChild(popup);},5000)}
+function formatDisplayName(fullName){if(!fullName)return'Someone';const parts=fullName.trim().split(' ');if(parts.length>=2){return `${parts[0]} ${parts[parts.length - 1].charAt(0)}.`}
+return parts[0]}
+fetchRecentPayouts().then(()=>{if(recentPayouts.length>0){setTimeout(()=>showNextPayoutPopup(),5000);payoutPopupInterval=setInterval(showNextPayoutPopup,45000)}}).catch(()=>{});document.addEventListener('DOMContentLoaded',()=>{lucide.createIcons();if(authToken){fetch(`${API_BASE}/api/auth/me`,{headers:{'Authorization':`Bearer ${authToken}`}}).then(r=>r.json()).then(d=>{if(d.user){currentUser=d.user;loadPaymentSettings()}else{localStorage.removeItem('gcc_token');localStorage.removeItem('gcc_user');authToken=null}}).catch(()=>{})}
+animateCounter();document.getElementById('deposit-modal').addEventListener('click',function(e){if(e.target===this)closeDepositModal();});document.getElementById('reinvest-new-plan').addEventListener('change',updateTier2Info);const planSelect=document.getElementById('reinvest-new-plan');if(planSelect){planSelect.addEventListener('change',updateTier2Info)}
+const savedDeposit=sessionStorage.getItem('gcc_deposit');if(savedDeposit){try{const deposit=JSON.parse(savedDeposit);if(deposit.expires>Date.now()){selectedPlan=deposit.plan;document.getElementById('deposit-plan').value=deposit.plan;document.getElementById('deposit-amount').value=deposit.amount;document.getElementById('pay-amount-display').textContent='₵'+formatNumber(deposit.amount);document.getElementById('pay-reference-code').textContent=deposit.reference;document.getElementById('pay-reference-expiry').textContent='Expires in 30 minutes';document.getElementById('pay-momo-number').textContent=paymentSettings.momo_number||'••••••••••';document.getElementById('pay-momo-name').textContent=paymentSettings.momo_name||'';document.getElementById('deposit-step1').classList.add('hidden');document.getElementById('deposit-step2').classList.remove('hidden');document.getElementById('deposit-modal').classList.remove('hidden');document.getElementById('deposit-modal').classList.add('flex');lucide.createIcons()}else{sessionStorage.removeItem('gcc_deposit')}}catch(e){sessionStorage.removeItem('gcc_deposit')}}
+if(!localStorage.getItem('gcc_terms_accepted')){const termsModal=document.getElementById('terms-modal');if(termsModal){termsModal.classList.remove('hidden');termsModal.classList.add('flex')}}});document.addEventListener('DOMContentLoaded',()=>{const urlParams=new URLSearchParams(window.location.search);const refCode=urlParams.get('ref');if(refCode){localStorage.setItem('gcc_ref_code',refCode)}else{const storedRef=localStorage.getItem('gcc_ref_code');if(storedRef){const refInput=document.getElementById('signup-referral');if(refInput)refInput.value=storedRef}}
+setInterval(loadLeaderboard,10000)});setInterval(loadLeaderboard,10000);if(!sessionStorage.getItem('_gcc_pv')){sessionStorage.setItem('_gcc_pv','1');fetch('https://goldcoast-api.onrender.com/api/page-view',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page:'landing'})}).catch(()=>{})}
+</script>
+</body>
+</html>
