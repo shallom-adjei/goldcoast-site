@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Gold Coast Capital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.js"></script>
+   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>" />
+  <script>
+  if (typeof Chart !== 'undefined') {
+    Chart.register(
+      Chart.LineController,
+      Chart.BarController,
+      Chart.CategoryScale,
+      Chart.LinearScale,
+      Chart.PointElement,
+      Chart.LineElement,
+      Chart.BarElement,
+      Chart.Filler,
+      Chart.Legend,
+      Chart.Tooltip
+    );
+  }
+</script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+
+    .status-active { color: #10b981; font-weight: 600; }
+.status-reinvested { color: #3b82f6; font-weight: 600; }
+
+    /* ── Premium Table Styles ── */
+.glass-table {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,215,120,0.08);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.table-premium {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.table-premium thead {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,215,120,0.12);
+}
+
+.table-premium thead th {
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.5);
+  padding: 1rem 1.2rem;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.table-premium tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.2s;
+}
+
+.table-premium tbody tr:hover {
+  background: rgba(255,215,120,0.04);
+}
+
+.table-premium tbody td {
+  padding: 0.9rem 1.2rem;
+  color: #e0e0e0;
+  vertical-align: middle;
+}
+
+.table-premium tbody td:first-child {
+  font-weight: 500;
+  color: white;
+}
+
+/* Status badges inside tables */
+.table-premium .badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  display: inline-block;
+  letter-spacing: 0.04em;
+}
+
+.badge-success { background: rgba(16,185,129,0.15); color: #10b981; }
+.badge-warning { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.badge-danger  { background: rgba(239,68,68,0.15); color: #ef4444; }
+.badge-info    { background: rgba(59,130,246,0.15); color: #3b82f6; }
+
+/* Search & filter bar */
+.admin-search {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 1rem;
+  padding: 0.6rem 1rem;
+  color: white;
+  font-size: 0.8rem;
+  width: 100%;
+  max-width: 280px;
+  backdrop-filter: blur(10px);
+}
+
+.admin-search:focus {
+  border-color: rgba(212,160,23,0.4);
+  box-shadow: 0 0 0 2px rgba(212,160,23,0.2);
+  outline: none;
+}
+
+/* Filter buttons */
+.status-filter-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #9ca3af;
+  transition: all 0.2s;
+}
+
+.status-filter-btn.active,
+.status-filter-btn:hover {
+  background: rgba(212,160,23,0.12);
+  color: #fbbf24;
+  border-color: rgba(212,160,23,0.3);
+}
+
+/* Export button */
+.btn-export {
+  background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 999px;
+  padding: 0.3rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #10b981;
+  transition: all 0.2s;
+}
+
+.btn-export:hover {
+  background: rgba(16,185,129,0.25);
+  border-color: #10b981;
+}
+
+    .stat-card-premium {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-card-premium:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35), 0 0 30px rgba(212,160,23,0.1);
+}
+    
+    #promo-bubble {
+  box-shadow: 0 0 20px rgba(255,215,0,0.5);
+}
+    body { font-family: 'Inter', sans-serif; background: #0a0a12; color: white; }
+    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+    .hidden { display: none; } .flex { display: flex; }
+    .status-pending { color: #fbbf24; } .status-active { color: #34d399; } .status-matured { color: #60a5fa; }
+    .gradient-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+    .text-dark-950 { color: #0a0a12; }
+    .status-reinvested { color: #60a5fa; }
+    .status-locked { color: #9ca3af; }
+    .chart-card {
+      background: linear-gradient(180deg, rgba(31,41,55,0.9), rgba(17,24,39,0.95));
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .period-btn.active { background: rgba(59,130,246,0.2); color: #3b82f6; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <div id="gate-screen" class="flex-grow flex items-center justify-center px-4">
+    <div class="glass rounded-2xl p-8 w-full max-w-md text-center">
+      <h2 class="text-lg font-semibold mb-4">Admin Access</h2>
+      <input type="password" id="gate-pass" placeholder="Enter access code" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-4">
+      <button onclick="checkGatePass()" class="w-full bg-yellow-600 text-black font-semibold py-3 rounded-xl">Submit</button>
+      <p id="gate-error" class="text-red-400 text-sm mt-2 hidden">Incorrect code</p>
+    </div>
+  </div>
+
+  <script>
+    const GATE_PASS = "CharlieBrown";
+    function checkGatePass() {
+      const input = document.getElementById('gate-pass').value;
+      if (input === GATE_PASS) {
+        document.getElementById('gate-screen').remove();
+        document.getElementById('login-screen').classList.remove('hidden');
+      } else {
+        document.getElementById('gate-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="hidden flex-grow flex items-center justify-center px-4">
+    <div class="glass rounded-2xl p-8 w-full max-w-md">
+      <h1 class="text-2xl font-bold mb-6 text-center">Admin Login</h1>
+      <form id="login-form" class="space-y-4">
+        <div><label class="block text-sm mb-1">Email</label><input type="email" id="login-email" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"></div>
+        <div class="relative">
+          <label class="block text-sm mb-1">Password</label>
+          <input type="password" id="login-password" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white">
+          <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3 top-8 text-gray-400 hover:text-white">
+            <i data-lucide="eye" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <button type="submit" class="w-full bg-yellow-600 text-black font-semibold py-3 rounded-xl">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard-screen" class="hidden flex-grow p-6">
+<!-- Minimised Promo Bubble -->
+<div id="promo-bubble" class="hidden fixed bottom-32 right-5 z-40 w-12 h-12 rounded-full gradient-gold flex items-center justify-center shadow-2xl cursor-pointer animate-bounce-gentle" onclick="expandPromo()" title="Active promo!">
+  <span class="text-lg">🎁</span>
+</div>
+    <nav class="glass rounded-xl p-4 mb-6 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <i data-lucide="shield" class="w-6 h-6 text-yellow-400"></i>
+        <span class="font-bold text-lg">Gold Coast Admin</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="openPasswordModal()" class="text-yellow-400 hover:text-yellow-300 flex items-center gap-1"><i data-lucide="key" class="w-5 h-5"></i> Change Password</button>
+        <button onclick="logout()" class="text-gray-400 hover:text-white flex items-center gap-2"><i data-lucide="log-out" class="w-5 h-5"></i> Logout</button>
+      </div>
+    </nav>
+
+    <!-- Stats -->
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+  <!-- Total Users -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group">
+    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="users" class="w-4 h-4 text-blue-400"></i>
+        <span class="text-gray-400 text-xs">Total Users</span>
+      </div>
+      <div class="text-xl font-bold" id="stat-users">0</div>
+    </div>
+  </div>
+
+  <!-- Total Investments -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group">
+    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="briefcase" class="w-4 h-4 text-indigo-400"></i>
+        <span class="text-gray-400 text-xs">Total Investments</span>
+      </div>
+      <div class="text-xl font-bold" id="stat-investments">0</div>
+    </div>
+  </div>
+
+  <!-- Total Amount -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group">
+    <div class="absolute top-0 left-0 w-1 h-full bg-gold-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="coins" class="w-4 h-4 text-gold-400"></i>
+        <span class="text-gray-400 text-xs">Total Amount</span>
+      </div>
+      <div class="text-xl font-bold" id="stat-total">0</div>
+    </div>
+  </div>
+
+  <!-- Active Investments -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group border-l-4 border-emerald-500/60">
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+        <span class="text-emerald-400 text-xs">Active Investments</span>
+      </div>
+      <div class="text-xl font-bold text-emerald-400" id="stat-active-investments">0</div>
+    </div>
+  </div>
+
+  <!-- Active Amount -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group border-l-4 border-emerald-500/60">
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+        <span class="text-emerald-400 text-xs">Active Amount</span>
+      </div>
+      <div class="text-xl font-bold text-emerald-400" id="stat-active-amount">₵0</div>
+    </div>
+  </div>
+
+  <!-- Reinvested Capital -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group border-l-4 border-blue-500/60">
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="refresh-cw" class="w-4 h-4 text-blue-400"></i>
+        <span class="text-blue-400 text-xs">Reinvested Capital</span>
+      </div>
+      <div class="text-xl font-bold" id="stat-reinvested-capital">₵0</div>
+    </div>
+  </div>
+
+  <!-- Platform Fees (NEW) -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group border-l-4 border-yellow-500/60">
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="banknote" class="w-4 h-4 text-yellow-400"></i>
+        <span class="text-yellow-400 text-xs">Platform Fees</span>
+      </div>
+      <div class="text-xl font-bold" id="stat-fees">₵0</div>
+    </div>
+  </div>
+
+  <!-- Payout Requests -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group">
+    <div class="absolute top-0 left-0 w-1 h-full bg-orange-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="arrow-up-circle" class="w-4 h-4 text-orange-400"></i>
+        <span class="text-gray-400 text-xs">Payout Requests</span>
+      </div>
+      <div class="text-xl font-bold" id="stat-withdrawals">0</div>
+    </div>
+  </div>
+
+  <!-- Total Paid -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group">
+    <div class="absolute top-0 left-0 w-1 h-full bg-green-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+        <span class="text-gray-400 text-xs">Total Paid</span>
+      </div>
+      <div class="text-xl font-bold" id="stat-paid-amount">0</div>
+      <p class="text-xs text-gray-400 mt-1" id="stat-paid-count">0 payouts</p>
+    </div>
+  </div>
+
+  <!-- Total Visits -->
+  <div class="glass-premium p-4 stat-card-premium relative overflow-hidden group">
+    <div class="absolute top-0 left-0 w-1 h-full bg-purple-500/60"></div>
+    <div class="pl-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="eye" class="w-4 h-4 text-purple-400"></i>
+        <span class="text-gray-400 text-xs">Total Visits (All Time)</span>
+      </div>
+      <div class="text-xl font-bold" id="stat-visits">0</div>
+      <p class="text-xs text-gray-500 mt-1">
+        <span id="stat-visits-today">0</span> today · 
+        <span id="stat-visits-month">0</span> this month
+      </p>
+    </div>
+  </div>
+</div>
+
+    <!-- Tabs -->
+    <div class="flex gap-4 mb-6">
+      <button onclick="showTab('users')" id="tab-users" class="px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400 font-medium">Users</button>
+      <button onclick="showTab('investments')" id="tab-investments" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Investments</button>
+      <button onclick="showTab('withdrawals')" id="tab-withdrawals" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Withdrawals</button>
+      <button onclick="showTab('portfolio')" id="tab-portfolio" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Portfolio</button>
+      <button onclick="showTab('partners')" id="tab-partners" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Partners</button>
+      <button onclick="showTab('settings')" id="tab-settings" class="px-4 py-2 rounded-full bg-white/5 text-gray-300 font-medium">Settings</button>
+    </div>
+
+    <!-- Users Table -->
+<div id="content-users" class="glass-table p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold text-white">Registered Users</h2>
+    <button onclick="exportCSV('users')" class="btn-export">Export CSV</button>
+  </div>
+  <div class="mb-4">
+    <input type="text" id="user-search" placeholder="Search by email or phone..." class="admin-search" oninput="filterUsers()">
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table-premium">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Referral</th>
+          <th>Admin</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody id="users-table"></tbody>
+    </table>
+  </div>
+</div>
+
+    <!-- Investments Table -->
+<div id="content-investments" class="hidden glass-table p-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <h2 class="text-lg font-semibold text-white">All Investments</h2>
+    <button onclick="exportCSV('investments')" class="btn-export">Export CSV</button>
+  </div>
+  <div id="investment-status-summary" class="text-xs text-gray-400 mb-3"></div>
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <div class="flex gap-2 flex-wrap">
+      <button onclick="filterInvestmentsByStatus('all')" class="status-filter-btn active">All</button>
+      <button onclick="filterInvestmentsByStatus('active')" class="status-filter-btn">Active</button>
+      <button onclick="filterInvestmentsByStatus('pending')" class="status-filter-btn">Pending</button>
+      <button onclick="filterInvestmentsByStatus('matured')" class="status-filter-btn">Matured</button>
+      <button onclick="filterInvestmentsByStatus('reinvested')" class="status-filter-btn">Reinvested</button>
+      <button onclick="filterInvestmentsByStatus('rejected')" class="status-filter-btn">Rejected</button>
+    </div>
+    <input type="text" id="investment-search" placeholder="Search by user name or email..." class="admin-search" oninput="filterInvestments()">
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table-premium">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Amount</th>
+          <th>Plan</th>
+          <th>Method</th>
+          <th>TxID</th>
+          <th>Reference</th>
+          <th>Status</th>
+          <th>Maturity</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="investments-table"></tbody>
+    </table>
+  </div>
+</div>
+
+    <!-- Withdrawals Table -->
+<div id="content-withdrawals" class="hidden glass-table p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold text-white">Payout Requests</h2>
+    <button onclick="exportCSV('withdrawals')" class="btn-export">Export CSV</button>
+  </div>
+  <div class="mb-4">
+    <input type="text" id="withdrawal-search" placeholder="Search by user name or email..." class="admin-search" oninput="filterWithdrawals()">
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table-premium">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Amount</th>
+          <th>Plan</th>
+          <th>Invested</th>
+          <th>Type</th>
+          <th>Paid</th>
+          <th>Status</th>
+          <th>Requested</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="withdrawals-table"></tbody>
+    </table>
+  </div>
+</div>
+
+    <!-- Settings Panel -->
+<div id="content-settings" class="hidden glass-table p-6">
+  <h2 class="text-lg font-semibold text-white mb-6">Platform Settings</h2>
+
+  <!-- Announcement -->
+  <div class="bg-white/5 rounded-xl p-5 mb-6 border border-white/5">
+    <h3 class="text-md font-semibold text-white mb-3">📢 Announcement</h3>
+    <input type="text" id="announcement-text" placeholder="Enter announcement message" class="admin-search mb-3 w-full max-w-md">
+    <div class="flex gap-2">
+      <button onclick="postAnnouncement()" class="btn-export bg-yellow-600 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg text-sm font-semibold">Publish</button>
+      <button onclick="clearAnnouncements()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-sm">Clear Expired</button>
+    </div>
+  </div>
+
+  <!-- Payment & Referral Settings -->
+  <form id="settings-form" class="space-y-5">
+    <div class="grid sm:grid-cols-2 gap-5">
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-300">MTN MoMo Number</label>
+        <input type="text" id="set-momo" class="admin-search w-full">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-300">MoMo Account Name</label>
+        <input type="text" id="set-momo-name" class="admin-search w-full">
+      </div>
+    </div>
+    <div class="grid sm:grid-cols-3 gap-5">
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-300">USDT (TRC20)</label>
+        <input type="text" id="set-usdt" class="admin-search w-full">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-300">Bitcoin (BTC)</label>
+        <input type="text" id="set-btc" class="admin-search w-full">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-300">Ethereum (ETH)</label>
+        <input type="text" id="set-eth" class="admin-search w-full">
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1 text-gray-300">Payment Note</label>
+      <textarea id="set-note" rows="2" class="admin-search w-full"></textarea>
+    </div>
+
+    <div class="grid sm:grid-cols-3 gap-5">
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-300">Referral Bonus (₵)</label>
+        <input type="number" id="set-referral-bonus" class="admin-search w-full">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-300">Referral Race Prize</label>
+        <input type="text" id="set-referral-race-prize" class="admin-search w-full">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-300">Investor Count</label>
+        <input type="number" id="set-investor-count" class="admin-search w-full" placeholder="e.g. 500">
+      </div>
+    </div>
+
+    <button type="submit" class="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-semibold py-3 px-8 rounded-xl hover:opacity-90 transition">Save Settings</button>
+  </form>
+
+  <!-- Promo Management -->
+  <div class="bg-white/5 rounded-xl p-5 mt-8 border border-white/5">
+    <h3 class="text-md font-semibold text-white mb-4">📢 Deposit Bonus Promo</h3>
+    <div class="grid sm:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="block text-sm mb-1 text-gray-300">Bonus (%)</label>
+        <input type="number" id="promo-bonus" value="10" class="admin-search w-full">
+      </div>
+      <div>
+        <label class="block text-sm mb-1 text-gray-300">Minimum Deposit (₵)</label>
+        <input type="number" id="promo-min" value="500" class="admin-search w-full">
+      </div>
+      <div>
+        <label class="block text-sm mb-1 text-gray-300">Duration (Hours)</label>
+        <input type="number" id="promo-hours" value="48" class="admin-search w-full">
+      </div>
+      <div>
+        <label class="block text-sm mb-1 text-gray-300">Custom Message</label>
+        <input type="text" id="promo-message" placeholder="Limited-time bonus!" class="admin-search w-full">
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="startPromo()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg text-sm font-semibold">🚀 Start Promo</button>
+      <button onclick="stopPromo()" class="bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg text-sm font-semibold">⏹ Stop Promo</button>
+    </div>
+    <p id="promo-status" class="text-xs text-gray-400 mt-2"></p>
+  </div>
+</div>
+
+    <!-- Portfolio Analyzer -->
+    <div id="content-portfolio" class="hidden glass rounded-xl p-6">
+      <!-- Platform-wide summary cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div class="glass rounded-xl p-4 border-l-4 border-blue-500">
+          <p class="text-blue-400 text-xs">Active Capital</p>
+          <p class="text-2xl font-bold mt-1" id="pf-active-capital">₵0</p>
+        </div>
+        <div class="glass rounded-xl p-4 border-l-4 border-yellow-500">
+          <p class="text-yellow-400 text-xs">Expected Payout</p>
+          <p class="text-2xl font-bold mt-1" id="pf-expected-payout">₵0</p>
+        </div>
+        <div class="glass rounded-xl p-4 border-l-4 border-red-500">
+          <p class="text-red-400 text-xs">Net Exposure</p>
+          <p class="text-2xl font-bold mt-1" id="pf-net-exposure">₵0</p>
+        </div>
+        <div class="glass rounded-xl p-4 border-l-4 border-purple-500">
+  <p class="text-purple-400 text-xs">Locked Balances</p>
+  <p class="text-2xl font-bold mt-1" id="pf-locked-balances">₵0</p>
+  <p class="text-[10px] text-gray-500 mt-1">Behind reinvestment gate</p>
+</div>
+        <div class="glass rounded-xl p-4 border-l-4 border-yellow-500">
+  <p class="text-yellow-400 text-xs">Rolled‑Over Capital</p>
+  <p class="text-2xl font-bold mt-1" id="pf-rolled-capital">₵0</p>
+</div>
+<div class="glass rounded-xl p-4 border-l-4 border-orange-500">
+  <p class="text-orange-400 text-xs">Rolled‑Over Payout (Liability)</p>
+  <p class="text-2xl font-bold mt-1" id="pf-rolled-payout">₵0</p>
+</div>
+        <div class="glass rounded-xl p-4 border-l-4 border-green-500">
+          <p class="text-green-400 text-xs">Total Paid Out</p>
+          <p class="text-2xl font-bold mt-1" id="pf-total-paid">₵0</p>
+        </div>
+      </div>
+
+      <!-- Cash Flow Chart -->
+      <div class="chart-card mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-md font-semibold">Cash Flow</h3>
+          <div class="flex gap-2">
+            <button onclick="loadCashflowData('all')" id="cf-all" class="period-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">All Time</button>
+            <button onclick="loadCashflowData('month')" id="cf-month" class="period-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">This Month</button>
+            <button onclick="loadCashflowData('today')" id="cf-today" class="period-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs">Today</button>
+          </div>
+        </div>
+
+        <!-- Summary badges -->
+        <div class="flex flex-wrap gap-3 mb-4" id="cashflow-summary">
+          <div class="glass rounded-lg px-4 py-2">
+            <p class="text-xs text-gray-400">All Time</p>
+            <p class="font-bold" id="sum-all-deposits">₵0</p>
+            <p class="text-xs text-red-400" id="sum-all-payouts">Payouts: ₵0</p>
+            <p class="text-xs" id="sum-all-net"></p>
+          </div>
+          <div class="glass rounded-lg px-4 py-2">
+            <p class="text-xs text-gray-400">This Month</p>
+            <p class="font-bold" id="sum-month-deposits">₵0</p>
+            <p class="text-xs text-red-400" id="sum-month-payouts">Payouts: ₵0</p>
+            <p class="text-xs" id="sum-month-net"></p>
+          </div>
+          <div class="glass rounded-lg px-4 py-2">
+            <p class="text-xs text-gray-400">Today</p>
+            <p class="font-bold" id="sum-today-deposits">₵0</p>
+            <p class="text-xs text-red-400" id="sum-today-payouts">Payouts: ₵0</p>
+            <p class="text-xs" id="sum-today-net"></p>
+          </div>
+        </div>
+
+        <div style="position: relative; height: 280px;">
+          <canvas id="cashflow-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- User search & table -->
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">User Portfolios</h2>
+        <input type="text" id="portfolio-user-search" placeholder="Search by name or email..." 
+          class="w-64 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-yellow-500"
+          oninput="filterPortfolioUsers()">
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="text-gray-400 border-b border-white/10">
+            <th class="text-left pb-3">User</th>
+            <th class="text-left pb-3">Active</th>
+            <th class="text-left pb-3">Total Invested</th>
+            <th class="text-left pb-3">Total Withdrawn</th>
+            <th class="text-left pb-3">Net Profit</th>
+            <th class="text-left pb-3">Active Capital</th>
+            <th class="text-left pb-3">Expected Payout</th>
+          </tr></thead>
+          <tbody id="portfolio-users-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+      <!-- Partners Tracker -->
+<div id="content-partners" class="hidden glass rounded-xl p-6">
+  <h2 class="text-lg font-semibold mb-4">Partner Performance</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+  <tr class="text-gray-400 border-b border-white/10">
+    <th class="text-left pb-3">Name</th>
+    <th class="text-left pb-3">Email</th>
+    <th class="text-left pb-3">Referral Bonus</th>
+    <th class="text-left pb-3">Prizes & Rewards</th>
+    <th class="text-left pb-3">Reward</th>
+  </tr>
+</thead>
+      <tbody id="partners-table"></tbody>
+    </table>
+  </div>
+</div>
+
+    <div class="glass rounded-xl p-5 mt-8">
+      <h2 class="text-lg font-semibold mb-4">Platform Overview (Last 30 Days)</h2>
+      <div style="position: relative; width: 100%; height: 300px;">
+        <canvas id="admin-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHANGE PASSWORD MODAL -->
+  <div id="password-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);">
+    <div class="glass rounded-2xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold">Change Admin Password</h3>
+        <button onclick="closePasswordModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <form id="change-password-form" class="space-y-4">
+        <div class="relative"><label class="block text-sm mb-1">Current Password</label><input type="password" id="current-password" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white"><button type="button" onclick="togglePasswordVisibility('current-password', this)" class="absolute right-3 top-8 text-gray-400 hover:text-white"><i data-lucide="eye" class="w-5 h-5"></i></button></div>
+        <div class="relative"><label class="block text-sm mb-1">New Password (min 6 chars)</label><input type="password" id="new-password" required minlength="6" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white"><button type="button" onclick="togglePasswordVisibility('new-password', this)" class="absolute right-3 top-8 text-gray-400 hover:text-white"><i data-lucide="eye" class="w-5 h-5"></i></button></div>
+        <button type="submit" class="w-full bg-yellow-600 text-black font-semibold py-3 rounded-xl">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Portfolio Detail Modal -->
+  <div id="portfolio-modal" class="fixed inset-0 z-[260] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+    <div class="glass rounded-2xl p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold" id="pf-detail-name">Portfolio</h3>
+        <button onclick="document.getElementById('portfolio-modal').classList.add('hidden')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6" id="pf-detail-summary"></div>
+      <h4 class="font-semibold text-gold-400 mb-2">Investment Timeline</h4>
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs"><thead>
+          <tr class="text-gray-400 border-b border-white/10">
+          <th class="text-left pb-2">Plan</th>
+            <th class="text-left pb-2">Amount</th>
+            <th class="text-left pb-2">Date</th>
+            <th class="text-left pb-2">Status</th>
+            <th class="text-left pb-2">Matured / Expected</th>
+            <th class="text-left pb-2">Profit</th>
+          </tr></thead><tbody id="pf-investment-timeline"></tbody></table>
+      </div>
+      <h4 class="font-semibold text-gold-400 mb-2">Withdrawals</h4>
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs"><thead>
+          <tr class="text-gray-400 border-b border-white/10">
+            <th class="text-left pb-2">Amount</th>
+            <th class="text-left pb-2">Type</th>
+            <th class="text-left pb-2">Status</th>
+            <th class="text-left pb-2">Date</th>
+          </tr></thead><tbody id="pf-withdrawals-timeline"></tbody></table>
+      </div>
+      <h4 class="font-semibold text-gold-400 mb-2">Cash Flow</h4>
+      <div style="position: relative; height: 250px;"><canvas id="pf-cashflow-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Custom Confirmation Modal -->
+  <div id="custom-confirm-modal" class="fixed inset-0 z-[260] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+    <div class="glass rounded-2xl p-6 w-full max-w-sm text-center">
+      <i data-lucide="help-circle" class="w-10 h-10 text-yellow-400 mx-auto mb-3"></i>
+      <p id="custom-confirm-message" class="text-white text-sm mb-6">Are you sure?</p>
+      <div class="flex justify-center gap-4">
+        <button id="custom-confirm-cancel" class="px-6 py-2 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+        <button id="custom-confirm-ok" class="px-6 py-2 rounded-full gradient-gold text-dark-950 font-semibold text-sm hover:opacity-90 transition">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Partner Reward Modal -->
+<div id="reward-modal" class="fixed inset-0 z-[270] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl w-full max-w-sm p-6 text-center">
+    <h3 class="text-lg font-semibold mb-1">🎁 Reward Partner</h3>
+    <p class="text-sm text-gray-400 mb-4" id="reward-partner-name"></p>
+
+    <!-- Reward type selector -->
+    <label class="block text-sm text-gray-300 mb-2">Reward Type</label>
+    <select id="reward-type" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white mb-4">
+      <option value="bonus">Referral Bonus</option>
+      <option value="game_balance">Prizes & Rewards</option>
+    </select>
+
+    <input type="number" id="reward-amount" placeholder="Amount (₵)" min="1" step="any" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-center text-lg mb-3">
+
+    <label class="block text-sm text-gray-300 mb-2">Note (optional)</label>
+    <input type="text" id="reward-note" placeholder="e.g., VIP monthly bonus" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-sm mb-4">
+
+    <div class="flex justify-center gap-3">
+      <button onclick="closeRewardModal()" class="px-5 py-2 rounded-full bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium">Cancel</button>
+      <button onclick="confirmReward()" class="px-5 py-2 rounded-full gradient-gold text-dark-950 font-semibold text-sm">Send Reward</button>
+    </div>
+  </div>
+</div>
+
+  <!-- User Quick View Modal -->
+  <div id="user-detail-modal" class="fixed inset-0 z-[250] hidden items-center justify-center p-4" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+    <div class="glass rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold" id="detail-name">User</h3>
+        <button onclick="document.getElementById('user-detail-modal').classList.add('hidden')" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <div id="detail-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'https://goldcoast-api.onrender.com/api/admin';
+    let allUsers = [], allInvestments = [], allWithdrawals = [], token = localStorage.getItem('admin_token');
+    let adminChart = null, cashFlowChart = null, cashflowChart = null, currentStatusFilter = 'all', allPortfolioUsers = [];
+    let currentCashflowPeriod = 'all';
+    let allInvestmentsFull = []; 
+    let threeDaysAgo = new Date(); // <-- add this line 
+
+    function toast(msg, type='success') {
+      const c = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = `glass ${type==='success'?'border-green-500 text-green-400':'border-red-500 text-red-400'} border rounded-xl px-4 py-3 flex items-center gap-2`;
+      el.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}" class="w-5 h-5"></i><span>${msg}</span>`;
+      c.appendChild(el); lucide.createIcons();
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    function copyToClipboard(text) {
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => toast('Phone number copied!')).catch(() => toast('Failed to copy', 'error'));
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon = btn.querySelector('[data-lucide]');
+      input.type = input.type === 'password' ? 'text' : 'password';
+      icon.setAttribute('data-lucide', input.type === 'password' ? 'eye' : 'eye-off');
+      lucide.createIcons();
+    }
+
+    function customConfirm(message) {
+      return new Promise(resolve => {
+        document.getElementById('custom-confirm-message').textContent = message;
+        const modal = document.getElementById('custom-confirm-modal');
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+        function cleanup() {
+          modal.classList.add('hidden'); modal.classList.remove('flex');
+          document.getElementById('custom-confirm-ok').removeEventListener('click', onOk);
+          document.getElementById('custom-confirm-cancel').removeEventListener('click', onCancel);
+        }
+        function onOk() { cleanup(); resolve(true); }
+        function onCancel() { cleanup(); resolve(false); }
+        document.getElementById('custom-confirm-ok').addEventListener('click', onOk);
+        document.getElementById('custom-confirm-cancel').addEventListener('click', onCancel);
+      });
+    }
+
+    function safe(str) {
+      return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+    }
+
+    // ── Login / Logout ──
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      try {
+        const res = await fetch(`${API}/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
+        const data = await res.json();
+        if(!res.ok) { alert('Login failed: ' + (data.error || 'Unknown error')); return; }
+        token = data.token; localStorage.setItem('admin_token', token);
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('dashboard-screen').classList.remove('hidden');
+        document.getElementById('dashboard-screen').classList.add('flex-grow');
+        loadDashboard();
+      } catch(err) { alert('Connection error. Is the backend awake? Wait 30s and try again.'); }
+    });
+
+    function logout() {
+      localStorage.removeItem('admin_token'); token = null;
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('dashboard-screen').classList.add('hidden');
+    }
+
+    // ── Tabs ──
+   function showTab(tab) {
+  ['content-users','content-investments','content-withdrawals','content-settings','content-portfolio','content-partners'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  ['tab-users','tab-investments','tab-withdrawals','tab-settings','tab-portfolio','tab-partners'].forEach(id => document.getElementById(id).className = 'px-4 py-2 rounded-full bg-white/5 text-gray-300');
+  if(tab==='users') {
+    document.getElementById('content-users').classList.remove('hidden');
+    document.getElementById('tab-users').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+  } else if(tab==='investments') {
+    document.getElementById('content-investments').classList.remove('hidden');
+    document.getElementById('tab-investments').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+  } else if(tab==='withdrawals') {
+    document.getElementById('content-withdrawals').classList.remove('hidden');
+    document.getElementById('tab-withdrawals').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+  } else if(tab==='settings') {
+    document.getElementById('content-settings').classList.remove('hidden');
+    document.getElementById('tab-settings').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+    loadSettings();
+  } else if(tab==='portfolio') {
+    document.getElementById('content-portfolio').classList.remove('hidden');
+    document.getElementById('tab-portfolio').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+    loadPortfolioUsers();
+  } else if(tab==='partners') {
+    document.getElementById('content-partners').classList.remove('hidden');
+    document.getElementById('tab-partners').className = 'px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-400';
+    loadPartners();
+  }
+}
+
+    function loadDashboard() {
+      loadUsers(); loadInvestments(); loadWithdrawals(); showTab('users'); loadAdminChart(); loadPageViews(); loadPlatformFees();
+    }
+
+   async function loadPageViews() {
+  try {
+    const res = await fetch(`${API}/page-views`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    document.getElementById('stat-visits').textContent = data.total.toLocaleString();
+    document.getElementById('stat-visits-today').textContent = data.today;
+    document.getElementById('stat-visits-month').textContent = data.thisMonth;
+  } catch (e) { /* ignore */ }
+}
+
+function minimizePromo() {
+  document.getElementById('promo-banner').classList.add('hidden');
+  document.getElementById('promo-bubble').classList.remove('hidden');
+  sessionStorage.setItem('promo_minimised', 'true');
+}
+
+function expandPromo() {
+  document.getElementById('promo-bubble').classList.add('hidden');
+  document.getElementById('promo-banner').classList.remove('hidden');
+  sessionStorage.setItem('promo_minimised', 'false');
+}
+
+    // ── Users ──
+    async function loadUsers() {
+      try {
+        const res = await fetch(`${API}/users`, { headers:{'Authorization':`Bearer ${token}`} });
+        const { users } = await res.json();
+        allUsers = users;
+        allUsers.sort((a, b) => a.name.localeCompare(b.name));
+        document.getElementById('stat-users').textContent = users.length;
+        document.getElementById('users-table').innerHTML = users.map(u => `
+  <tr class="border-b border-white/5 cursor-pointer hover:bg-white/5" onclick="showUserDetail(${u.id})">
+    <td class="py-3">${safe(u.name)}</td>
+    <td class="py-3">${safe(u.email)}</td>
+    <td class="py-3">${safe(u.phone)}</td>
+    <td class="py-3">${safe(u.referral_code||'-')}</td>
+    <td class="py-3">${u.is_admin?'✅':'❌'}</td>
+    <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
+  </tr>`).join('');
+        document.getElementById('user-search').value = '';
+      } catch(err) { toast('Failed to load users','error'); }
+    }
+async function makePartner(userId) {
+  if (!await customConfirm('Make this user a partner?')) return;
+  try {
+    const res = await fetch(`${API}/users/${userId}/make-partner`, {
+      method: 'PUT',
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    if (res.ok) {
+      toast('User is now a partner');
+      showUserDetail(userId);  // refresh modal to show updated button
+      loadUsers();             // refresh table (though no change visible)
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+async function revokePartner(userId) {
+  if (!await customConfirm('Revoke partner status?')) return;
+  try {
+    const res = await fetch(`${API}/users/${userId}/revoke-partner`, {
+      method: 'PUT',
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    if (res.ok) {
+      toast('Partner status revoked');
+      showUserDetail(userId);
+      loadUsers();
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+async function deleteUserFromModal(userId) {
+  if (!await customConfirm('Are you sure you want to permanently delete this user and all their investments?')) return;
+  try {
+    const res = await fetch(`${API}/users/${userId}`, { method:'DELETE', headers:{'Authorization':`Bearer ${token}`} });
+    const data = await res.json();
+    if (res.ok) {
+      toast('User deleted successfully');
+      document.getElementById('user-detail-modal').classList.add('hidden');
+      document.getElementById('user-detail-modal').classList.remove('flex');
+      loadUsers();
+    } else {
+      toast(data.error || 'Failed to delete', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+    async function deleteInvestment(investmentId) {
+  if (!await customConfirm('Permanently delete this investment? This cannot be undone.')) return;
+  try {
+    const res = await fetch(`${API}/investments/${investmentId}`, {
+      method: 'DELETE',
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    if (res.ok) {
+      toast('Investment deleted', 'success');
+      loadInvestments();
+    } else {
+      const data = await res.json();
+      toast(data.error || 'Failed to delete', 'error');
+    }
+  } catch (err) {
+    toast('Connection error', 'error');
+  }
+}
+
+    async function loadPlatformFees() {
+  try {
+    const res = await fetch(`${API}/platform-fees`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    document.getElementById('stat-fees').textContent = '₵' + data.total.toLocaleString();
+  } catch (e) {
+    document.getElementById('stat-fees').textContent = 'Error';
+  }
+}
+
+    async function startPromo() {
+  const bonus = document.getElementById('promo-bonus').value;
+  const min = document.getElementById('promo-min').value;
+  const hours = document.getElementById('promo-hours').value;
+  const message = document.getElementById('promo-message').value;
+
+  const res = await fetch(`${API}/promo/start`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ bonus, min_deposit: min, hours, message })
+  });
+  if (res.ok) {
+    const data = await res.json();
+    document.getElementById('promo-status').textContent = `✅ Promo active until ${new Date(data.ends_at).toLocaleString()}`;
+  }
+}
+
+async function stopPromo() {
+  await fetch(`${API}/promo/stop`, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  document.getElementById('promo-status').textContent = '⏹ Promo stopped';
+}
+
+// Load promo status when settings tab opens (add inside loadSettings or showTab)
+async function loadPromoStatus() {
+  const res = await fetch(`${API}/promo-status`);
+  const data = await res.json();
+  if (data.active) {
+    document.getElementById('promo-status').textContent = `✅ Active – ends ${new Date(data.end_time).toLocaleString()}`;
+  }
+}
+
+  async function loadPartners() {
+  try {
+    const res = await fetch(`${API}/partners`, { headers: {'Authorization': `Bearer ${token}`} });
+    const { partners } = await res.json();
+    document.getElementById('partners-table').innerHTML = partners.map(p => `
+      <tr class="border-b border-white/5">
+        <td class="py-3">${safe(p.name)}</td>
+        <td class="py-3 text-xs text-gray-400">${safe(p.email)}</td>
+        <td class="py-3">₵${(p.bonus || 0).toLocaleString()}</td>
+        <td class="py-3">₵${(p.game_balance || 0).toLocaleString()}</td>
+        <td class="py-3">
+        <button onclick="openRewardModal(${p.id}, '${safe(p.name).replace(/'/g, "\\'")}')" class="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-3 py-1 text-xs">Reward</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) { toast('Failed to load partners', 'error'); }
+}
+
+    async function rewardPartner(partnerId) {
+  const amountStr = prompt('Enter reward amount (cedis):');
+  if (!amountStr) return;
+  const amount = parseFloat(amountStr);
+  if (isNaN(amount) || amount <= 0) {
+    toast('Invalid amount', 'error');
+    return;
+  }
+  try {
+    const res = await fetch(`${API}/partners/${partnerId}/reward`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ amount, notes: 'Manual reward' })
+    });
+    if (res.ok) {
+      toast(`₵${amount} added to partner rewards`, 'success');
+      loadPartners();
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+async function payPartner(partnerId) {
+  if (!await customConfirm('Mark all unpaid earnings as paid?')) return;
+  try {
+    const res = await fetch(`${API}/partners/${partnerId}/pay`, {
+      method: 'POST',
+      headers: {'Authorization': `Bearer ${token}`}
+    });
+    if (res.ok) {
+      toast('Partner marked as paid', 'success');
+      loadPartners();
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+let currentRewardPartnerId = null;
+
+function openRewardModal(partnerId, partnerName) {
+  currentRewardPartnerId = partnerId;
+  document.getElementById('reward-partner-name').textContent = partnerName;
+  document.getElementById('reward-amount').value = '';
+  document.getElementById('reward-type').value = 'bonus';
+  document.getElementById('reward-note').value = '';
+  const modal = document.getElementById('reward-modal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeRewardModal() {
+  document.getElementById('reward-modal').classList.add('hidden');
+  document.getElementById('reward-modal').classList.remove('flex');
+  currentRewardPartnerId = null;
+}
+
+async function confirmReward() {
+  const amountStr = document.getElementById('reward-amount').value;
+  const amount = parseFloat(amountStr);
+  if (isNaN(amount) || amount <= 0) {
+    toast('Enter a valid amount', 'error');
+    return;
+  }
+
+  const type = document.getElementById('reward-type').value;
+  const notes = document.getElementById('reward-note').value.trim() || 'Manual reward';
+
+  try {
+    const res = await fetch(`${API}/partners/${currentRewardPartnerId}/reward`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ amount, type, notes })
+    });
+    if (res.ok) {
+      toast(`₵${amount} added to partner (${type === 'bonus' ? 'Referral Bonus' : 'Prizes & Rewards'})`, 'success');
+      closeRewardModal();
+      loadPartners();
+    } else {
+      toast('Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+    function filterUsers() {
+      const term = document.getElementById('user-search').value.toLowerCase().trim();
+      const filtered = allUsers.filter(u => u.email.toLowerCase().includes(term) || u.phone.includes(term));
+      document.getElementById('users-table').innerHTML = filtered.map(u => `
+        <tr class="border-b border-white/5 cursor-pointer hover:bg-white/5" onclick="showUserDetail(${u.id})">
+    <td class="py-3">${safe(u.name)}</td>
+    <td class="py-3">${safe(u.email)}</td>
+    <td class="py-3">${safe(u.phone)}</td>
+    <td class="py-3">${safe(u.referral_code||'-')}</td>
+    <td class="py-3">${u.is_admin?'✅':'❌'}</td>
+    <td class="py-3 text-gray-400">${new Date(u.created_at).toLocaleString()}</td>
+  </tr>`).join('');
+    }
+
+    async function showUserDetail(userId) {
+  const res = await fetch(`${API}/user/${userId}/details`, { headers:{'Authorization':`Bearer ${token}`} });
+  const data = await res.json();
+  if(!data.user) return toast('Failed to load user','error');
+  
+  const u = data.user;
+  document.getElementById('detail-name').textContent = u.name;
+  
+  let partnerButton = '';
+  if (!u.is_admin) {
+    if (u.is_partner) {
+      partnerButton = `<button onclick="revokePartner(${userId})" class="bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg px-4 py-2 text-sm">Revoke Partner</button>`;
+    } else {
+      partnerButton = `<button onclick="makePartner(${userId})" class="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 text-sm">Make Partner</button>`;
+    }
+  }
+  
+  const deleteButton = !u.is_admin ? `<button onclick="deleteUserFromModal(${userId})" class="bg-red-600 hover:bg-red-500 text-white rounded-lg px-4 py-2 text-sm">Delete User</button>` : '';
+  
+  document.getElementById('detail-content').innerHTML = `
+    <p class="text-sm text-gray-400 mb-2">Email: ${u.email} | Phone: ${u.phone}</p>
+    <p class="text-sm text-gray-400 mb-4">Referral Code: ${u.referral_code||'N/A'} | Referrals: ${data.referralCount} | Bonus: ₵${u.bonus||0}</p>
+    <h4 class="font-semibold text-gold-400 mb-2">Investments (${data.investments.length})</h4>
+    <div class="max-h-40 overflow-y-auto mb-4">${data.investments.map(i => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>${i.plan} - ₵${i.amount} (${i.status})</span><span>${new Date(i.date).toLocaleString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}</div>
+    <h4 class="font-semibold text-gold-400 mb-2">Withdrawals (${data.withdrawals.length})</h4>
+    <div class="max-h-40 overflow-y-auto mb-4">${data.withdrawals.map(w => `<div class="text-xs flex justify-between py-1 border-b border-white/5"><span>₵${w.amount} (${w.status})</span><span>${new Date(w.created_at).toLocaleString()}</span></div>`).join('') || '<p class="text-gray-500 text-xs">None</p>'}</div>
+    <div class="flex gap-3 mt-4 pt-4 border-t border-white/10">
+      ${partnerButton}
+      ${deleteButton}
+    </div>
+  `;
+  
+  document.getElementById('user-detail-modal').classList.remove('hidden');
+  document.getElementById('user-detail-modal').classList.add('flex');
+}
+
+    async function deleteUser(userId) {
+      if(!await customConfirm('Are you sure you want to permanently delete this user and all their investments?')) return;
+      try {
+        const res = await fetch(`${API}/users/${userId}`, { method:'DELETE', headers:{'Authorization':`Bearer ${token}`} });
+        const data = await res.json();
+        if(res.ok) { toast('User deleted successfully','success'); loadUsers(); }
+        else { toast(data.error || 'Failed to delete','error'); }
+      } catch(err) { toast('Connection error','error'); }
+    }
+
+    // ── Investments ──
+async function loadInvestments() {
+  try {
+    const res = await fetch(`${API}/investments`, { headers:{'Authorization':`Bearer ${token}`} });
+    const { investments } = await res.json();
+
+    // Keep the full list in case admin clicks "Rejected" filter
+    allInvestmentsFull = investments;
+
+    // Update the cut-off date and apply the hide-old-rejected filter
+    threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+    allInvestments = investments.filter(inv => {
+      if (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo) {
+        return false;
+      }
+      return true;
+    });
+
+    document.getElementById('investment-search').value = '';
+
+    // Status counts (using the full list for accurate summary)
+    const statusCounts = { active:0, pending:0, matured:0, rejected:0, reinvested:0 };
+    investments.forEach(i => { if(statusCounts[i.status] !== undefined) statusCounts[i.status]++; });
+    document.getElementById('investment-status-summary').innerHTML =
+      `Active: ${statusCounts.active} | Pending: ${statusCounts.pending} | Matured: ${statusCounts.matured} | Rejected: ${statusCounts.rejected} | Reinvested: ${statusCounts.reinvested}`;
+
+    // Stat cards (using filtered allInvestments so rejected don't inflate totals)
+    document.getElementById('stat-investments').textContent = allInvestments.filter(i => i.status !== 'rejected').length;
+    document.getElementById('stat-total').textContent = allInvestments.reduce((s,i) => i.status !== 'rejected' ? s + i.amount : s, 0).toLocaleString('en-GH');
+    const activeInvs = allInvestments.filter(i => i.status === 'active');
+    document.getElementById('stat-active-investments').textContent = activeInvs.length;
+    document.getElementById('stat-active-amount').textContent = '₵' + activeInvs.reduce((s,i) => s + i.amount, 0).toLocaleString('en-GH');
+    const reinvestedAmount = allInvestments.filter(i => i.status === 'reinvested').reduce((s,i) => s + i.amount, 0);
+    document.getElementById('stat-reinvested-capital').textContent = '₵' + reinvestedAmount.toLocaleString('en-GH');
+
+    // Render table using filtered allInvestments
+    document.getElementById('investments-table').innerHTML = allInvestments.map(inv => `
+      <tr class="border-b border-white/5">
+        <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
+        <td class="py-3">₵${inv.amount.toLocaleString()}</td><td class="py-3 capitalize">${inv.plan}</td><td class="py-3">${inv.method}</td>
+        <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
+        <td class="py-3 text-xs text-gray-400">${inv.reference_code||'-'}</td>
+<td class="py-3" data-status="${inv.status}">
+  ${inv.status === 'active' ? (() => {
+    const effectiveDays = inv.duration_days || { starter:10, growth:20, premium:30 }[inv.plan] || 14;
+    const maturityDate = new Date(new Date(inv.date).getTime() + effectiveDays * 86400000);
+    return `<span data-maturity="${maturityDate.toISOString()}" class="status-active">Active</span>`;
+  })() : ''}
+
+  ${inv.status === 'reinvested' ? 
+    `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : ''}</span>` 
+  : ''}
+
+  ${inv.status !== 'active' && inv.status !== 'reinvested' ? 
+    `<span class="badge ${
+      inv.status === 'pending' ? 'badge-warning' :
+      inv.status === 'rejected' ? 'badge-danger' :
+      inv.status === 'matured' ? 'badge-info' : 'badge-info'
+    }">${inv.status}</span>` 
+  : ''}
+</td>
+        <td class="py-3 text-xs text-gray-400">
+  ${inv.maturity_date ? new Date(inv.maturity_date).toLocaleDateString() : '—'}
+</td>
+        <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
+<td class="py-3 flex items-center gap-2">
+  ${inv.status === 'reinvested' 
+    ? '<span class="text-blue-400 text-xs">Reinvested 🔒</span>'
+    : (inv.status === 'matured')
+    ? '<span class="text-green-400 text-xs">Matured 🔒</span>'
+    : (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo)
+    ? '<span class="text-red-400 text-xs">Rejected 🔒</span>'
+    : `<select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
+         <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
+         <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
+         <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
+         <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
+       </select>`
+  }
+  <button onclick="deleteInvestment(${inv.id})" class="text-red-400 hover:text-red-300 text-xs" title="Delete investment">
+    <i data-lucide="trash-2" class="w-4 h-4"></i>
+  </button>
+</td>
+      </tr>`).join('');
+    updateActiveCountdowns();
+    lucide.createIcons();  
+  } catch(err) { toast('Failed to load investments','error'); }
+}
+
+    function filterInvestments() {
+      const term = document.getElementById('investment-search').value.toLowerCase().trim();
+      let filtered = allInvestments;
+      if(currentStatusFilter !== 'all') filtered = filtered.filter(inv => inv.status === currentStatusFilter);
+      if(term) filtered = filtered.filter(inv => inv.user_name.toLowerCase().includes(term) || inv.user_email.toLowerCase().includes(term));
+      document.getElementById('investments-table').innerHTML = filtered.map(inv => `
+        <tr class="border-b border-white/5">
+          <td class="py-3">${safe(inv.user_name)}<br><span class="text-xs text-gray-400">${safe(inv.user_email)}</span></td>
+          <td class="py-3">₵${inv.amount.toLocaleString()}</td><td class="py-3 capitalize">${inv.plan}</td><td class="py-3">${inv.method}</td>
+          <td class="py-3 text-xs text-gray-400">${inv.transaction_id||'-'}</td>
+          <td class="py-3 text-xs text-gray-400">${inv.reference_code||'-'}</td> 
+<td class="py-3" data-status="${inv.status}">
+  ${inv.status === 'active' ? (() => {
+    const effectiveDays = inv.duration_days || { starter:10, growth:20, premium:30 }[inv.plan] || 14;
+    const maturityDate = new Date(new Date(inv.date).getTime() + effectiveDays * 86400000);
+    return `<span data-maturity="${maturityDate.toISOString()}" class="status-active">Active</span>`;
+  })() : ''}
+
+  ${inv.status === 'reinvested' ? 
+    `<span class="status-reinvested">Reinvested 🔄 ${inv.original_plan ? inv.original_plan + ' → ' + inv.plan : ''}</span>` 
+  : ''}
+
+  ${inv.status !== 'active' && inv.status !== 'reinvested' ? 
+    `<span class="badge ${
+      inv.status === 'pending' ? 'badge-warning' :
+      inv.status === 'rejected' ? 'badge-danger' :
+      inv.status === 'matured' ? 'badge-info' : 'badge-info'
+    }">${inv.status}</span>` 
+  : ''}
+</td>
+<td class="py-3 text-xs text-gray-400">
+  ${inv.maturity_date ? new Date(inv.maturity_date).toLocaleDateString() : '—'}
+</td>
+          <td class="py-3 text-gray-400">${new Date(inv.date).toLocaleString()}</td>
+        <td class="py-3 flex items-center gap-2">
+  ${inv.status === 'reinvested' 
+    ? '<span class="text-blue-400 text-xs">Reinvested 🔒</span>'
+    : (inv.status === 'matured')
+    ? '<span class="text-green-400 text-xs">Matured 🔒</span>'
+    : (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo)
+    ? '<span class="text-red-400 text-xs">Rejected 🔒</span>'
+    : `<select onchange="updateInvestmentStatus(${inv.id}, this.value)" class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm">
+         <option value="pending" ${inv.status==='pending'?'selected':''}>Pending</option>
+         <option value="active" ${inv.status==='active'?'selected':''}>Active</option>
+         <option value="matured" ${inv.status==='matured'?'selected':''}>Matured</option>
+         <option value="rejected" ${inv.status==='rejected'?'selected':''}>Rejected</option>
+       </select>`
+  }
+  <button onclick="deleteInvestment(${inv.id})" class="text-red-400 hover:text-red-300 text-xs" title="Delete investment">
+    <i data-lucide="trash-2" class="w-4 h-4"></i>
+  </button>
+</td>
+        </tr>`).join('');
+      updateActiveCountdowns();
+      lucide.createIcons();  
+    }
+
+   function filterInvestmentsByStatus(status) {
+  currentStatusFilter = status;
+
+  // If "Rejected" is selected, temporarily use the full list
+  if (status === 'rejected') {
+    allInvestments = allInvestmentsFull;
+  } else {
+    // Restore the filtered list (hide old rejected)
+    allInvestments = allInvestmentsFull.filter(inv => {
+      if (inv.status === 'rejected' && new Date(inv.date) < threeDaysAgo) return false;
+      return true;
+    });
+  }
+
+  document.querySelectorAll('.status-filter-btn').forEach(btn => btn.className = 'status-filter-btn px-3 py-1 rounded-full bg-white/5 text-gray-300 text-xs');
+  const activeBtn = document.querySelector(`[onclick="filterInvestmentsByStatus('${status}')"]`);
+  if(activeBtn) activeBtn.className = 'status-filter-btn px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-medium';
+
+  filterInvestments();
+}
+
+    function updateActiveCountdowns() {
+      const now = Date.now();
+      document.querySelectorAll('[data-maturity]').forEach(el => {
+        const maturity = new Date(el.getAttribute('data-maturity')).getTime();
+        const distance = maturity - now;
+        if(distance <= 0) { el.innerHTML = '<span class="status-matured">Matured ✅</span>'; el.removeAttribute('data-maturity'); return; }
+        const days = Math.floor(distance/(86400000));
+        const hours = Math.floor((distance%(86400000))/(3600000));
+        const minutes = Math.floor((distance%(3600000))/60000);
+        const seconds = Math.floor((distance%60000)/1000);
+        el.innerHTML = `<span class="status-active">Active (${days}d ${hours}h ${minutes}m ${seconds}s)</span>`;
+      });
+    }
+    setInterval(updateActiveCountdowns, 1000);
+
+    async function updateInvestmentStatus(id, status) {
+      const res = await fetch(`${API}/investments/${id}`, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body:JSON.stringify({status}) });
+      if(res.ok) { toast('Status updated'); loadInvestments(); }
+      else { const data = await res.json(); toast(data.error || 'Error','error'); }
+    }
+
+    // ── Withdrawals ──
+    async function loadWithdrawals() {
+      try {
+        const res = await fetch(`${API}/withdrawals`, { headers:{'Authorization':`Bearer ${token}`} });
+        const { withdrawals } = await res.json();
+        allWithdrawals = withdrawals;
+        document.getElementById('withdrawal-search').value = '';
+        document.getElementById('stat-withdrawals').textContent = withdrawals.filter(w => w.status === 'pending' || w.status === 'approved').length;
+        const paid = withdrawals.filter(w => w.status === 'paid');
+        document.getElementById('stat-paid-amount').textContent = '₵' + paid.reduce((s,w) => s + w.amount, 0).toLocaleString();
+        document.getElementById('stat-paid-count').textContent = `${paid.length} payout${paid.length!==1?'s':''}`;
+        document.getElementById('withdrawals-table').innerHTML = withdrawals.map(w => `
+          <tr class="border-b border-white/5">
+            <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span><br><span class="text-xs text-gray-500">${safe(w.user_phone||'')} ${w.user_phone ? `<button onclick="copyToClipboard('${w.user_phone.replace(/'/g,"\\'")}')" class="ml-1 text-gray-400 hover:text-white text-[10px] underline">Copy</button>` : ''}</span></td>
+            <td class="py-3">₵${w.amount.toLocaleString()}</td><td class="py-3 capitalize">${w.plan || 'Referral'}</td><td class="py-3">${w.invested_amount ? '₵'+w.invested_amount.toLocaleString() : '-'}</td>
+            <td class="py-3 text-xs capitalize">${w.type || 'investment'}</td><td class="py-3">${w.paid ? '<span class="text-green-400">Yes</span>' : '<span class="text-red-400">No</span>'}</td>
+            <td class="py-3"><span class="status-${w.status}">${w.status}</span></td>
+            <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleString()}</td>
+           <td class="py-3">
+  ${w.status === 'pending' ? `<button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button><button onclick="rejectWithdrawal(${w.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Reject</button>` : ''}
+  ${w.status === 'approved' && !w.paid ? `<button onclick="markWithdrawalPaid(${w.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mt-1">Mark Paid</button>` : ''}
+  ${w.status === 'paid' ? `<button onclick="markWithdrawalPending(${w.id})" class="bg-yellow-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-yellow-500">Undo to Pending</button>` : ''}
+</td>
+          </tr>`).join('');
+      } catch(err) { toast('Failed to load withdrawals','error'); }
+    }
+
+    function filterWithdrawals() {
+      const term = document.getElementById('withdrawal-search').value.toLowerCase().trim();
+      const filtered = allWithdrawals.filter(w => w.user_name.toLowerCase().includes(term) || w.user_email.toLowerCase().includes(term));
+      document.getElementById('withdrawals-table').innerHTML = filtered.map(w => `
+        <tr class="border-b border-white/5">
+          <td class="py-3">${safe(w.user_name)}<br><span class="text-xs text-gray-400">${safe(w.user_email)}</span><br><span class="text-xs text-gray-500">${safe(w.user_phone||'')} ${w.user_phone ? `<button onclick="copyToClipboard('${w.user_phone.replace(/'/g,"\\'")}')" class="ml-1 text-gray-400 hover:text-white text-[10px] underline">Copy</button>` : ''}</span></td>
+          <td class="py-3">₵${w.amount.toLocaleString()}</td><td class="py-3 capitalize">${w.plan || 'Referral'}</td><td class="py-3">${w.invested_amount ? '₵'+w.invested_amount.toLocaleString() : '-'}</td>
+          <td class="py-3 text-xs capitalize">${w.type || 'investment'}</td><td class="py-3">${w.paid ? '<span class="text-green-400">Yes</span>' : '<span class="text-red-400">No</span>'}</td>
+          <td class="py-3"><span class="status-${w.status}">${w.status}</span></td>
+          <td class="py-3 text-gray-400">${new Date(w.created_at).toLocaleString()}</td>
+          <td class="py-3">
+           <td class="py-3">
+  ${w.status === 'pending' ? `<button onclick="approveWithdrawal(${w.id})" class="bg-green-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-green-500 mr-1">Approve</button><button onclick="rejectWithdrawal(${w.id})" class="bg-red-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-red-500">Reject</button>` : ''}
+  ${w.status === 'approved' && !w.paid ? `<button onclick="markWithdrawalPaid(${w.id})" class="bg-blue-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-blue-500 mt-1">Mark Paid</button>` : ''}
+  ${w.status === 'paid' ? `<button onclick="markWithdrawalPending(${w.id})" class="bg-yellow-600 text-white rounded-lg px-3 py-1 text-xs hover:bg-yellow-500">Undo to Pending</button>` : ''}
+</td>
+        </tr>`).join('');
+    }
+
+    async function approveWithdrawal(id) {
+      if(!await customConfirm('Approve this payout?')) return;
+      const res = await fetch(`${API}/withdrawals/${id}`, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body:JSON.stringify({status:'approved'}) });
+      if(res.ok) { toast('Payout approved'); loadWithdrawals(); }
+      else { const data = await res.json(); toast(data.error || 'Failed','error'); }
+    }
+
+    async function rejectWithdrawal(id) {
+      if(!await customConfirm('Reject this payout?')) return;
+      const res = await fetch(`${API}/withdrawals/${id}`, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body:JSON.stringify({status:'rejected'}) });
+      if(res.ok) { toast('Payout rejected'); loadWithdrawals(); }
+      else { const data = await res.json(); toast(data.error || 'Failed','error'); }
+    }
+
+    async function markWithdrawalPaid(id) {
+      if(!await customConfirm('Mark this withdrawal as paid?')) return;
+      const res = await fetch(`${API}/withdrawals/${id}/paid`, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`} });
+      if(res.ok) { toast('Withdrawal marked as paid'); loadWithdrawals(); }
+      else { const data = await res.json(); toast(data.error || 'Failed','error'); }
+    }
+
+    async function markWithdrawalPending(id) {
+  if (!await customConfirm('Mark this withdrawal back to pending? This will not refund the user.')) return;
+  try {
+    const res = await fetch(`${API}/withdrawals/${id}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+      body: JSON.stringify({ status: 'pending' })
+    });
+    if (res.ok) {
+      toast('Withdrawal moved back to pending', 'success');
+      loadWithdrawals();
+    } else {
+      const data = await res.json();
+      toast(data.error || 'Failed', 'error');
+    }
+  } catch (err) { toast('Connection error', 'error'); }
+}
+
+    // ── Settings ──
+    async function loadSettings() {
+      try {
+        const res = await fetch(`${API}/settings`, { headers:{'Authorization':`Bearer ${token}`} });
+        const data = await res.json();
+        if(data.settings) {
+          document.getElementById('set-momo').value = data.settings.momo_number || '';
+          document.getElementById('set-momo-name').value = data.settings.momo_name || '';
+          document.getElementById('set-usdt').value = data.settings.usdt_address || '';
+          document.getElementById('set-btc').value = data.settings.btc_address || '';
+          document.getElementById('set-eth').value = data.settings.eth_address || '';
+          document.getElementById('set-note').value = data.settings.payment_note || '';
+          document.getElementById('set-referral-bonus').value = data.settings.referral_bonus || '5';
+          document.getElementById('set-referral-race-prize').value = data.settings.referral_race_prize || '₵20 airtime';
+          document.getElementById('set-investor-count').value = data.settings.investor_count || '500';
+        }
+      } catch(err) { toast('Failed to load settings','error'); }
+    }
+
+    document.getElementById('settings-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const updates = [
+        { key:'momo_number', value:document.getElementById('set-momo').value },
+        { key:'usdt_address', value:document.getElementById('set-usdt').value },
+        { key:'btc_address', value:document.getElementById('set-btc').value },
+        { key:'eth_address', value:document.getElementById('set-eth').value },
+        { key:'payment_note', value:document.getElementById('set-note').value },
+        { key:'momo_name', value:document.getElementById('set-momo-name').value },
+        { key:'referral_bonus', value:document.getElementById('set-referral-bonus').value },
+        { key:'referral_race_prize', value:document.getElementById('set-referral-race-prize').value },
+        { key:'investor_count', value: document.getElementById('set-investor-count').value }
+      ];
+      try {
+        for(let item of updates) {
+          await fetch(`${API}/settings/${item.key}`, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body:JSON.stringify({value:item.value}) });
+        }
+        toast('Settings saved!','success');
+      } catch(err) { toast('Failed to save settings','error'); }
+    });
+
+    async function postAnnouncement() {
+      const msg = document.getElementById('announcement-text').value.trim();
+      if(!msg) return toast('Enter a message','error');
+      try {
+        const res = await fetch(`${API}/announcements`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body:JSON.stringify({message:msg}) });
+        if(res.ok) { toast('Announcement published!'); document.getElementById('announcement-text').value = ''; }
+        else { const d = await res.json(); toast(d.error || 'Failed','error'); }
+      } catch(e) { toast('Connection error','error'); }
+    }
+
+    async function clearAnnouncements() {
+      if(!await customConfirm('Delete all expired announcements?')) return;
+      try { await fetch(`${API}/announcements`, { method:'DELETE', headers:{'Authorization':`Bearer ${token}`} }); toast('Expired announcements cleared.'); }
+      catch(e) { toast('Error','error'); }
+    }
+
+    // ── Password ──
+    function openPasswordModal() { document.getElementById('password-modal').classList.remove('hidden'); document.getElementById('password-modal').classList.add('flex'); }
+    function closePasswordModal() { document.getElementById('password-modal').classList.add('hidden'); document.getElementById('password-modal').classList.remove('flex'); }
+    document.getElementById('change-password-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const current = document.getElementById('current-password').value;
+      const newPass = document.getElementById('new-password').value;
+      try {
+        const res = await fetch(`${API}/change-password`, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}, body:JSON.stringify({currentPassword:current, newPassword:newPass}) });
+        const data = await res.json();
+        if(res.ok) { toast('Password updated!','success'); closePasswordModal(); }
+        else { toast(data.error || 'Failed','error'); }
+      } catch(err) { toast('Connection error','error'); }
+    });
+
+    // ── Chart ──
+    async function loadAdminChart() {
+      const res = await fetch(`${API}/dashboard-stats`, { headers:{'Authorization':`Bearer ${token}`} });
+      const data = await res.json();
+      const ctx = document.getElementById('admin-chart').getContext('2d');
+      if(adminChart) adminChart.destroy();
+      adminChart = new Chart(ctx, {
+        type:'line',
+        data:{
+          labels: data.days.map(d => d.slice(5)),
+          datasets:[
+            { label:'New Users', data:data.newUsers, borderColor:'#34d399', tension:0.3 },
+            { label:'Deposits', data:data.newDeposits, borderColor:'#D4A017', tension:0.3 },
+            { label:'Paid Payouts', data:data.newPayouts, borderColor:'#60a5fa', tension:0.3 }
+          ]
+        },
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
+      });
+    }
+
+    // ── CSV Export ──
+    function exportCSV(type) {
+      let data, headers, filename;
+      if(type==='users') {
+        headers = ['Name','Email','Phone','Referral','Admin','Joined'];
+        data = allUsers.map(u => [u.name, u.email, u.phone, u.referral_code||'', u.is_admin?'Yes':'No', new Date(u.created_at).toLocaleDateString()]);
+        filename = 'users.csv';
+      } else if(type==='investments') {
+        headers = ['User','Email','Amount','Plan','Method','TxID','Status','Date'];
+        data = allInvestments.map(i => [i.user_name, i.user_email, i.amount, i.plan, i.method, i.transaction_id||'', i.status, new Date(i.date).toLocaleDateString()]);
+        filename = 'investments.csv';
+      } else if(type==='withdrawals') {
+        headers = ['User','Email','Amount','Plan','Invested','Type','Paid','Status','Requested'];
+        data = allWithdrawals.map(w => [w.user_name, w.user_email, w.amount, w.plan||'Referral', w.invested_amount||'', w.type||'investment', w.paid?'Yes':'No', w.status, new Date(w.created_at).toLocaleDateString()]);
+        filename = 'withdrawals.csv';
+      }
+      let csv = headers.join(',') + '\n';
+      data.forEach(row => csv += row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',') + '\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+    }
+
+    // ── Portfolio Analyzer ──
+    async function loadPortfolioUsers() {
+      try {
+        // Fetch platform-wide summary
+        const summaryRes = await fetch(`${API}/portfolio-summary`, { headers: {'Authorization': `Bearer ${token}`} });
+        const summary = await summaryRes.json();
+        document.getElementById('pf-active-capital').textContent = '₵' + (summary.activeCapital || 0).toLocaleString();
+        document.getElementById('pf-expected-payout').textContent = '₵' + (summary.expectedPayout || 0).toLocaleString();
+        document.getElementById('pf-net-exposure').textContent = '₵' + (summary.netExposure || 0).toLocaleString();
+        document.getElementById('pf-total-paid').textContent = '₵' + (summary.totalPaid || 0).toLocaleString();
+        document.getElementById('pf-rolled-capital').textContent = '₵' + (summary.rolledCapital || 0).toLocaleString();
+        document.getElementById('pf-rolled-payout').textContent = '₵' + (summary.rolledPayout || 0).toLocaleString();
+        document.getElementById('pf-locked-balances').textContent = '₵' + (summary.totalLocked || 0).toLocaleString();
+
+        // Load cash flow data and summaries
+        loadCashflowData('all');
+        updateSummaries();
+
+        // Fetch user list
+        const usersRes = await fetch(`${API}/users`, { headers: {'Authorization': `Bearer ${token}`} });
+        const { users } = await usersRes.json();
+        allPortfolioUsers = users;
+        filterPortfolioUsers();
+      } catch (err) { toast('Failed to load portfolio data', 'error'); }
+    }
+
+    function filterPortfolioUsers() {
+      const term = document.getElementById('portfolio-user-search').value.toLowerCase().trim();
+      const filtered = term
+        ? allPortfolioUsers.filter(u => u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term))
+        : allPortfolioUsers;
+      document.getElementById('portfolio-users-table').innerHTML = filtered.map(u => `
+        <tr class="border-b border-white/5 hover:bg-white/5 cursor-pointer" onclick="showPortfolioDetail(${u.id})">
+          <td class="py-3">${safe(u.name)}<br><span class="text-xs text-gray-400">${safe(u.email)}</span></td>
+          <td class="py-3">—</td><td class="py-3">—</td><td class="py-3">—</td><td class="py-3">—</td><td class="py-3">—</td><td class="py-3">—</td>
+        </tr>`).join('');
+    }
+
+    async function showPortfolioDetail(userId) {
+      const res = await fetch(`${API}/user/${userId}/portfolio`, { headers:{'Authorization':`Bearer ${token}`} });
+      const data = await res.json();
+      if(!data.user) return toast('Failed to load portfolio','error');
+      document.getElementById('pf-detail-name').textContent = data.user.name + ' - Portfolio';
+      const s = data.summary;
+      document.getElementById('pf-detail-summary').innerHTML = `
+        <div class="glass rounded-lg p-3 text-center"><p class="text-gray-400 text-xs">Total Invested</p><p class="text-lg font-bold">₵${s.totalInvested.toLocaleString()}</p></div>
+        <div class="glass rounded-lg p-3 text-center"><p class="text-gray-400 text-xs">Total Withdrawn</p><p class="text-lg font-bold">₵${s.totalWithdrawn.toLocaleString()}</p></div>
+        <div class="glass rounded-lg p-3 text-center"><p class="text-gray-400 text-xs">Net Profit</p><p class="text-lg font-bold ${s.netProfit >= 0 ? 'text-green-400' : 'text-red-400'}">₵${s.netProfit.toLocaleString()}</p></div>
+        <div class="glass rounded-lg p-3 text-center"><p class="text-gray-400 text-xs">Active Capital</p><p class="text-lg font-bold">₵${s.activeCapital.toLocaleString()}</p></div>
+        <div class="glass rounded-lg p-3 text-center"><p class="text-gray-400 text-xs">Expected Payout</p><p class="text-lg font-bold">₵${s.expectedPayout.toLocaleString()}</p></div>
+      `;
+      document.getElementById('pf-investment-timeline').innerHTML = data.investments.map(inv => `
+        <tr class="border-b border-white/5">
+          <td class="py-2 capitalize">${inv.plan}</td><td class="py-2">₵${inv.amount.toLocaleString()}</td>
+          <td class="py-2">${new Date(inv.date).toLocaleDateString()}</td>
+<td class="py-2">${inv.status === 'active' 
+  ? `<span class="status-active">Active (${inv.daysLeft}d)</span>` 
+  : `<span class="badge ${
+      inv.status === 'pending' ? 'badge-warning' :
+      inv.status === 'rejected' ? 'badge-danger' :
+      inv.status === 'matured' ? 'badge-info' :
+      inv.status === 'reinvested' ? 'badge-info' : 'badge-info'
+    }">${inv.status}</span>`
+}</td>
+          <td class="py-2">${inv.maturedValue ? '₵'+inv.maturedValue.toLocaleString() : (inv.expectedValue ? '₵'+inv.expectedValue.toLocaleString()+' (proj.)' : '—')}</td>
+          <td class="py-2 ${inv.profit != null ? (inv.profit >= 0 ? 'text-green-400' : 'text-red-400') : ''}">${inv.profit != null ? '₵'+inv.profit.toLocaleString() : '—'}</td>
+        </tr>`).join('');
+      document.getElementById('pf-withdrawals-timeline').innerHTML = data.withdrawals.map(w => `
+        <tr class="border-b border-white/5">
+          <td class="py-2">₵${w.amount.toLocaleString()}</td><td class="py-2 capitalize">${w.type || 'investment'}</td>
+          <td class="py-2">${w.status}</td><td class="py-2">${new Date(w.created_at).toLocaleDateString()}</td>
+        </tr>`).join('');
+      drawCashFlowChart2(data);
+      document.getElementById('portfolio-modal').classList.remove('hidden'); document.getElementById('portfolio-modal').classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function drawCashFlowChart2(data) {
+      const ctx = document.getElementById('pf-cashflow-chart').getContext('2d');
+      if(cashFlowChart) cashFlowChart.destroy();
+      const sortedInv = [...data.investments].sort((a,b) => new Date(a.date)-new Date(b.date));
+      const sortedWdr = [...data.withdrawals].sort((a,b) => new Date(a.created_at)-new Date(b.created_at));
+      const dates = [...new Set([...sortedInv.map(i=>i.date), ...sortedWdr.map(w=>w.created_at)])].sort();
+      let cumInv = 0, cumWdr = 0;
+      const invSeries = [], wdrSeries = [];
+      dates.forEach(d => {
+        cumInv += sortedInv.filter(i=>i.date===d).reduce((s,i)=>s+i.amount,0);
+        cumWdr += sortedWdr.filter(w=>w.created_at===d && w.status==='paid').reduce((s,w)=>s+w.amount,0);
+        invSeries.push(cumInv); wdrSeries.push(cumWdr);
+      });
+      cashFlowChart = new Chart(ctx, {
+        type:'line',
+        data:{
+          labels: dates.map(d => new Date(d).toLocaleDateString()),
+          datasets:[
+            { label:'Cumulative Invested', data:invSeries, borderColor:'#fbbf24', tension:0.3 },
+            { label:'Cumulative Withdrawn', data:wdrSeries, borderColor:'#34d399', tension:0.3 }
+          ]
+        },
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
+      });
+    }
+
+    // ── Cash Flow Chart with period selector ──
+    async function loadCashflowData(period = 'all') {
+      currentCashflowPeriod = period;
+      document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`cf-${period}`).classList.add('active');
+
+      try {
+        const res = await fetch(`${API}/cashflow?period=${period}`, { headers: {'Authorization': `Bearer ${token}`} });
+        if (!res.ok) throw new Error('Failed to fetch cashflow');
+        const data = await res.json();
+        drawCashflowChart(data);
+      } catch (e) {
+        console.error('Cashflow load error:', e);
+      }
+    }
+
+    async function updateSummaries() {
+      try {
+        const [allRes, monthRes, todayRes] = await Promise.all([
+          fetch(`${API}/cashflow?period=all`, { headers: {'Authorization': `Bearer ${token}`} }),
+          fetch(`${API}/cashflow?period=month`, { headers: {'Authorization': `Bearer ${token}`} }),
+          fetch(`${API}/cashflow?period=today`, { headers: {'Authorization': `Bearer ${token}`} })
+        ]);
+
+        const allData = await allRes.json();
+        const monthData = await monthRes.json();
+        const todayData = await todayRes.json();
+
+        const allDeposits = allData.deposits.reduce((a,b) => a+b, 0);
+        const allPayouts = allData.payouts.reduce((a,b) => a+b, 0);
+        const monthDeposits = monthData.deposits.reduce((a,b) => a+b, 0);
+        const monthPayouts = monthData.payouts.reduce((a,b) => a+b, 0);
+        const todayDeposits = todayData.deposits.reduce((a,b) => a+b, 0);
+        const todayPayouts = todayData.payouts.reduce((a,b) => a+b, 0);
+
+        document.getElementById('sum-all-deposits').textContent = '₵' + allDeposits.toLocaleString();
+        document.getElementById('sum-all-payouts').textContent = 'Payouts: ₵' + allPayouts.toLocaleString();
+        document.getElementById('sum-all-net').innerHTML = `Net: <span class="${allDeposits - allPayouts >= 0 ? 'text-green-400' : 'text-red-400'}">₵${(allDeposits - allPayouts).toLocaleString()}</span>`;
+
+        document.getElementById('sum-month-deposits').textContent = '₵' + monthDeposits.toLocaleString();
+        document.getElementById('sum-month-payouts').textContent = 'Payouts: ₵' + monthPayouts.toLocaleString();
+        document.getElementById('sum-month-net').innerHTML = `Net: <span class="${monthDeposits - monthPayouts >= 0 ? 'text-green-400' : 'text-red-400'}">₵${(monthDeposits - monthPayouts).toLocaleString()}</span>`;
+
+        document.getElementById('sum-today-deposits').textContent = '₵' + todayDeposits.toLocaleString();
+        document.getElementById('sum-today-payouts').textContent = 'Payouts: ₵' + todayPayouts.toLocaleString();
+        document.getElementById('sum-today-net').innerHTML = `Net: <span class="${todayDeposits - todayPayouts >= 0 ? 'text-green-400' : 'text-red-400'}">₵${(todayDeposits - todayPayouts).toLocaleString()}</span>`;
+      } catch (e) { /* ignore */ }
+    }
+
+   function drawCashflowChart(data) {
+  const canvas = document.getElementById('cashflow-chart');
+  if (!canvas) {
+    console.error('Canvas #cashflow-chart not found');
+    return;
+  }
+  const ctx = canvas.getContext('2d');
+  if (cashflowChart) cashflowChart.destroy();
+
+  // Make sure all necessary controllers are registered (safety net)
+  if (typeof Chart !== 'undefined' && Chart.register) {
+    Chart.register(
+      Chart.BarController,
+      Chart.LineController,
+      Chart.CategoryScale,
+      Chart.LinearScale,
+      Chart.PointElement,
+      Chart.LineElement,
+      Chart.BarElement,
+      Chart.Filler,
+      Chart.Legend,
+      Chart.Tooltip
+    );
+  }
+
+  const netDaily = data.deposits.map((d, i) => d - data.payouts[i]);
+
+  cashflowChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.days.map(d => {
+        const date = new Date(d + 'T00:00:00');
+        return date.toLocaleDateString('en-GH', { month: 'short', day: 'numeric' });
+      }),
+      datasets: [
+        {
+          label: 'Deposits',
+          data: data.deposits,
+          backgroundColor: 'rgba(34, 197, 94, 0.6)',
+          borderColor: '#22c55e',
+          borderWidth: 1,
+          borderRadius: 4,
+          order: 2
+        },
+        {
+          label: 'Payouts',
+          data: data.payouts,
+          backgroundColor: 'rgba(239, 68, 68, 0.6)',
+          borderColor: '#ef4444',
+          borderWidth: 1,
+          borderRadius: 4,
+          order: 2
+        },
+        {
+          label: 'Net Flow',
+          data: netDaily,
+          type: 'line',
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59,130,246,0.1)',
+          borderWidth: 3,
+          tension: 0.3,
+          fill: true,
+          pointRadius: 2,
+          pointBackgroundColor: '#3b82f6',
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              return ctx.dataset.label + ': ₵' + ctx.raw.toLocaleString();
+            }
+          }
+        },
+        legend: {
+          labels: {
+            color: '#9ca3af',
+            usePointStyle: true,
+            pointStyle: 'circle'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#9ca3af' }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#9ca3af', maxTicksLimit: 8 }
+        }
+      }
+    }
+  });
+}
+
+    // ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  if(token) {
+    const gate = document.getElementById('gate-screen');
+    if (gate) gate.remove();
+    
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('dashboard-screen').classList.remove('hidden');
+    document.getElementById('dashboard-screen').classList.add('flex-grow');
+    loadDashboard();
+  }
+});
+  </script>
+</body>
+</html>
